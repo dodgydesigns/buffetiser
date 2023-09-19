@@ -30,8 +30,9 @@ logger.setLevel(logging.DEBUG)
 
 class History(Model):
     """
-    This will hold a lot of data about the performance of an Investment for each day. It will be used to
-    supplement the portfolio buy/sell data.
+    This will hold a lot of data about the performance of an
+    Investment for each day. It will be used to supplement the portfolio
+    buy/sell data.
     """
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
@@ -55,17 +56,17 @@ class History(Model):
     def use_big_charts(self):
         """
         Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
-        There is no official API so data is scraped from their website. Not sure if this breaks terms of use.
+        There is no official API so data is scraped from their website. Not sure if this
+        breaks terms of use.
         :param symbol: The investment symbol to fetch data for.
         :param todayString: The date for today.
         """
 
-        url = "https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=" + "au:{}+".format(
-            self.investment.symbol
-        )
+        url = "https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=" + \
+              "au:{}+".format(self.investment.symbol)
         page = requests.get(url)
         soup = BeautifulSoup(page.content, "html.parser")
-        lastPrice = soup.find("td", {"class": "last-col"}).text
+        last_price = soup.find("td", {"class": "last-col"}).text
         high = soup.find("td", {"class": "high-col"}).text
         low = soup.find("td", {"class": "low-col"}).text
         volume = soup.find("td", {"class": "volume-col"}).text
@@ -74,8 +75,8 @@ class History(Model):
         self.open = float(low)
         self.high = float(high)
         self.low = float(low)
-        self.close = float(lastPrice)
-        self.adjustedClose = float(lastPrice)
+        self.close = float(last_price)
+        self.adjustedClose = float(last_price)
         self.volume = int(volume.replace(",", ""))
 
     def print_stuff(self):

@@ -1,4 +1,4 @@
-from django.db.models import Model, IntegerField, CharField
+from django.db.models import Model, CharField
 
 
 class UserSettings(Model):

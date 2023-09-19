@@ -1,4 +1,5 @@
 
-django
-requests
-bs4
+django>=4.2
+djangorestframework>=3.13
+requests>=2.31
+beautifulsoup4>=4.12

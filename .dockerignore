@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+
+# docker
+.docker
+
+# Python
+buffetiser_api/__pycache__/
+buffetiser_api/*/__pycache__/
+buffetiser_api/*/*/__pycache__/
+buffetiser_api/*/*/*/__pycache__/
+.env/
+.venv/
+venv/

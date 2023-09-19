@@ -16,8 +16,8 @@ from config.constants import Constants
 
 class Investment(Model):
     """
-    This represents either Shares or Crypto-currency. There is only one of these of each type:platform:symbol
-    in the system.
+    This represents either Shares or Crypto-currency. There is only one of these
+    of each type:platform:symbol in the system.
     Each one of these however, can have multiple purchases and sales.
     """
 
