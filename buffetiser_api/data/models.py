@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import logging
 from django.utils import timezone
 import requests
 from bs4 import BeautifulSoup
@@ -14,18 +13,6 @@ from django.db.models import (
 )
 
 from core.models import Investment
-
-# Create and configure logger
-logging.basicConfig(
-    filename="debug.log",
-    # format='%(asctime)s %(message)s',
-    format="--------useBigCharts----------%(message)s",
-    filemode="w",
-)
-# Creating an object
-logger = logging.getLogger()
-# Setting the threshold of logger to DEBUG
-logger.setLevel(logging.DEBUG)
 
 
 class History(Model):
