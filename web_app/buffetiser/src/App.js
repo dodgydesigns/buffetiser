@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import Header from "./components/dashboard/Header"
 import InvestmentPanel from "./components/investment/Investment_panel"
 import InvestmentList from "./components/dashboard/InvestmentList"

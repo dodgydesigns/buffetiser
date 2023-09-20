@@ -1,6 +1,6 @@
-import { useState } from "react"
+import React, { useState } from "react"
 
-function InvestmentPanel()//symbol, investment_name, units, price_per_unit, fee) {
+function InvestmentPanel() {//symbol, investment_name, units, price_per_unit, fee) {
   /* Add private to this */
   const [symbol, setSymbol] = useState("ASX")
   const [investment_name, setInvestmentName] = useState("Aust.. Securities Exchange")
@@ -28,5 +28,6 @@ function InvestmentPanel()//symbol, investment_name, units, price_per_unit, fee)
       </table>
     </>
   )
+  }
 
 export default InvestmentPanel
