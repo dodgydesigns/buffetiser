@@ -12,7 +12,8 @@ ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip
 RUN /py/bin/pip install "psycopg[binary,pool]" && \
-    /py/bin/pip install psycopg2-binary drf_spectacular
+    /py/bin/pip install psycopg2-binary
+RUN /py/bin/pip install drf_spectacular
 # RUN apk add --update --no-cache postgresql-client && \
 #     apk add --update --no-cache --virtual .tmp-build-deps \
 #     build-base postgresql-dev musl-dev
