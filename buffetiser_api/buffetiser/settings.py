@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "help",
     "report",
     "security",
+    "rest_framework",
+    "drf-spectacular",
 ]
 
 MIDDLEWARE = [
@@ -131,3 +133,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "core.User"
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf-spectacular.openapi.AutoSchema",
+}
