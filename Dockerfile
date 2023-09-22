@@ -12,7 +12,7 @@ ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip
 RUN /py/bin/pip install "psycopg[binary,pool]" && \
-    /py/bin/pip install psycopg2-binary
+    /py/bin/pip install psycopg2-binary, drf_spectacular
 # RUN apk add --update --no-cache postgresql-client && \
 #     apk add --update --no-cache --virtual .tmp-build-deps \
 #     build-base postgresql-dev musl-dev
@@ -24,7 +24,7 @@ RUN /py/bin/pip install -r requirements.txt && \
 RUN adduser \
     --disabled-password \
     --no-create-home \
-    django-user 
+    django-user
 
 ENV PATH="/py/bin:$PATH"
 

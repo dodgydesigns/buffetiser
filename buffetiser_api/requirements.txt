@@ -4,4 +4,4 @@ djangorestframework>=3.13
 requests>=2.31
 beautifulsoup4>=4.12
 # psycopg>=3 // Easier to use pip install "psycopg[binary,pool]" in Dockerfile for deps
-drf_spectacular
+# drf_spectacular
