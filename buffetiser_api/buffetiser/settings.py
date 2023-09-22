@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "report",
     "security",
     "rest_framework",
-    "drf-spectacular",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
