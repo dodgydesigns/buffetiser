@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "data",
     "help",
     "report",
-    "security",
+    "user",
     "rest_framework",
     "drf_spectacular",
 ]
