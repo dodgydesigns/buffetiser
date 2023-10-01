@@ -209,7 +209,9 @@ class Purchase(models.Model):
     The basis of an Investment. Most Investment details are held here.
     """
 
-    investment = models.ForeignKey(to=Investment, related_name="purchases", on_delete=models.CASCADE)
+    investment = models.ForeignKey(to=Investment,
+                                   related_name="purchases",
+                                   on_delete=models.CASCADE)
 
     platform = models.CharField(
         choices=Constants.Platforms.choices,
@@ -236,7 +238,9 @@ class Sale(models.Model):
     Remove investment and update all values.
     """
 
-    investment = models.ForeignKey(to=Investment, related_name="sales", on_delete=models.CASCADE)
+    investment = models.ForeignKey(to=Investment,
+                                   related_name="sales",
+                                   on_delete=models.CASCADE)
 
     units = models.IntegerField()
     price_per_unit = models.IntegerField()
