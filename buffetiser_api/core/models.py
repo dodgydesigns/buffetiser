@@ -10,6 +10,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
+from django.db.models import Sum
 
 from core.constants import Constants
 
@@ -79,134 +80,92 @@ class Investment(models.Model):
 
         return self.purchases.all()
 
-    # @property
-    # def all_sales(self):
-    #     """Get all the sales for this investment via reverse."""
+    @property
+    def all_sales(self):
+        """Get all the sales for this investment via reverse."""
 
-    #     return self.sales.all()
+        return self.sales.all()
 
-    # unitsHeld=CALC
-    # totalFees=CALC
-    # averageCost=CALC
-    # totalCost=CALC
-    # totalValue=CALC
-    # profit=CALC
-    # percentProfit=CALC
-    # plotPath=CALC
+    @property
+    def total_units_purchased(self):
+        """
+        The sum of all units purchased.
+        """
+        total_units_purchased = self.all_purchases.aggregate(Sum('units')).get("units__sum")
 
+        return total_units_purchased
 
-#     def add_purchase(self, purchase) -> None:
-#         date_time = datetime.now()
-#         self.price_history[str(date_time)] = purchase.price_per_unit
-#         self.value_history[str(date_time)] = self.total_value + (
-#             purchase.price_per_unit * purchase.units
-#         )
-#         self.type = purchase.investment_type
-#         self.save()
+    @property
+    def total_units_sold(self):
+        """
+        The sum of all units sold units.
+        """
+        total_units_sold = self.all_sales.aggregate(Sum('units')).get("units__sum")
 
-#     def add_sale(self, sale) -> bool:
-#         # modify bank_balance ???
+        return total_units_sold
 
-#         if self.total_units < sale.units:
-#             raise Exception(
-#                 f"Only {self.total_units} units of {self.name} ({self.symbol}) are held."
-#             )
+    @property
+    def total_units_held(self):
+        """
+        The sum of all units purchased minus all units sold.
+        """
 
-#         date_time = datetime.now()
-#         self.value_history[str(date_time)] = self.total_value - (
-#             sale.price_per_unit * sale.units
-#         )
-#         self.save()
-#         return True
+        return self.total_units_purchased - self.total_units_sold
 
-#     @staticmethod
-#     def generate_key(exchange, symbol):
-#         return f"{exchange}-{symbol}"
+    @property
+    def total_cost_excluding_fees(self) -> float:
+        """
+        The sum of the cost each purchase made excluding fees.
+        """
+        total_cost = sum(purchase.price_per_unit * purchase.units for purchase in self.all_purchases)
 
-#     @property
-#     def total_units(self) -> Union[int, float]:
-#         """
-#         The sum of all units purchased minus sold units.
-#         """
-#         total_units = 0
-#         purchases = Purchase.objects.filter(investment=self)
-#         for purchase in purchases:
-#             total_units += purchase.units
+        return total_cost
 
-#         sales = Sale.objects.filter(investment=self)
-#         for sale in sales:
-#             total_units -= sale.units
+    @property
+    def total_yield_excluding_fees(self) -> float:
+        """
+        The sum of the income for each sale made excluding fees.
+        """
+        total_yield = sum(sale.price_per_unit * sale.units for sale in self.all_sales)
 
-#         if self.type == Constants.InvestmentType.SHARES:
-#             return int(total_units)
-#         else:
-#             return total_units
+        return total_yield
 
-#     @property
-#     def total_cost_excluding_fees(self) -> float:
-#         """
-#         The sum of the cost each purchase made excluding fees.
-#         """
-#         total_cost = 0
-#         purchases = Purchase.objects.filter(investment=self)
-#         for purchase in purchases:
-#             total_cost += purchase.price_per_unit * purchase.units
+    @property
+    def total_fees(self) -> float:
+        """
+        The sum of the fees for each purchase.
+        """
+        total_fees = sum(purchase.fees for purchase in self.all_purchases)
+        total_fees += sum(sale.fees for sale in self.all_sales)
 
-#         sales = Sale.objects.filter(investment=self)
-#         for sale in sales:
-#             total_cost -= sale.price_per_unit * sale.units
+        return total_fees
 
-#         return total_cost + self.total_fees
+    @property
+    def average_cost_excluding_fees(self) -> float:
+        """
+        The average cost over all purchases excluding fees.
+        """
+        return self.total_cost_excluding_fees / self.total_units_purchased
 
-#     @property
-#     def average_cost_excluding_fees(self) -> float:
-#         """
-#         The sum of each purchase made.
-#         """
-#         return self.total_cost_excluding_fees / self.total_units
+    @property
+    def total_current_value(self) -> float:
+        """
+        The current value of all units held.
+        """
+        return self.total_units_held * self.live_price
 
-#     @property
-#     def total_value(self) -> float:
-#         """
-#         The current value of all units held.
-#         """
-#         return self.total_units * self.live_price
-
-#     @property
-#     def total_fees(self) -> float:
-#         """
-#         The sum of the fees for each purchase.
-#         """
-#         total_fees = 0
-#         purchases = Purchase.objects.filter(investment=self)
-#         for purchase in purchases:
-#             total_fees += purchase.fee
-
-#         sales = Sale.objects.filter(investment=self)
-#         for sale in sales:
-#             total_fees += sale.fee
-
-#         return total_fees
-
-#     @property
-#     def daily_gain(self) -> float:
-#         """
-#         The profit or loss for current day.
-#         """
-#         # Use history
-#         pass
-
-#     @property
-#     def total_profit(self) -> float:
-#         """
-#         The current value of all units held minus all costs.
-#         """
-#         return self.total_value - self.total_cost_excluding_fees - self.total_fees
+    @property
+    def total_profit(self) -> float:
+        """
+        The current value of all units held minus all costs.
+        """
+        return self.total_current_value - self.total_cost_excluding_fees - self.total_fees
 
 
 class Purchase(models.Model):
     """
-    The basis of an Investment. Most Investment details are held here.
+    Each purchase is related to a specific investment and provides info to its
+    Investment object.
     """
 
     investment = models.ForeignKey(to=Investment,
@@ -244,11 +203,51 @@ class Sale(models.Model):
 
     units = models.IntegerField()
     price_per_unit = models.IntegerField()
-    fee = models.IntegerField()
+    fees = models.IntegerField()
     date = models.DateField(default=django.utils.timezone.now)
 
     def __str__(self) -> str:
         return f"Sold {self.units} at ${self.price_per_unit}"
+
+
+#     def add_sale(self, sale) -> bool:
+#         # modify bank_balance ???
+
+#         if self.total_units < sale.units:
+#             raise Exception(
+#                 f"Only {self.total_units} units of {self.name} ({self.symbol}) are held."
+#             )
+
+#         date_time = datetime.now()
+#         self.value_history[str(date_time)] = self.total_value - (
+#             sale.price_per_unit * sale.units
+#         )
+#         self.save()
+#         return True
+
+#     @staticmethod
+#     def generate_key(exchange, symbol):
+#         return f"{exchange}-{symbol}"
+
+
+#     def add_purchase(self, purchase) -> None:
+#         date_time = datetime.now()
+#         self.price_history[str(date_time)] = purchase.price_per_unit
+#         self.value_history[str(date_time)] = self.total_value + (
+#             purchase.price_per_unit * purchase.units
+#         )
+#         self.type = purchase.investment_type
+#         self.save()
+
+
+#     @property
+#     def daily_gain(self) -> float:
+#         """
+#         The profit or loss for current day.
+#         """
+#         # Use history
+#         pass
+
 
 # class Financials(Model):
 #     """

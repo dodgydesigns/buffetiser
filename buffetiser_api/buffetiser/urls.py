@@ -30,5 +30,5 @@ urlpatterns = [
     path("config/", include("config.urls")),
     path("help/", include("help.urls")),
     path("report/", include("report.urls")),
-    path("security/", include("security.urls")),
+    path("investment/", include("investment.urls")),
 ]

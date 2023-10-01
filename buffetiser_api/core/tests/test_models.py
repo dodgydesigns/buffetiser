@@ -72,7 +72,7 @@ class ModelTests(TestCase):
             investment_type=Constants.InvestmentType.SHARES,
             name="Megaport",
             symbol="MP1",
-            live_price=1678,
+            live_price=2000,
         )
 
         purchase = models.Purchase.objects.create(
@@ -81,17 +81,47 @@ class ModelTests(TestCase):
             currency="AUD",
             exchange=Constants.Exchanges.XASX,
             units=10,
-            fees=11,
-            price_per_unit=1678,
+            fees=5000,
+            price_per_unit=5000,
+        )
+
+        purchase2 = models.Purchase.objects.create(
+            investment=investment,
+            platform=Constants.Platforms.CMC,
+            currency="AUD",
+            exchange=Constants.Exchanges.XASX,
+            units=10,
+            fees=5000,
+            price_per_unit=10000,
         )
 
         sale = models.Sale.objects.create(
             investment=investment,
-            units=10,
-            price_per_unit=2000,
-            fee=11
+            units=5,
+            price_per_unit=20000,
+            fees=5000,
         )
 
         self.assertEqual(investment.user, user)
         self.assertEqual(purchase.investment.name, "Megaport")
+        self.assertEqual(purchase2.investment.name, "Megaport")
         self.assertEqual(sale.investment.name, "Megaport")
+
+        self.assertEqual(investment.total_units_purchased, 20)
+        self.assertEqual(investment.total_units_sold, 5)
+        self.assertEqual(investment.total_units_held, 15)
+        self.assertEqual(investment.total_cost_excluding_fees, 150000)
+        self.assertEqual(investment.total_yield_excluding_fees, 100000)
+        self.assertEqual(investment.total_fees, 15000)
+        self.assertEqual(investment.average_cost_excluding_fees, 7500)
+        self.assertEqual(investment.total_current_value, 30000)
+        self.assertEqual(investment.total_profit, -135000)
+
+        print("-------------------------------------------")
+        print("total_units", investment.total_units_held)
+        print("total_cost_excluding_fees", investment.total_cost_excluding_fees)
+        print("total_fees", investment.total_fees)
+        print("average_cost_excluding_fees", investment.average_cost_excluding_fees)
+        print("total_value", investment.total_current_value)
+        print("total_profit", investment.total_profit)
+        print("-------------------------------------------")
