@@ -117,7 +117,8 @@ class Investment(models.Model):
         """
         The sum of the cost each purchase made excluding fees.
         """
-        total_cost = sum(purchase.price_per_unit * purchase.units for purchase in self.all_purchases)
+        total_cost = sum(purchase.price_per_unit * purchase.units for
+                         purchase in self.all_purchases)
 
         return total_cost
 
