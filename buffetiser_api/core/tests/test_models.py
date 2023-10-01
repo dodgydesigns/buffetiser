@@ -6,6 +6,9 @@ Tests for Models.
 from unittest import TestCase
 from django.contrib.auth import get_user_model
 
+from core import models
+from core.constants import Constants
+
 
 class ModelTests(TestCase):
     """Test core models."""
@@ -55,3 +58,40 @@ class ModelTests(TestCase):
         self.assertTrue(user.is_staff)
 
         user.delete()
+
+    def test_create_investment_via_purchase(self):
+        """Test creating a new investment is successful."""
+
+        user = get_user_model().objects.create_user(
+            "test2@example.com",
+            "testpass123",
+        )
+
+        investment = models.Investment.objects.create(
+            user=user,
+            investment_type=Constants.InvestmentType.SHARES,
+            name="Megaport",
+            symbol="MP1",
+            live_price=1678,
+        )
+
+        purchase = models.Purchase.objects.create(
+            investment=investment,
+            platform=Constants.Platforms.CMC,
+            currency="AUD",
+            exchange=Constants.Exchanges.XASX,
+            units=10,
+            fees=11,
+            price_per_unit=1678,
+        )
+
+        sale = models.Sale.objects.create(
+            investment=investment,
+            units=10,
+            price_per_unit=2000,
+            fee=11
+        )
+
+        self.assertEqual(investment.user, user)
+        self.assertEqual(purchase.investment.name, "Megaport")
+        self.assertEqual(sale.investment.name, "Megaport")

@@ -2,16 +2,16 @@
 
 """
 
-
-# from datetime import datetime
-# from typing import Union
-
+import django
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
+
+from core.constants import Constants
 
 
 class UserManager(BaseUserManager):
@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password):
-        """Creat and return a new superuser."""
+        """Create and return a new superuser."""
 
         user = self.create_user(email, password)
         user.is_staff = True
@@ -52,34 +52,48 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
 
 
-# from config.constants import Constants
+class Investment(models.Model):
+    """
+    This represents either Shares or Crypto-currency. There is only one of
+    these for each type:platform:symbol in the system.
+    Each one however, can have multiple purchases and sales.
+    """
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=32)
+    symbol = models.CharField(max_length=32)
+    investment_type = models.CharField(
+        choices=Constants.InvestmentType.choices,
+        max_length=16,
+        default=Constants.InvestmentType.SHARES,
+        null=False,
+    )
+    live_price = models.IntegerField(default=0)
 
-# class Investment(Model):
-#     """
-#     This represents either Shares or Crypto-currency. There is only one of
-#     these for each type:platform:symbol in the system.
-#     Each one however, can have multiple purchases and sales.
-#     """
+    def __str__(self) -> str:
+        return self.name + (self.symbol)
 
-#     # key will be purchase/sale exchange-symbol
-#     key = CharField(max_length=32, primary_key=True, default=None)
-#     name = CharField(max_length=32, default=None, null=True)
-#     symbol = CharField(max_length=32, default=None, null=True)
-#     type = CharField(
-#         choices=Constants.InvestmentType.choices,
-#         max_length=16,
-#         default=Constants.InvestmentType.SHARES,
-#         null=False,
-#     )
-#     live_price = FloatField(default=0)
-#     price_history = JSONField(null=True)
-#     # This will include all purchases and sales as well as price history
-#     value_history = JSONField(null=True)
-#     # might be able to get rid of this and live draw from history
-#     plot_path = CharField(
-#         max_length=512, default="./"
-#     )  # hold the path of the last history plot.
+    @property
+    def all_purchases(self):
+        """Get all the purchases for this investment via reverse."""
+
+        return self.purchases.all()
+
+    # @property
+    # def all_sales(self):
+    #     """Get all the sales for this investment via reverse."""
+
+    #     return self.sales.all()
+
+    # unitsHeld=CALC
+    # totalFees=CALC
+    # averageCost=CALC
+    # totalCost=CALC
+    # totalValue=CALC
+    # profit=CALC
+    # percentProfit=CALC
+    # plotPath=CALC
+
 
 #     def add_purchase(self, purchase) -> None:
 #         date_time = datetime.now()
@@ -190,53 +204,47 @@ class User(AbstractBaseUser, PermissionsMixin):
 #         return self.total_value - self.total_cost_excluding_fees - self.total_fees
 
 
-# class Purchase(Model):
-#     """
-#     The basis of an Investment. Most Investment details are held here.
-#     """
+class Purchase(models.Model):
+    """
+    The basis of an Investment. Most Investment details are held here.
+    """
 
-#     investment = ForeignKey(to=Investment, on_delete=CASCADE)
-#     symbol = CharField(max_length=5)
+    investment = models.ForeignKey(to=Investment, related_name="purchases", on_delete=models.CASCADE)
 
-#     investment_type = CharField(
-#         null=False,
-#         choices=Constants.InvestmentType.choices,
-#         max_length=16,
-#         default=Constants.InvestmentType.SHARES,
-#     )
-#     investment_name = CharField(null=False, max_length=128, default="unnamed")
-#     currency = CharField(max_length=5, default="AUD")
-#     exchange = CharField(
-#         choices=Constants.Exchanges.choices,
-#         max_length=4,
-#         default=Constants.Exchanges.XASX,
-#     )
-#     platform = CharField(
-#         choices=Constants.Platforms.choices,
-#         max_length=128,
-#         default=Constants.Platforms.CMC,
-#     )
-#     units = FloatField()
-#     price_per_unit = FloatField()
-#     fee = FloatField()
-#     date_time = DateTimeField(auto_now=True)
+    platform = models.CharField(
+        choices=Constants.Platforms.choices,
+        max_length=128,
+        default=Constants.Platforms.CMC,
+    )
+    currency = models.CharField(max_length=5, default="AUD")
+    exchange = models.CharField(
+        choices=Constants.Exchanges.choices,
+        max_length=4,
+        default=Constants.Exchanges.XASX,
+    )
+    units = models.IntegerField()
+    fees = models.IntegerField()
+    price_per_unit = models.IntegerField()
+    date_time = models.DateTimeField(default=django.utils.timezone.now)
 
-#     class Meta:
-#         unique_together = ("exchange", "symbol", "date_time")
+    def __str__(self) -> str:
+        return f"Purchased {self.units} at ${self.price_per_unit}"
 
 
-# class Sale(Model):
-#     """
-#     Remove shares and update all values.
-#     """
+class Sale(models.Model):
+    """
+    Remove investment and update all values.
+    """
 
-#     investment = ForeignKey(to=Investment, on_delete=CASCADE)
+    investment = models.ForeignKey(to=Investment, related_name="sales", on_delete=models.CASCADE)
 
-#     units = FloatField()
-#     price_per_unit = FloatField()
-#     fee = FloatField()
-#     date = DateField(auto_now=True)
+    units = models.IntegerField()
+    price_per_unit = models.IntegerField()
+    fee = models.IntegerField()
+    date = models.DateField(default=django.utils.timezone.now)
 
+    def __str__(self) -> str:
+        return f"Sold {self.units} at ${self.price_per_unit}"
 
 # class Financials(Model):
 #     """
