@@ -169,10 +169,10 @@ class Purchase(models.Model):
     Investment object.
     """
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     investment = models.ForeignKey(to=Investment,
                                    related_name="purchases",
                                    on_delete=models.CASCADE)
-
     platform = models.CharField(
         choices=Constants.Platforms.choices,
         max_length=128,
@@ -190,7 +190,7 @@ class Purchase(models.Model):
     date_time = models.DateTimeField(default=django.utils.timezone.now)
 
     def __str__(self) -> str:
-        return f"Purchased {self.units} at ${self.price_per_unit}"
+        return f"{self.user} purchased {self.units} {self.investment.symbol} at ${self.price_per_unit}"
 
 
 class Sale(models.Model):
@@ -198,17 +198,17 @@ class Sale(models.Model):
     Remove investment and update all values.
     """
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     investment = models.ForeignKey(to=Investment,
                                    related_name="sales",
                                    on_delete=models.CASCADE)
-
     units = models.IntegerField()
     price_per_unit = models.IntegerField()
     fees = models.IntegerField()
-    date = models.DateField(default=django.utils.timezone.now)
+    date_time = models.DateField(default=django.utils.timezone.now)
 
     def __str__(self) -> str:
-        return f"Sold {self.units} at ${self.price_per_unit}"
+        return f"{self.user} sold {self.units} {self.investment.symbol} at ${self.price_per_unit}"
 
 
 #     def add_sale(self, sale) -> bool:
