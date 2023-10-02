@@ -190,7 +190,8 @@ class Purchase(models.Model):
     date_time = models.DateTimeField(default=django.utils.timezone.now)
 
     def __str__(self) -> str:
-        return f"{self.user} purchased {self.units} {self.investment.symbol} at ${self.price_per_unit}"
+        return f"{self.user} purchased {self.units} {self.investment.symbol} \
+            at ${self.price_per_unit}"
 
 
 class Sale(models.Model):

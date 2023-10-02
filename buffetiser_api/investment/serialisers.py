@@ -20,7 +20,8 @@ class PurchaseSerialiser(InvestmentSerialiser):
 
     class Meta(InvestmentSerialiser.Meta):
         model = Purchase
-        fields = ["investment", "units", "fees", "price_per_unit", "date_time", "platform", "currency", "exchange"]
+        fields = ["investment", "units", "fees", "price_per_unit",
+                  "date_time", "platform", "currency", "exchange"]
 
 
 class SaleSerialiser(InvestmentSerialiser):
