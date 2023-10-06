@@ -5,7 +5,7 @@ Views for the Investment APIs.
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from core.models import Investment, Purchase, Sale
+from core.models import History, Investment, Purchase, Sale
 
 from investment import serialisers
 
@@ -63,5 +63,24 @@ class SaleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Create a new Investment and make sure correct user is assigned."""
+
+        serializer.save(user=self.request.user)
+
+
+class HistoryViewSet(viewsets.ModelViewSet):
+    """View for managing Sale APIs."""
+
+    serializer_class = serialisers.HistorySerialiser
+    queryset = History.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Get History for authenticated user."""
+
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Create a new History entry and make sure correct user is assigned."""
 
         serializer.save(user=self.request.user)

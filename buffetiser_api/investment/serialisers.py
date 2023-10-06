@@ -3,7 +3,7 @@ Serialiser for the APIs.
 """
 from rest_framework import serializers
 
-from core.models import Investment, Purchase, Sale
+from core.models import History, Investment, Purchase, Sale
 
 
 class InvestmentSerialiser(serializers.ModelSerializer):
@@ -20,8 +20,16 @@ class PurchaseSerialiser(InvestmentSerialiser):
 
     class Meta(InvestmentSerialiser.Meta):
         model = Purchase
-        fields = ["investment", "units", "fees", "price_per_unit",
-                  "date_time", "platform", "currency", "exchange"]
+        fields = [
+            "investment",
+            "units",
+            "fees",
+            "price_per_unit",
+            "date_time",
+            "platform",
+            "currency",
+            "exchange",
+        ]
 
 
 class SaleSerialiser(InvestmentSerialiser):
@@ -30,3 +38,11 @@ class SaleSerialiser(InvestmentSerialiser):
     class Meta(InvestmentSerialiser.Meta):
         model = Sale
         fields = ["investment", "units", "fees", "price_per_unit", "date_time"]
+
+
+class HistorySerialiser(InvestmentSerialiser):
+    """Serialiser for History."""
+
+    class Meta(InvestmentSerialiser.Meta):
+        model = History
+        fields = ["investment", "date", "open", "high", "low", "close", "volume"]

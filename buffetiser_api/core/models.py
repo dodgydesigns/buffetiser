@@ -2,6 +2,8 @@
 
 """
 
+from datetime import datetime, timedelta, timezone
+from bs4 import BeautifulSoup
 import django
 from django.conf import settings
 from django.db import models
@@ -11,6 +13,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db.models import Sum
+import requests
 
 from core.constants import Constants
 
@@ -72,7 +75,13 @@ class Investment(models.Model):
     live_price = models.IntegerField(default=0)
 
     def __str__(self) -> str:
-        return self.name + (self.symbol)
+        return f"{self.name} ({self.symbol})"
+
+    class Meta:
+        unique_together = [
+            "user",
+            "name",
+        ]
 
     @property
     def all_purchases(self):
@@ -91,7 +100,9 @@ class Investment(models.Model):
         """
         The sum of all units purchased.
         """
-        total_units_purchased = self.all_purchases.aggregate(Sum('units')).get("units__sum")
+        total_units_purchased = self.all_purchases.aggregate(Sum("units")).get(
+            "units__sum"
+        )
 
         return total_units_purchased
 
@@ -100,7 +111,7 @@ class Investment(models.Model):
         """
         The sum of all units sold units.
         """
-        total_units_sold = self.all_sales.aggregate(Sum('units')).get("units__sum")
+        total_units_sold = self.all_sales.aggregate(Sum("units")).get("units__sum")
 
         return total_units_sold
 
@@ -117,8 +128,9 @@ class Investment(models.Model):
         """
         The sum of the cost each purchase made excluding fees.
         """
-        total_cost = sum(purchase.price_per_unit * purchase.units for
-                         purchase in self.all_purchases)
+        total_cost = sum(
+            purchase.price_per_unit * purchase.units for purchase in self.all_purchases
+        )
 
         return total_cost
 
@@ -160,7 +172,25 @@ class Investment(models.Model):
         """
         The current value of all units held minus all costs.
         """
-        return self.total_current_value - self.total_cost_excluding_fees - self.total_fees
+        return (
+            self.total_current_value - self.total_cost_excluding_fees - self.total_fees
+        )
+
+    @property
+    def daily_gain(self) -> float:
+        """
+        The profit or loss for an Investment for the current day.
+        """
+        # Use history
+        pass
+
+    @property
+    def portfolio_daily_gain(self) -> float:
+        """
+        The profit or loss for an Investment for the current day.
+        """
+        # Use history - where does this belong?
+        pass
 
 
 class Purchase(models.Model):
@@ -170,9 +200,9 @@ class Purchase(models.Model):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    investment = models.ForeignKey(to=Investment,
-                                   related_name="purchases",
-                                   on_delete=models.CASCADE)
+    investment = models.ForeignKey(
+        to=Investment, related_name="purchases", on_delete=models.CASCADE
+    )
     platform = models.CharField(
         choices=Constants.Platforms.choices,
         max_length=128,
@@ -189,6 +219,13 @@ class Purchase(models.Model):
     price_per_unit = models.IntegerField()
     date_time = models.DateTimeField(default=django.utils.timezone.now)
 
+    class Meta:
+        unique_together = [
+            "user",
+            "investment",
+            "date_time",
+        ]
+
     def __str__(self) -> str:
         return f"{self.user} purchased {self.units} {self.investment.symbol} \
             at ${self.price_per_unit}"
@@ -200,55 +237,98 @@ class Sale(models.Model):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    investment = models.ForeignKey(to=Investment,
-                                   related_name="sales",
-                                   on_delete=models.CASCADE)
+    investment = models.ForeignKey(
+        to=Investment, related_name="sales", on_delete=models.CASCADE
+    )
     units = models.IntegerField()
     price_per_unit = models.IntegerField()
     fees = models.IntegerField()
     date_time = models.DateField(default=django.utils.timezone.now)
 
+    class Meta:
+        unique_together = [
+            "user",
+            "investment",
+            "date_time",
+        ]
+
     def __str__(self) -> str:
         return f"{self.user} sold {self.units} {self.investment.symbol} at ${self.price_per_unit}"
 
 
-#     def add_sale(self, sale) -> bool:
-#         # modify bank_balance ???
+class History(models.Model):
+    """
+    This will hold a lot of data about the performance of an Investment for each day. It will be used to
+    supplement the investment buy/sell data and update current values e.g. current price.
+    """
 
-#         if self.total_units < sale.units:
-#             raise Exception(
-#                 f"Only {self.total_units} units of {self.name} ({self.symbol}) are held."
-#             )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    investment = models.ForeignKey(to=Investment, on_delete=models.CASCADE)
+    # The date this history object was updated. Prevent hitting the source too often.
+    date = models.DateTimeField(default=django.utils.timezone.now)
+    open = models.IntegerField(default=0)
+    high = models.IntegerField(default=0)
+    low = models.IntegerField(default=0)
+    close = models.IntegerField(default=0)
+    volume = models.IntegerField(default=0)
 
-#         date_time = datetime.now()
-#         self.value_history[str(date_time)] = self.total_value - (
-#             sale.price_per_unit * sale.units
-#         )
-#         self.save()
-#         return True
+    class Meta:
+        unique_together = [
+            "user",
+            "investment",
+            "date",
+        ]
 
-#     @staticmethod
-#     def generate_key(exchange, symbol):
-#         return f"{exchange}-{symbol}"
+    def __str__(self) -> str:
+        return f"{self.investment.symbol} - {self.date}: {self.close}"
 
-
-#     def add_purchase(self, purchase) -> None:
-#         date_time = datetime.now()
-#         self.price_history[str(date_time)] = purchase.price_per_unit
-#         self.value_history[str(date_time)] = self.total_value + (
-#             purchase.price_per_unit * purchase.units
-#         )
-#         self.type = purchase.investment_type
-#         self.save()
+    # def update_history(self):
+    #     """ """
+    #     if timezone.now() - self.date >= timedelta(days=1):
+    #         print("ggooooooooood")
+    #     else:
+    #         print("baaaaaad")
+    # self.use_big_charts()
+    # self.save()
 
 
-#     @property
-#     def daily_gain(self) -> float:
+#     def use_big_charts(self):
 #         """
-#         The profit or loss for current day.
+#         Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
+#         There is no official API so data is scraped from their website. Not sure if this breaks terms of use.
+#         :param symbol: The investment symbol to fetch data for.
+#         :param todayString: The date for today.
 #         """
-#         # Use history
-#         pass
+
+#         url = (
+#             "https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb="
+#             + "au:{}+".format(self.investment.symbol)
+#         )
+#         page = requests.get(url)
+#         soup = BeautifulSoup(page.content, "html.parser")
+#         lastPrice = soup.find("td", {"class": "last-col"}).text
+#         high = soup.find("td", {"class": "high-col"}).text
+#         low = soup.find("td", {"class": "low-col"}).text
+#         volume = soup.find("td", {"class": "volume-col"}).text
+
+#         self.date = datetime.now()
+#         self.open = float(low)
+#         self.high = float(high)
+#         self.low = float(low)
+#         self.close = float(lastPrice)
+#         self.adjustedClose = float(lastPrice)
+#         self.volume = int(volume.replace(",", ""))
+
+#     def print_stuff(self):
+#         print(self.investment.name)
+#         print(f"date: {self.date}")
+#         print(f"open: {self.open}")
+#         print(f"high: {self.high}")
+#         print(f"low: {self.low}")
+#         print(f"close: {self.close}")
+#         print(f"adjusted: {self.adjustedClose}")
+#         print(f"volume: {self.volume}")
+#         print("\n")
 
 
 # class Financials(Model):

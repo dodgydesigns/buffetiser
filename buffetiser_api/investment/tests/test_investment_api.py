@@ -8,24 +8,14 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from investment.serialisers import InvestmentSerialiser, PurchaseSerialiser, SaleSerialiser
+from investment.serialisers import (
+    InvestmentSerialiser,
+)
 
 from core.models import Investment, Purchase, Sale  # , Purchase, Sale
 from config.constants import Constants
 
 INVESTMENTS_URL = reverse("investment:investment-list")
-
-
-def purchase_url(investment_id):
-    """Create and return an Investment Purchase URL."""
-
-    return reverse("investment:purchase-detail", args=[investment_id])
-
-
-def sale_url(investment_id):
-    """Create and return an Investment Sale URL."""
-
-    return reverse("investment:sale-detail", args=[investment_id])
 
 
 def create_investment(user, **params):
@@ -64,7 +54,7 @@ def create_sale(user, investment, **params):
     """Create and return a sample investment sale."""
 
     defaults = {
-        "units":  1,
+        "units": 1,
         "price_per_unit": 1,
         "fees": 1,
     }
@@ -95,8 +85,7 @@ class PrivateInvestmentAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            "test@example.com",
-            "testpass123"
+            "test@example.com", "testpass123"
         )
         self.client.force_authenticate(self.user)
 
@@ -111,15 +100,13 @@ class PrivateInvestmentAPITests(TestCase):
         investments = Investment.objects.all().order_by("name")
         serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        # self.assertEqual(res.data, serialiser.data)
-        print(serialiser)
+        self.assertEqual(res.data, serialiser.data)
 
     def test_investment_list_limited_to_user(self):
         """Test getting a list of investments that is limited to the authenticated user"""
 
         other_user = get_user_model().objects.create_user(
-            "test2@example.com",
-            "testpass123"
+            "test2@example.com", "testpass123"
         )
 
         create_investment(user=other_user)
@@ -128,47 +115,25 @@ class PrivateInvestmentAPITests(TestCase):
         res = self.client.get(INVESTMENTS_URL)
 
         investments = Investment.objects.filter(user=self.user)
-        serialiser = InvestmentSerialiser(investments)
+        serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        # self.assertEqual(res.data, serialiser.data)
-        print(serialiser)
+        self.assertEqual(res.data, serialiser.data)
 
-    def test_get_investment_purchase(self):
-        """Test getting a Purchase of an Investment."""
+    def test_create_investment(self):
+        """Test that creating an Investment via the actual API is successful."""
 
-        investment = create_investment(user=self.user)
-        purchase = create_purchase(user=self.user, investment=investment)
-        purchase2 = create_purchase(user=self.user, investment=investment)
+        payload = {
+            "investment_type": Constants.InvestmentType.SHARES,
+            "name": "SampleShare",
+            "symbol": "SSH",
+            "live_price": 1,
+        }
+        res = self.client.post(INVESTMENTS_URL, payload)
 
-        url = purchase_url(investment.id)
-        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        serialiser = PurchaseSerialiser(investment)
-        # self.assertEqual(res.data, serialiser.data)
-        print("----------------------------------------------------")
-        print("serialiser", serialiser)
-        print("res", res)
-        print("res.data", res)
-        print("purchase", purchase)
-        print("purchase2", purchase2)
-        print("----------------------------------------------------")
+        investment = Investment.objects.get(id=res.data["id"])
+        for key, value in payload.items():
+            self.assertEqual(getattr(investment, key), value)
 
-    def test_get_investment_sale(self):
-        """Test getting a Sale of an Investment."""
-
-        investment = create_investment(user=self.user)
-        sale = create_sale(user=self.user, investment=investment)
-        sale2 = create_sale(user=self.user, investment=investment)
-
-        url = sale_url(investment.id)
-        res = self.client.get(url)
-
-        serialiser = SaleSerialiser(investment, many=True)
-        # self.assertEqual(res.data, serialiser.data)
-        print("----------------------------------------------------")
-        print("serialiser", serialiser)
-        print("res", res)
-        print("res.data", res)
-        print("sale", sale)
-        print("sale2", sale2)
-        print("----------------------------------------------------")
+        self.assertEqual(investment.user, self.user)
