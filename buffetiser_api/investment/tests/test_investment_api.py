@@ -2,17 +2,20 @@
 Tests for Investment API.
 """
 
+from datetime import timedelta
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from rest_framework.test import APIClient
 from rest_framework import status
+from core import models
+from core.utils.net_utils import update_history, use_big_charts
 from investment.serialisers import (
     InvestmentSerialiser,
 )
 
-from core.models import Investment, Purchase, Sale  # , Purchase, Sale
 from config.constants import Constants
 
 INVESTMENTS_URL = reverse("investment:investment-list")
@@ -28,7 +31,7 @@ def create_investment(user, **params):
         "live_price": 1,
     }
     defaults.update(params)
-    investment = Investment.objects.create(user=user, **defaults)
+    investment = models.Investment.objects.create(user=user, **defaults)
 
     return investment
 
@@ -45,7 +48,9 @@ def create_purchase(user, investment, **params):
         "price_per_unit": 1,
     }
     defaults.update(params)
-    purchase = Purchase.objects.create(user=user, investment=investment, **defaults)
+    purchase = models.Purchase.objects.create(
+        user=user, investment=investment, **defaults
+    )
 
     return purchase
 
@@ -60,7 +65,7 @@ def create_sale(user, investment, **params):
     }
     defaults.update(params)
 
-    sale = Sale.objects.create(user=user, investment=investment, **defaults)
+    sale = models.Sale.objects.create(user=user, investment=investment, **defaults)
 
     return sale
 
@@ -97,7 +102,7 @@ class PrivateInvestmentAPITests(TestCase):
 
         res = self.client.get(INVESTMENTS_URL)
 
-        investments = Investment.objects.all().order_by("name")
+        investments = models.Investment.objects.all().order_by("name")
         serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serialiser.data)
@@ -114,7 +119,7 @@ class PrivateInvestmentAPITests(TestCase):
 
         res = self.client.get(INVESTMENTS_URL)
 
-        investments = Investment.objects.filter(user=self.user)
+        investments = models.Investment.objects.filter(user=self.user)
         serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serialiser.data)
@@ -124,16 +129,47 @@ class PrivateInvestmentAPITests(TestCase):
 
         payload = {
             "investment_type": Constants.InvestmentType.SHARES,
-            "name": "SampleShare",
-            "symbol": "SSH",
+            "name": "Megaport",
+            "symbol": "MP1",
             "live_price": 1,
         }
         res = self.client.post(INVESTMENTS_URL, payload)
-
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        investment = Investment.objects.get(id=res.data["id"])
+        investment = models.Investment.objects.get(id=res.data["id"])
+
         for key, value in payload.items():
             self.assertEqual(getattr(investment, key), value)
 
         self.assertEqual(investment.user, self.user)
+
+    def test_create_investment_history(self):
+        """Test that creating an History for an Investment."""
+
+        payload = {
+            "investment_type": Constants.InvestmentType.SHARES,
+            "name": "Megaport",
+            "symbol": "MP1",
+            "live_price": 1,
+        }
+        res = self.client.post(INVESTMENTS_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        investment = models.Investment.objects.get(id=res.data["id"])
+        history_entry = models.History.objects.create(
+            user=investment.user,
+            investment=investment,
+            date=timezone.now() - timedelta(days=1),
+            high=1678,
+            low=1545,
+            close=1660,
+            volume=109897,
+        )
+        history_entry.save()
+        msg = update_history(investment)
+        print(msg)
+
+        # for key, value in payload.items():
+        #     self.assertEqual(getattr(investment, key), value)
+
+        # self.assertEqual(investment.user, self.user)

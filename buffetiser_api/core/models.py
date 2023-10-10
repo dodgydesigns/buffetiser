@@ -2,9 +2,8 @@
 
 """
 
-from datetime import datetime, timedelta, timezone
-from bs4 import BeautifulSoup
 import django
+from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
@@ -13,7 +12,6 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db.models import Sum
-import requests
 
 from core.constants import Constants
 
@@ -264,9 +262,7 @@ class History(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     investment = models.ForeignKey(to=Investment, on_delete=models.CASCADE)
-    # The date this history object was updated. Prevent hitting the source too often.
-    date = models.DateTimeField(default=django.utils.timezone.now)
-    open = models.IntegerField(default=0)
+    date = models.DateTimeField(default=timezone.now())
     high = models.IntegerField(default=0)
     low = models.IntegerField(default=0)
     close = models.IntegerField(default=0)
@@ -281,54 +277,6 @@ class History(models.Model):
 
     def __str__(self) -> str:
         return f"{self.investment.symbol} - {self.date}: {self.close}"
-
-    # def update_history(self):
-    #     """ """
-    #     if timezone.now() - self.date >= timedelta(days=1):
-    #         print("ggooooooooood")
-    #     else:
-    #         print("baaaaaad")
-    # self.use_big_charts()
-    # self.save()
-
-
-#     def use_big_charts(self):
-#         """
-#         Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
-#         There is no official API so data is scraped from their website. Not sure if this breaks terms of use.
-#         :param symbol: The investment symbol to fetch data for.
-#         :param todayString: The date for today.
-#         """
-
-#         url = (
-#             "https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb="
-#             + "au:{}+".format(self.investment.symbol)
-#         )
-#         page = requests.get(url)
-#         soup = BeautifulSoup(page.content, "html.parser")
-#         lastPrice = soup.find("td", {"class": "last-col"}).text
-#         high = soup.find("td", {"class": "high-col"}).text
-#         low = soup.find("td", {"class": "low-col"}).text
-#         volume = soup.find("td", {"class": "volume-col"}).text
-
-#         self.date = datetime.now()
-#         self.open = float(low)
-#         self.high = float(high)
-#         self.low = float(low)
-#         self.close = float(lastPrice)
-#         self.adjustedClose = float(lastPrice)
-#         self.volume = int(volume.replace(",", ""))
-
-#     def print_stuff(self):
-#         print(self.investment.name)
-#         print(f"date: {self.date}")
-#         print(f"open: {self.open}")
-#         print(f"high: {self.high}")
-#         print(f"low: {self.low}")
-#         print(f"close: {self.close}")
-#         print(f"adjusted: {self.adjustedClose}")
-#         print(f"volume: {self.volume}")
-#         print("\n")
 
 
 # class Financials(Model):

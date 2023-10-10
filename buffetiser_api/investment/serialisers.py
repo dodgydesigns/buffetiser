@@ -45,4 +45,4 @@ class HistorySerialiser(InvestmentSerialiser):
 
     class Meta(InvestmentSerialiser.Meta):
         model = History
-        fields = ["investment", "date", "open", "high", "low", "close", "volume"]
+        fields = ["investment", "date", "high", "low", "close", "volume"]
