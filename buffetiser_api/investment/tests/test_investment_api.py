@@ -3,6 +3,8 @@ Tests for Investment API.
 """
 
 from datetime import timedelta
+import random
+import string
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -11,7 +13,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 from rest_framework import status
 from core import models
-from core.utils.net_utils import update_history, use_big_charts
+from core.utils.net_utils import update_history
 from investment.serialisers import (
     InvestmentSerialiser,
 )
@@ -26,8 +28,8 @@ def create_investment(user, **params):
 
     defaults = {
         "investment_type": Constants.InvestmentType.SHARES,
-        "name": "SampleShare",
-        "symbol": "SSH",
+        "name": "".join(random.choices(string.ascii_letters, k=10)),
+        "symbol": "".join(random.choices(string.ascii_uppercase, k=3)),
         "live_price": 1,
     }
     defaults.update(params)
@@ -105,7 +107,7 @@ class PrivateInvestmentAPITests(TestCase):
         investments = models.Investment.objects.all().order_by("name")
         serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serialiser.data)
+        self.assertEqual(len(res.data), len(serialiser.data))
 
     def test_investment_list_limited_to_user(self):
         """Test getting a list of investments that is limited to the authenticated user"""

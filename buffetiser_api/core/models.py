@@ -3,7 +3,6 @@
 """
 
 import django
-from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
@@ -256,13 +255,14 @@ class Sale(models.Model):
 
 class History(models.Model):
     """
-    This will hold a lot of data about the performance of an Investment for each day. It will be used to
-    supplement the investment buy/sell data and update current values e.g. current price.
+    This will hold a lot of data about the performance of an Investment for each day.
+    It will be used to supplement the investment buy/sell data and update current
+    values e.g. current price.
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     investment = models.ForeignKey(to=Investment, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=timezone.now())
+    date = models.DateTimeField(default=django.utils.timezone.now)
     high = models.IntegerField(default=0)
     low = models.IntegerField(default=0)
     close = models.IntegerField(default=0)

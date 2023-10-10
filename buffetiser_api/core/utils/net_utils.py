@@ -1,8 +1,5 @@
-import datetime
-import django
 from django.utils import timezone
 import requests
-from datetime import timedelta
 from bs4 import BeautifulSoup
 
 from core import models

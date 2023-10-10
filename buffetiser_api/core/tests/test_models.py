@@ -3,9 +3,10 @@ Tests for Models.
 """
 
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest import TestCase
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from core import models
 from core.constants import Constants
@@ -144,9 +145,9 @@ class ModelTests(TestCase):
     def test_create_investment_history(self):
         """Test creating a new investment is successful."""
 
-        date = datetime.now()
+        date = timezone.now()
         user = get_user_model().objects.create_user(
-            "test1@example.com",
+            "test10@example.com",
             "testpass123",
         )
 
@@ -162,7 +163,6 @@ class ModelTests(TestCase):
             user=user,
             investment=investment,
             date=date,
-            open=100,
             high=120,
             low=80,
             close=110,
@@ -173,7 +173,6 @@ class ModelTests(TestCase):
             user=user,
             investment=investment,
             date=date + +timedelta(days=1),
-            open=110,
             high=130,
             low=90,
             close=120,
@@ -184,7 +183,6 @@ class ModelTests(TestCase):
             user=user,
             investment=investment,
             date=date + timedelta(days=2),
-            open=120,
             high=140,
             low=100,
             close=130,
