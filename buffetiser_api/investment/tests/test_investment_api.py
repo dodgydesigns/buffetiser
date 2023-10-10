@@ -104,10 +104,10 @@ class PrivateInvestmentAPITests(TestCase):
 
         res = self.client.get(INVESTMENTS_URL)
 
-        investments = models.Investment.objects.all().order_by("name")
+        investments = models.Investment.objects.all()
         serialiser = InvestmentSerialiser(investments, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), len(serialiser.data))
+        self.assertEqual(res.data, serialiser.data)
 
     def test_investment_list_limited_to_user(self):
         """Test getting a list of investments that is limited to the authenticated user"""
