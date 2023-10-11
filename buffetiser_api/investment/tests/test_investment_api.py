@@ -100,8 +100,6 @@ class PrivateInvestmentAPITests(TestCase):
         """Get a list of investments."""
 
         create_investment(user=self.user)
-        create_investment(user=self.user)
-
         res = self.client.get(INVESTMENTS_URL)
 
         investments = models.Investment.objects.all()
