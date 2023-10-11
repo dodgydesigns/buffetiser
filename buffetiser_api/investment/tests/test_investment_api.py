@@ -171,3 +171,4 @@ class PrivateInvestmentAPITests(TestCase):
 
         # Test that there are 2 history objects that have different values
         msg = update_history(investment)
+        print(msg)
