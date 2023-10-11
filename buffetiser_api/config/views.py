@@ -5,6 +5,27 @@
 # from data.models import History
 
 
+# def portfolioSetup(self):
+
+#     with open('config.csv') as csvFile:
+#         csvReader = csv.reader(csvFile, delimiter=',')
+#         for row in csvReader:
+#             if row[0] == 'key':
+#                 self.fatController.key = row[1]
+#             elif row[0] == 'share':
+#                 self.portfolio.append(Share(InvestmentType.Share,
+#                                             row[1],
+#                                             row[2],
+#                                             row[3],
+#                                             row[4]))
+#             elif row[0] == 'crypto':
+#                 self.portfolio.append(Crypto(InvestmentType.Crypto,
+#                                              row[1],
+#                                              row[2],
+#                                              row[3],
+#                                              row[4]))
+
+
 # def create_test_data(request):
 #     text = "<h1>Buffetiser Unchained Data!</h1>"
 

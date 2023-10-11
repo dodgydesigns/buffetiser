@@ -61,8 +61,8 @@ class Investment(models.Model):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    name = models.CharField(max_length=32)
-    symbol = models.CharField(max_length=32)
+    name = models.CharField(max_length=64)
+    symbol = models.CharField(max_length=8)
     investment_type = models.CharField(
         choices=Constants.InvestmentType.choices,
         max_length=16,

@@ -52,3 +52,17 @@ class Constants:
 
         AUD = ("AUD", "AUD")
         USD = ("USD", "USD")
+
+
+class APIMessage:
+    """
+    A class to ensure consistent messages for failed and successful
+    transactions are always sent to and from the backend.
+    """
+
+    NO_FILE_FOUND = "Given path does not point to a file."
+    ERROR_READING_FILE = "An error occurred reading the investment file."
+
+    def __init__(self, status, payload):
+        self.status = status
+        self.payload = payload
