@@ -15,6 +15,29 @@ class InvestmentSerialiser(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class InvestmentImportSerialiser(serializers.Serializer):
+    """Serializer to accept list of Investment data."""
+
+    import_data = serializers.ListField(child=InvestmentSerialiser(), required=False)
+
+    def to_internal_value(self, data):
+        """Turn the list of dicts of string into nice Investment objects."""
+        payload = []
+        for investment_dict in data:
+            investment = Investment.objects.create(
+                user=self.context.get("user"),
+                investment_type=investment_dict["investment_type"],
+                name=investment_dict["name"],
+                symbol=investment_dict["symbol"],
+                live_price=0,
+            )
+            payload.append(investment)
+
+        return super(InvestmentImportSerialiser, self).to_internal_value(
+            {"payload": payload}
+        )
+
+
 class PurchaseSerialiser(InvestmentSerialiser):
     """Serialiser for Purchase."""
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "user",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_swagger",
     "drf_spectacular",
 ]
 
@@ -137,3 +138,5 @@ AUTH_USER_MODEL = "core.User"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+SPECTACULAR_SETTINGS = {"COMPONENT_SPLIT_REQUEST": True}

@@ -1,29 +1,20 @@
-# from django.http import HttpResponse
-# from config.constants import Constants
+"""
 
-# from core.models import Investment, Purchase, Sale
-# from data.models import History
+"""
+
+# from django.views import View
 
 
-# def portfolioSetup(self):
+# class ImportInvestmentsView(View):
+#     """Used to import Investments from a file provided by a user."""
 
-#     with open('config.csv') as csvFile:
-#         csvReader = csv.reader(csvFile, delimiter=',')
-#         for row in csvReader:
-#             if row[0] == 'key':
-#                 self.fatController.key = row[1]
-#             elif row[0] == 'share':
-#                 self.portfolio.append(Share(InvestmentType.Share,
-#                                             row[1],
-#                                             row[2],
-#                                             row[3],
-#                                             row[4]))
-#             elif row[0] == 'crypto':
-#                 self.portfolio.append(Crypto(InvestmentType.Crypto,
-#                                              row[1],
-#                                              row[2],
-#                                              row[3],
-#                                              row[4]))
+#     print("------------------------------------------")
+#     print("------------------------------------------")
+#     print("------------------------------------------")
+#     print("------------------------------------------")
+
+#     def get_extra_actions():
+#         pass
 
 
 # def create_test_data(request):

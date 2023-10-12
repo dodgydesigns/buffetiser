@@ -14,11 +14,31 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-# from django.urls import path
 
-# from config.views import create_test_data
+# from config import views
 
+# from django.urls import path, include
+# from rest_framework import routers
+
+# # router = routers.DefaultRouter()
+# # router.register("import/", views.ImportInvestmentsView, basename="import")
+# # urlpatterns = router.urls
+
+# # app_name = "config"
 
 urlpatterns = [
-    # path("test", create_test_data, name="Create Test Data"),
+    # path("", include(router.urls)),
 ]
+
+# # urlpatterns = [
+# #     path(r"^swagger/", schema_view),
+# #     path("import/", views.ImportInvestmentsView.as_view(), name="import"),
+# # ]
+# router = routers.DefaultRouter()
+# router.register(r"purchase", views.ImportInvestmentsView, basename="import")
+
+# app_name = "config"
+
+# urlpatterns = [
+#     path("", include(router.urls)),
+# ]

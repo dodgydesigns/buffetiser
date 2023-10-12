@@ -47,7 +47,7 @@ class TestImportExport(TestCase):
             self.assertIsNotNone(models.Investment.objects.filter(symbol=symbol))
 
     def test_create_investment_from_import(self):
-        """Test that creating an Investment via the actual API is successful."""
+        """Test that creating an Investment is successful."""
 
         investment_data = read_investments_from_file(TEST_FILE)
         for symbol, investment_dict in investment_data.payload.items():
@@ -66,3 +66,10 @@ class TestImportExport(TestCase):
                 self.assertEqual(getattr(investment, key), value)
 
         self.assertEqual(investment.user, self.user)
+
+    def test_create_investment_from_import_api(self):
+        """Test that creating an Investment via the actual API is successful."""
+
+        print("*************************************")
+        print(reverse("import"))
+        print("*************************************")
