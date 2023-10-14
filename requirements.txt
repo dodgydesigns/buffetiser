@@ -1,0 +1,9 @@
+django>=4.2
+djangorestframework>=3.13
+requests>=2.31
+beautifulsoup4>=4.12
+# psycopg>=3 // Easier to use pip install "psycopg[binary,pool]" in Dockerfile for deps
+drf_spectacular>=0.26
+django-rest-swagger
+pillow>=10
+uwsgi>=2.0.19

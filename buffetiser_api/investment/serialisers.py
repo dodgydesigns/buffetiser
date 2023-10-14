@@ -16,7 +16,25 @@ class InvestmentSerialiser(serializers.ModelSerializer):
 
 
 class InvestmentImportSerialiser(serializers.Serializer):
-    """Serializer to accept list of Investment data."""
+    """
+    Serializer to accept list of Investment data.
+
+    Expect data in form:
+        [
+            {
+            "name": "aa",
+            "symbol": "a",
+            "investment_type": "Shares",
+            "live_price": 2147483647
+            },
+            {
+            "name": "bb",
+            "symbol": "b",
+            "investment_type": "Shares",
+            "live_price": 2147483647
+            }
+        ]
+    """
 
     import_data = serializers.ListField(child=InvestmentSerialiser(), required=False)
 
