@@ -1,5 +1,6 @@
 """
 Views for the Investment APIs.
+functools
 """
 
 import json
@@ -50,9 +51,6 @@ class InvestmentViewSet(viewsets.ModelViewSet):
                 payload.append(json.dumps(investment))
             return Response(status=status.HTTP_200_OK)
         else:
-            print("E E E E E E E E E E E E E E E E E E E E E E E E E")
-            print(serializer.errors)
-            print("E E E E E E E E E E E E E E E E E E E E E E E E E`")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

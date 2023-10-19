@@ -27,7 +27,7 @@ RUN /py/bin/pip install uwsgi
 RUN apk add --update uwsgi-python
 RUN /py/bin/pip install -r /tmp/requirements.txt
 RUN if [ $DEV = "true" ]; \
-    then /py/bin/pip install -r requirements.dev.txt ; \
+    then /py/bin/pip install -r ./requirements/requirements-dev.txt ; \
     fi
 # apk del .tmp-build-deps
 RUN adduser \
