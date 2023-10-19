@@ -26,18 +26,19 @@ RUN apk update  && \
     /py/bin/pip install uwsgi  && \
     apk add --update uwsgi-python  && \
     /py/bin/pip install -r /tmp/requirements.txt
+RUN echo $DEV
 RUN if [ $DEV = "true" ]; \
-    then /py/bin/pip install -r requirements/requirements-dev.txt ; \
+    then /py/bin/pip install -r /tmp/requirements-dev.txt ; \
     fi
 # apk del .tmp-build-deps
 RUN adduser \
     --disabled-password \
     --no-create-home \
     django-user &&\
-    mkdir -p /vol/web/media &&\
-    mkdir -p /vol/web/static &&\
-    chown -R django-user:django-user /vol &&\
-    chmod -R 755 /vol &&\
+    mkdir -p /vol/web/media && \
+    mkdir -p /vol/web/static && \
+    chown -R django-user:django-user /vol && \
+    chmod -R 755 /vol && \
     chmod -R +x /scripts
 
 ENV PATH="/scripts:/py/bin:$PATH"
