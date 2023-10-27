@@ -28,7 +28,9 @@ class InvestmentViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """Return the correct serializer for each action type."""
-        if self.action == "list":
+        if self.action not in ["create", "list"]:
+            breakpoint()
+        if self.action in ["create", "list"]:
             return serialisers.InvestmentSerialiser
         elif self.action == "import_investments":
             return serialisers.InvestmentImportSerialiser

@@ -71,5 +71,5 @@ class TestImportExport(TestCase):
         """Test that creating an Investment via the actual API is successful."""
 
         print("*************************************")
-        print(reverse("import"))
+        # print(reverse("import"))
         print("*************************************")
