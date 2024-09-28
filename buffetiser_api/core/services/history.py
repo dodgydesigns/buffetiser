@@ -4,8 +4,18 @@ This module contains a number of functions that can be used to get historical da
 Investment. The functions are used by DRF to retrieve the required data to satisfy URL 
 get/post calls from the front end.
 """
-from datetime import datetime
-from core.models import Investment, Purchase, Sale
+import datetime
+from core.models import DividendReinvestment, History, Investment, Purchase, Sale
+import logging
+import requests
+from bs4 import BeautifulSoup
+
+logging.basicConfig(filename="debug.log",
+                    # format='%(asctime)s %(message)s',
+                    format='--------history.py----------%(message)s',
+                    filemode='w')
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 def get_purchase_history(investment):
@@ -30,6 +40,17 @@ def get_sale_history(investment):
             .append((sale.units, sale.price_per_unit, sale.units*sale.price_per_unit))
     return sales
 
+def get_total_reinvestment_units(investment):
+    """
+    If an Investment has recieved reinvestment units, return the total number of units
+    received.
+    """
+    reinvestments = DividendReinvestment.objects.filter(investment=investment)
+    total_reinvestment_units = 0
+    for reinvestment in reinvestments:
+        total_reinvestment_units += reinvestment.units
+    return total_reinvestment_units
+
 def get_credit_debit_history():
     """
     Generates the money put into (purchases) and removed (sales) by date for all Investments.
@@ -42,7 +63,7 @@ def get_credit_debit_history():
         sales.update(get_sale_history(investment))
 
     all_transaction_dates = list(set(list(purchases.keys()) + list(sales.keys())))
-    all_transaction_dates.sort(key=lambda date: datetime.strptime(date, "%d/%m/%Y"))
+    all_transaction_dates.sort(key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
     credit_debit_history_by_date = {}
     for date in all_transaction_dates:
@@ -60,3 +81,74 @@ def get_credit_debit_history():
         credit_debit_history[date] = running_total
         
         return credit_debit_history
+
+def get_total_units_held(investment):
+    """
+    Get the number of units held of a particular investment.
+    """
+    units_held = 0
+    purchases = get_purchase_history(investment).values()
+    for purchase in purchases:
+        units_held += int(purchase[0][0])
+        
+    reinvestment_units = get_total_reinvestment_units(investment)
+    units_held += reinvestment_units
+
+    sales = get_sale_history(investment)
+    for sale in sales:
+        units_held -= int(sale[0][0])
+    return units_held 
+
+def get_live_price(investment):
+    """
+    Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
+    There is no official API so data is scraped from their website. Not sure if this 
+    breaks terms of use.
+    :param: The investment to fetch data for.
+    :param todayString: The date for today.
+    """
+    last_update = History.objects.filter(investment=investment).order_by('-id')[0]
+    # Don't want to hammer (abuse) the service so only allow updates once a day.
+    if last_update != datetime.date.today().strftime("%d-%m-%Y"):
+        url = 'https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=' + \
+            'au:{}+'.format(investment.symbol)
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        lastPrice = soup.find('td', {'class': 'last-col'}).text
+        high = soup.find('td', {'class': 'high-col'}).text
+        low = soup.find('td', {'class': 'low-col'}).text
+        volume = soup.find('td', {'class': 'volume-col'}).text
+
+        history_entry = History(
+            investment=investment,
+            date=datetime.date.today(),
+            high=high,
+            low=low,
+            close=lastPrice,
+            volume=int(volume.replace(',', '')),
+        )
+        history_entry.save()
+
+        return history_entry
+    else:
+        return last_update
+
+
+# (name, code), (last price, +/-, %), (Daily Gain, P&L, P&L%), 
+# (units, avg. cost, tot. cost, profit)
+def get_all_details_for_investment(investment):
+    """
+    Return a dictionary with all the details required by the front end to render an Investment
+    entry.
+    """
+    yesterday_price = History.objects.filter(investment=investment).order_by('-id')[0].close
+    last_price = get_live_price(investment).close
+    all_details = {
+        "name": investment.name,
+        "symbol":investment.symbol,
+        "yesterday_price":yesterday_price,
+        "last_price":last_price,
+        "variation": last_price-yesterday_price,
+        "variation_percent": (last_price-yesterday_price) / yesterday_price,
+    }
+    return all_details
