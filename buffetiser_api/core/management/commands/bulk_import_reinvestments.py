@@ -9,8 +9,6 @@ import csv
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from core.models import DividendReinvestment, Investment
-from core.services.history import get_all_details_for_investment, get_daily_change, get_live_price, get_total_reinvestment_units, get_total_units_held
-
 
 class Command(BaseCommand):
     """
@@ -24,7 +22,6 @@ class Command(BaseCommand):
         parser.add_argument("file_path", type=str)
 
     def handle(self, *args, **options):
-        inv = Investment.objects.filter(symbol="VTS").first()
 
         with open(options["file_path"]) as file_obj:
             reader_obj = csv.reader(file_obj)

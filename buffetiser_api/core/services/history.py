@@ -219,3 +219,15 @@ def get_all_details_for_investment(investment):
         "profit_percent": profit_total[1],
     }
     return all_details
+
+def get_plot_data(investment):
+    """
+    Return the history data: low, high, close for an invesment. Used to plot value history.
+    """
+    history = History.objects.filter(investment=investment).all()
+    history_dict = {}
+    for day in history:
+        print(day.date)
+        history_dict[day.date.strftime("%d/%m/%Y")] = (day.low, day.high, day.close)
+
+    return history_dict
