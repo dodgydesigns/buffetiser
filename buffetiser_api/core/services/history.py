@@ -97,8 +97,58 @@ def get_total_units_held(investment):
     sales = get_sale_history(investment)
     for sale in sales:
         units_held -= int(sale[0][0])
-    return units_held 
+    return units_held
 
+def get_total_cost(investment):
+    """
+    The sum of all purchases of an investment.
+    """
+    purchases = Purchase.objects.filter(investment=investment).all()
+    total_cost = 0
+    for purchase in purchases:
+        total_cost += purchase.price_per_unit * purchase.units
+    return total_cost
+
+def get_total_value(investment):
+    """
+    The current total value of an investment.
+    """
+    return get_total_units_held(investment) * get_live_price(investment).close
+
+def get_average_cost(investment):
+    """
+    The average cost per unit of an investment.
+    """
+    return get_total_cost(investment) / get_total_units_held(investment)
+
+def get_profit_total_and_percentage(investment):
+    """
+    Return the profit in dollars and as a percent.
+    """
+    total_profit = (total_value := get_total_value(investment)) - \
+                   (total_cost := get_total_cost(investment))
+    total_profit_percentage = (total_value / total_cost -1) * 100
+    return (total_profit, total_profit_percentage)
+
+def get_daily_change(investment):
+    """
+    Uses ASX data from BigCharts (MarketWatch) to get daily change data.
+    """
+    last_update = None
+    if len(History.objects.filter(investment=investment).all()) > 0:
+        last_update = History.objects.filter(investment=investment).order_by('-id')[0]
+    # Don't want to hammer (abuse) the service so only allow updates once a day.
+    # if not last_update or last_update.date != datetime.date.today():
+    print("Getting live price")
+    url = 'https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=' + \
+        'au:{}+'.format(investment.symbol)
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    daily_change = soup.find('td', {'class': 'change-col'}).text.replace("\xa0", "")
+    daily_change_percent = soup.find('td', {'class': 'percent-col'}).text
+
+    return (daily_change, daily_change_percent)
+    
 def get_live_price(investment):
     """
     Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
@@ -107,9 +157,12 @@ def get_live_price(investment):
     :param: The investment to fetch data for.
     :param todayString: The date for today.
     """
-    last_update = History.objects.filter(investment=investment).order_by('-id')[0]
+    last_update = None
+    if len(History.objects.filter(investment=investment).all()) > 0:
+        last_update = History.objects.filter(investment=investment).order_by('-id')[0]
     # Don't want to hammer (abuse) the service so only allow updates once a day.
-    if last_update != datetime.date.today().strftime("%d-%m-%Y"):
+    if not last_update or last_update.date != datetime.date.today():
+        print("Getting live price")
         url = 'https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=' + \
             'au:{}+'.format(investment.symbol)
         page = requests.get(url)
@@ -117,6 +170,8 @@ def get_live_price(investment):
         lastPrice = soup.find('td', {'class': 'last-col'}).text
         high = soup.find('td', {'class': 'high-col'}).text
         low = soup.find('td', {'class': 'low-col'}).text
+        daily_change = soup.find('td', {'class': 'change-col'}).text
+        daily_change_percent = soup.find('td', {'class': 'percent-col'}).text
         volume = soup.find('td', {'class': 'volume-col'}).text
 
         history_entry = History(
@@ -134,21 +189,33 @@ def get_live_price(investment):
         return last_update
 
 
-# (name, code), (last price, +/-, %), (Daily Gain, P&L, P&L%), 
-# (units, avg. cost, tot. cost, profit)
 def get_all_details_for_investment(investment):
     """
     Return a dictionary with all the details required by the front end to render an Investment
     entry.
     """
-    yesterday_price = History.objects.filter(investment=investment).order_by('-id')[0].close
-    last_price = get_live_price(investment).close
+    history = None
+    last_price = float(get_live_price(investment).close)
+    if len(History.objects.filter(investment=investment).all()) > 0:
+        yesterday_price = History.objects.filter(investment=investment).order_by('-id')[0].close
+    else:
+        yesterday_price = last_price
+
+    daily_change = get_daily_change(investment)
+    profit_total = get_profit_total_and_percentage(investment)
     all_details = {
         "name": investment.name,
         "symbol":investment.symbol,
         "yesterday_price":yesterday_price,
         "last_price":last_price,
-        "variation": last_price-yesterday_price,
+        "variation": last_price - yesterday_price,
         "variation_percent": (last_price-yesterday_price) / yesterday_price,
+        "daily_gain": daily_change[0],
+        "daily_gain_percent": daily_change[1],
+        "units": get_total_units_held(investment),
+        "average_cost": get_average_cost(investment),
+        "total_cost": get_total_cost(investment),
+        "profit": profit_total[0],
+        "profit_percent": profit_total[1],
     }
     return all_details
