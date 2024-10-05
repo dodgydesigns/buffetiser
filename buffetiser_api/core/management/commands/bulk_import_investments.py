@@ -11,6 +11,7 @@ import csv
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from core.models import Investment, Purchase, Sale
+from core.services.update_investment import get_live_price, get_total_units_held
 
 
 class Command(BaseCommand):
@@ -56,6 +57,8 @@ class Command(BaseCommand):
                                     date=datetime.strptime(row[0], "%d/%m/%Y"),
                                     trade_count=trade_count,)
                         sale.save()
+                    # Get live prices for all investments
+                    get_live_price(investment)
                     investment.save()
                 trade_count += 1
 
