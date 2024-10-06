@@ -1,4 +1,5 @@
 import datetime
+
 from core.models import Purchase, Sale
 
 
@@ -37,7 +38,7 @@ def get_units_held_at_date(investment, cut_off_date):
     This gets all the units held for an Investment up to (and including) a certain date.
     """
     purchases = get_purchase_history(investment)
-    sales= get_sale_history(investment)
+    sales = get_sale_history(investment)
 
     units_held_at_date = 0
     for purchase_date in list(purchases.keys()):

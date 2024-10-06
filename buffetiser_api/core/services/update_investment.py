@@ -1,6 +1,7 @@
 """
 All the functions to update values for Investments.
 """
+
 import datetime
 import logging
 from math import floor
@@ -8,8 +9,7 @@ from math import floor
 import requests
 from bs4 import BeautifulSoup
 
-from core.models import (DividendPayment, DividendReinvestment, History,
-                         Investment)
+from core.models import DividendPayment, DividendReinvestment, History, Investment
 from core.services.investmet_helpers import get_units_held_at_date
 
 logging.basicConfig(
@@ -27,7 +27,7 @@ def update_all_investment_prices():
     Get today's prices for all investment to add to History.
     NOTE: This could be added as a Command and run as CRON job.
     """
-    for  trade_count, investment in enumerate(Investment.objects.all()):
+    for trade_count, investment in enumerate(Investment.objects.all()):
         get_live_price(investment)
 
 
@@ -44,7 +44,11 @@ def get_live_price(investment):
         last_update = History.objects.filter(investment=investment).order_by("-id")[0]
     # Don't want to hammer (abuse) the service so only allow updates once a day.
     # Also don't check if it's Saturday or Sunday
-    if not last_update or last_update.date != (today := datetime.date.today()) and (today.weekday() not in [5, 6]):
+    if (
+        not last_update
+        or last_update.date != (today := datetime.date.today())
+        and (today.weekday() not in [5, 6])
+    ):
         print(f"Getting live price: {investment.symbol}")
         history_entry = None
         last_update = None
@@ -103,7 +107,9 @@ def add_dividend(investment, reinvest, cutoff_date, reinvestment_date, price_per
     nearest_history_date_to_cutoff = nearest(price_history_list, cutoff_date)
     if len(price_history_list) > 0 and nearest_history_date_to_cutoff:
         nearest_value_to_cutoff = (
-            History.objects.filter(date=nearest(price_history_list, cutoff_date), investment=investment)
+            History.objects.filter(
+                date=nearest(price_history_list, cutoff_date), investment=investment
+            )
             .first()
             .close
         )
@@ -111,26 +117,36 @@ def add_dividend(investment, reinvest, cutoff_date, reinvestment_date, price_per
         # Can we afford one or more shares (based on cutoff price and the amount of money we were paid?)
         #     money we were paid        cost of one share at cutoff
         if (units_held * price_per_unit) >= nearest_value_to_cutoff:
-            reinvestment_units_received = int(floor((units_held * price_per_unit) / nearest_value_to_cutoff))
-            reinvestment = DividendReinvestment(reinvestment_date=reinvestment_date, 
-                                                units=reinvestment_units_received, 
-                                                investment=investment)
+            reinvestment_units_received = int(
+                floor((units_held * price_per_unit) / nearest_value_to_cutoff)
+            )
+            reinvestment = DividendReinvestment(
+                reinvestment_date=reinvestment_date,
+                units=reinvestment_units_received,
+                investment=investment,
+            )
             # Once we have bought all the full shares we can afford, handle the leftover money
-            left_over = (units_held * price_per_unit) - (reinvestment_units_received * nearest_value_to_cutoff)
-            dividend_payment = DividendPayment(payment_date=reinvestment_date, 
-                                               value=left_over, 
-                                               investment=investment)
+            left_over = (units_held * price_per_unit) - (
+                reinvestment_units_received * nearest_value_to_cutoff
+            )
+            dividend_payment = DividendPayment(
+                payment_date=reinvestment_date, value=left_over, investment=investment
+            )
             reinvestment.save()
             dividend_payment.save()
         else:
-            dividend_payment = DividendPayment(payment_date=reinvestment_date, 
-                                               value=(units_held * price_per_unit), 
-                                               investment=investment)
+            dividend_payment = DividendPayment(
+                payment_date=reinvestment_date,
+                value=(units_held * price_per_unit),
+                investment=investment,
+            )
             dividend_payment.save()
     else:
-        dividend_payment = DividendPayment(payment_date=reinvestment_date, 
-                                           value=(units_held * price_per_unit), 
-                                           investment=investment)
+        dividend_payment = DividendPayment(
+            payment_date=reinvestment_date,
+            value=(units_held * price_per_unit),
+            investment=investment,
+        )
         dividend_payment.save()
         # TODO: Put the money in Financial as well
 

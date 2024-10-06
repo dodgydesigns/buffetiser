@@ -1,10 +1,10 @@
 import datetime
-import requests
 import logging
+
+import requests
 from bs4 import BeautifulSoup
 
-from core.models import (DividendReinvestment, History,
-                         Investment, Purchase)
+from core.models import DividendReinvestment, History, Investment, Purchase
 from core.services.investmet_helpers import get_purchase_history, get_sale_history
 from core.services.update_investment import get_live_price
 
@@ -16,6 +16,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
 
 def get_daily_change(investment):
     """
