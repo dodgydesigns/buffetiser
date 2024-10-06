@@ -219,13 +219,3 @@ class History(Model):
 
     class Meta:
         unique_together = ("date", "investment")
-
-
-class Financials(Model):
-    """
-    A collection of fields and properties that represent values that span
-    the whole portfolio.
-    """
-    total_value = FloatField()
-    total_spent_on_purchase = FloatField()
-    total_earned_on_sale = FloatField()

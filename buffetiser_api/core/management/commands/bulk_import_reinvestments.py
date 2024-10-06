@@ -8,8 +8,7 @@ e.g. VDHG,16/07/2024,3
 import csv
 from datetime import datetime
 from django.core.management.base import BaseCommand
-from core.models import DividendReinvestment, Investment
-from core.services.update_investment import add_dividend, get_all_details_for_investment, get_units_held_at_date, update_all_investment_prices
+from core.models import  DividendReinvestment, Investment
 
 class Command(BaseCommand):
     """
@@ -23,38 +22,6 @@ class Command(BaseCommand):
         parser.add_argument("file_path", type=str)
 
     def handle(self, *args, **options):
-
-
-        for i in Investment.objects.all():
-            dc = get_all_details_for_investment(i)
-
-        update_all_investment_prices()
-        inv = Investment.objects.filter(symbol="VAS").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 103.32)
-        inv = Investment.objects.filter(symbol="VDHG").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 36.97)
-        inv = Investment.objects.filter(symbol="VGS").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 28.81)
-        inv = Investment.objects.filter(symbol="VTS").first()
-        add_dividend(inv,
-                 True,
-                 "27/09/2024",
-                 "24/10/2024",
-                 107.57)
-
-
         with open(options["file_path"]) as file_obj:
             reader_obj = csv.reader(file_obj)
             for row in reader_obj:
