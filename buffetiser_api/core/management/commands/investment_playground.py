@@ -1,10 +1,8 @@
 """
 This command can be used to test various functions in core.
 """
-import csv
-from datetime import datetime
 from django.core.management.base import BaseCommand
-from core.models import  DividendReinvestment, Investment
+from core.models import Investment
 from core.services.investment_details import get_all_details_for_investment, get_credit_debit_history
 from core.services.update_investment import add_dividend, update_all_investment_prices
 
