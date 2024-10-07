@@ -5,12 +5,11 @@ All the functions to update values for Investments.
 import datetime
 import logging
 from math import floor
-
 import requests
+
 from bs4 import BeautifulSoup
 
 from core.models import DividendPayment, DividendReinvestment, History, Investment
-from core.services.investmet_helpers import get_units_held_at_date
 
 logging.basicConfig(
     filename="debug.log",
@@ -27,7 +26,7 @@ def update_all_investment_prices():
     Get today's prices for all investment to add to History.
     NOTE: This could be added as a Command and run as CRON job.
     """
-    for trade_count, investment in enumerate(Investment.objects.all()):
+    for investment in Investment.objects.all():
         get_live_price(investment)
 
 
@@ -49,11 +48,11 @@ def get_live_price(investment):
         or last_update.date != (today := datetime.date.today())
         and (today.weekday() not in [5, 6])
     ):
-        print(f"Getting live price: {investment.symbol}")
         history_entry = None
         last_update = None
         try:
             url = f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+"
+            print(f"Getting live price: {investment.symbol}")
             page = requests.get(url)
             soup = BeautifulSoup(page.content, "html.parser")
             last_price = soup.find("td", {"class": "last-col"}).text

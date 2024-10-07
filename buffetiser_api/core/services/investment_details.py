@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 
 import requests
@@ -60,8 +61,8 @@ def get_all_details_for_investment(investment):
         "last_price": live_price.close,
         "variation": live_price.close - yesterday_price,
         "variation_percent": (live_price.close - yesterday_price) / yesterday_price,
-        "daily_change": daily_change["daily_change"],
-        "daily_change_percent": daily_change["daily_change_percent"],
+        "daily_change": daily_change["daily_change"] if daily_change["daily_change"] else 0,
+        "daily_change_percent": daily_change["daily_change_percent"] if daily_change["daily_change_percent"] else 0,
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),
@@ -69,6 +70,16 @@ def get_all_details_for_investment(investment):
         "profit_percent": profit_total[1],
     }
     return all_details
+
+
+def get_details_for_all_investments():
+        """
+        Get the details for all Investments as JSON.
+        """
+        all_investment_details= []
+        for investment in Investment.objects.all():
+            all_investment_details.append(get_all_details_for_investment(investment))
+        return json.dumps(all_investment_details)
 
 
 def get_credit_debit_history():
