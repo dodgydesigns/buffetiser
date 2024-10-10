@@ -61,8 +61,14 @@ def get_all_details_for_investment(investment):
         "last_price": live_price,
         "variation": live_price - yesterday_price,
         "variation_percent": (live_price - yesterday_price) / yesterday_price,
-        "daily_change": daily_change["daily_change"] if daily_change["daily_change"] else 0,
-        "daily_change_percent": daily_change["daily_change_percent"] if daily_change["daily_change_percent"] else 0,
+        "daily_change": (
+            daily_change["daily_change"] if daily_change["daily_change"] else 0
+        ),
+        "daily_change_percent": (
+            daily_change["daily_change_percent"]
+            if daily_change["daily_change_percent"]
+            else 0
+        ),
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),
@@ -73,13 +79,13 @@ def get_all_details_for_investment(investment):
 
 
 def get_details_for_all_investments():
-        """
-        Get the details for all Investments as JSON.
-        """
-        all_investment_details= []
-        for investment in Investment.objects.all():
-            all_investment_details.append(get_all_details_for_investment(investment))
-        return json.dumps(all_investment_details)
+    """
+    Get the details for all Investments as JSON.
+    """
+    all_investment_details = []
+    for investment in Investment.objects.all():
+        all_investment_details.append(get_all_details_for_investment(investment))
+    return json.dumps(all_investment_details)
 
 
 def get_credit_debit_history():
@@ -146,7 +152,9 @@ def get_total_value(investment):
     # Make sure live price and history are the latest values.
     # update_investment_and_history()
     # Get the latest History entry
-    return get_total_units_held(investment) * float(list(History.objects.filter(investment=investment))[-1].close)
+    return get_total_units_held(investment) * float(
+        list(History.objects.filter(investment=investment))[-1].close
+    )
 
 
 def get_average_cost(investment):

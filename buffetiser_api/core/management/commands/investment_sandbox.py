@@ -1,12 +1,16 @@
 """
 This command can be used to test various functions in core.
 """
+
 import json
+
 from django.core.management.base import BaseCommand
 
 from core.models import Investment
-from core.services.investment_details import (get_credit_debit_history,
-                                              get_all_details_for_investment)
+from core.services.investment_details import (
+    get_all_details_for_investment,
+    get_credit_debit_history,
+)
 from core.services.update_investment import add_dividend
 
 
@@ -32,29 +36,13 @@ class Command(BaseCommand):
 
     def insert_dividends(self):
         inv = Investment.objects.filter(symbol="VAS").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 103.32)
+        add_dividend(inv, True, "01/10/2024", "16/10/2024", 103.32)
         inv = Investment.objects.filter(symbol="VDHG").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 36.97)
+        add_dividend(inv, True, "01/10/2024", "16/10/2024", 36.97)
         inv = Investment.objects.filter(symbol="VGS").first()
-        add_dividend(inv,
-                 True,
-                 "01/10/2024",
-                 "16/10/2024",
-                 28.81)
+        add_dividend(inv, True, "01/10/2024", "16/10/2024", 28.81)
         inv = Investment.objects.filter(symbol="VTS").first()
-        add_dividend(inv,
-                 True,
-                 "27/09/2024",
-                 "24/10/2024",
-                 107.57)
+        add_dividend(inv, True, "27/09/2024", "24/10/2024", 107.57)
 
     def get_money_in_out(self):
         dc = get_credit_debit_history()

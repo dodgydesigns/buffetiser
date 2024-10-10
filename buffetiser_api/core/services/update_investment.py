@@ -3,13 +3,13 @@ All the functions to update values for Investments.
 """
 
 import asyncio
-import aiohttp
-from asgiref.sync import sync_to_async
-import requests
 import datetime
 import logging
 from math import floor
 
+import aiohttp
+import requests
+from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendPayment, DividendReinvestment, History, Investment
@@ -32,9 +32,12 @@ def get_investment_and_urls():
     """
     investment_and_url = {}
     for investment in list(Investment.objects.all()):
-        investment_and_url[investment.symbol] = {"investment": investment,
-                                                    "url": f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+"}
+        investment_and_url[investment.symbol] = {
+            "investment": investment,
+            "url": f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+",
+        }
     return investment_and_url
+
 
 async def fetch(session, url):
     """
@@ -42,6 +45,7 @@ async def fetch(session, url):
     """
     async with session.get(url) as response:
         return await response.text()
+
 
 async def scrape():
     """
@@ -70,6 +74,7 @@ async def scrape():
             # investment.live_price = last_price
             # investment.save()
 
+
 def update_investment_and_history():
     """
     Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
@@ -80,7 +85,7 @@ def update_investment_and_history():
     """
     loop = asyncio.get_event_loop()
     loop.run_until_complete(scrape())
-   
+
 
 def nearest(items, pivot):
     """
