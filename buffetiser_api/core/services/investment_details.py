@@ -2,12 +2,11 @@ import datetime
 import json
 import logging
 
-import requests
 from bs4 import BeautifulSoup
 
 from core.models import DividendReinvestment, History, Investment, Purchase
 from core.services.investmet_helpers import get_purchase_history, get_sale_history
-from core.services.update_investment import get_live_price
+from core.services.update_investment import update_investment_and_history
 
 logging.basicConfig(
     filename="debug.log",
@@ -44,13 +43,14 @@ def get_all_details_for_investment(investment):
     Return a dictionary with all the details required by the front end to render an Investment
     entry.
     """
-    live_price = get_live_price(investment)
+    # update_investment_and_history()
+    live_price = investment.live_price
     if len(History.objects.filter(investment=investment).all()) > 0:
         yesterday_price = (
             History.objects.filter(investment=investment).order_by("-id")[0].close
         )
     else:
-        yesterday_price = live_price.close
+        yesterday_price = live_price
 
     daily_change = get_daily_change(investment)
     profit_total = get_profit_total_and_percentage(investment)
@@ -58,9 +58,9 @@ def get_all_details_for_investment(investment):
         "name": investment.name,
         "symbol": investment.symbol,
         "yesterday_price": yesterday_price,
-        "last_price": live_price.close,
-        "variation": live_price.close - yesterday_price,
-        "variation_percent": (live_price.close - yesterday_price) / yesterday_price,
+        "last_price": live_price,
+        "variation": live_price - yesterday_price,
+        "variation_percent": (live_price - yesterday_price) / yesterday_price,
         "daily_change": daily_change["daily_change"] if daily_change["daily_change"] else 0,
         "daily_change_percent": daily_change["daily_change_percent"] if daily_change["daily_change_percent"] else 0,
         "units": get_total_units_held(investment),
@@ -143,7 +143,10 @@ def get_total_value(investment):
     """
     The current total value of an investment.
     """
-    return get_total_units_held(investment) * get_live_price(investment).close
+    # Make sure live price and history are the latest values.
+    # update_investment_and_history()
+    # Get the latest History entry
+    return get_total_units_held(investment) * float(list(History.objects.filter(investment=investment))[-1].close)
 
 
 def get_average_cost(investment):

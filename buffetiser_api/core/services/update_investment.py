@@ -2,10 +2,13 @@
 All the functions to update values for Investments.
 """
 
+import asyncio
+import aiohttp
+from asgiref.sync import sync_to_async
+import requests
 import datetime
 import logging
 from math import floor
-import requests
 
 from bs4 import BeautifulSoup
 
@@ -21,55 +24,63 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 
-def update_all_investment_prices():
+@sync_to_async
+def get_investment_and_urls():
     """
-    Get today's prices for all investment to add to History.
-    NOTE: This could be added as a Command and run as CRON job.
+    Get each Investment and the URL containing the data for that investment. This information can then
+    be used to scrape the page and get the values needed.
     """
-    for investment in Investment.objects.all():
-        get_live_price(investment)
+    investment_and_url = {}
+    for investment in list(Investment.objects.all()):
+        investment_and_url[investment.symbol] = {"investment": investment,
+                                                    "url": f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+"}
+    return investment_and_url
 
+async def fetch(session, url):
+    """
+    Get all the data from the page.
+    """
+    async with session.get(url) as response:
+        return await response.text()
 
-def get_live_price(investment):
+async def scrape():
     """
-    Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
-    There is no official API so data is scraped from their website. Not sure if this
-    breaks terms of use.
-    :param: The investment to fetch data for.
-    :param todayString: The date for today.
+    Scrape the source for each Investment. Update the the live price for each and create an entry
+    into the investment's value history.
     """
-    last_update = None
-    if len(History.objects.filter(investment=investment).all()) > 0:
-        last_update = History.objects.filter(investment=investment).order_by("-id")[0]
-    # Don't want to hammer (abuse) the service so only allow updates once a day.
-    # Also don't check if it's Saturday or Sunday
-    if (
-        not last_update
-        or last_update.date != (today := datetime.date.today())
-        and (today.weekday() not in [5, 6])
-    ):
-        history_entry = None
-        last_update = None
-        try:
-            url = f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+"
-            print(f"Getting live price: {investment.symbol}")
-            page = requests.get(url)
-            soup = BeautifulSoup(page.content, "html.parser")
+    investment_and_url = await get_investment_and_urls()
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for value in investment_and_url.values():
+            page_data = fetch(session, value["url"])
+            tasks.append(asyncio.ensure_future(page_data))
+        responses = await asyncio.gather(*tasks)
+
+        for response in responses:
+            soup = BeautifulSoup(response, "html.parser")
+            symbol = soup.find("td", {"class": "symb-col"}).text
             last_price = soup.find("td", {"class": "last-col"}).text
             high = soup.find("td", {"class": "high-col"}).text
             low = soup.find("td", {"class": "low-col"}).text
             volume = soup.find("td", {"class": "volume-col"}).text
+            investment = investment_and_url[symbol]
+            print(investment, high, low, last_price, volume)
+            # update_history(investment, high, low, last_price, volume)
 
-            update_history(investment, high, low, last_price, volume)
+            # investment.live_price = last_price
+            # investment.save()
 
-            investment.live_price = last_price
-            investment.save()
-        except Exception as e:
-            print(f"Couldn't get data for {investment.symbol}: {e}")
-        return history_entry
-    else:
-        return last_update
+def update_investment_and_history():
+    """
+    Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
+    There is no official API so data is scraped from their website. Not sure if this
+    breaks terms of use.
 
+    This is done asynchronously to improve speed.
+    """
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(scrape())
+   
 
 def nearest(items, pivot):
     """
