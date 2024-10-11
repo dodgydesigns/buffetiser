@@ -7,11 +7,17 @@ import json
 from django.core.management.base import BaseCommand
 
 from core.models import Investment
+from core.services import investment_details
 from core.services.investment_details import (
     get_all_details_for_investment,
     get_credit_debit_history,
+    scraper_function_get_daily_change,
 )
-from core.services.update_investment import add_dividend
+from core.services.investmet_helpers import initiate_async_scape
+from core.services.update_investment import (
+    add_dividend,
+    scraper_function_investment_and_history,
+)
 
 
 class Command(BaseCommand):
@@ -24,8 +30,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # for inv in list(Investment.objects.all()):
+        print("*" * 60)
+        # print(initiate_async_scape(scraper_function_investment_and_history))
+        # print("************")
+        initiate_async_scape(scraper_function_get_daily_change)
+        print("poo", investment_details.current_daily_change_values)
+        print("*" * 60)
+        # initiate_async_scape(scraper_function_investment_and_history)
         # self.insert_dividends()
-        self.get_all_investment_details()
+        # self.get_all_investment_details()
         # self.get_money_in_out()
 
     def get_all_investment_details(self):

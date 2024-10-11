@@ -2,13 +2,10 @@
 All the functions to update values for Investments.
 """
 
-import asyncio
 import datetime
 import logging
 from math import floor
 
-import aiohttp
-import requests
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
@@ -25,66 +22,25 @@ logger.setLevel(logging.DEBUG)
 
 
 @sync_to_async
-def get_investment_and_urls():
+def scraper_function_investment_and_history(investment_and_url, response):
     """
-    Get each Investment and the URL containing the data for that investment. This information can then
-    be used to scrape the page and get the values needed.
+    This function is passed to the scraper functions that will asynchronously iterate through
+    Investments, pull the data from the Investments URLs and provide the data required below.
+
+    To execute: initiate_async_scape(scraper_function_investment_and_history)
     """
-    investment_and_url = {}
-    for investment in list(Investment.objects.all()):
-        investment_and_url[investment.symbol] = {
-            "investment": investment,
-            "url": f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+",
-        }
-    return investment_and_url
+    soup = BeautifulSoup(response, "html.parser")
+    symbol = soup.find("td", {"class": "symb-col"}).text
+    last_price = soup.find("td", {"class": "last-col"}).text
+    high = soup.find("td", {"class": "high-col"}).text
+    low = soup.find("td", {"class": "low-col"}).text
+    volume = soup.find("td", {"class": "volume-col"}).text
+    investment = investment_and_url[symbol]["investment"]
 
+    update_history(investment, high, low, last_price, volume)
 
-async def fetch(session, url):
-    """
-    Get all the data from the page.
-    """
-    async with session.get(url) as response:
-        return await response.text()
-
-
-async def scrape():
-    """
-    Scrape the source for each Investment. Update the the live price for each and create an entry
-    into the investment's value history.
-    """
-    investment_and_url = await get_investment_and_urls()
-    async with aiohttp.ClientSession() as session:
-        tasks = []
-        for value in investment_and_url.values():
-            page_data = fetch(session, value["url"])
-            tasks.append(asyncio.ensure_future(page_data))
-        responses = await asyncio.gather(*tasks)
-
-        for response in responses:
-            soup = BeautifulSoup(response, "html.parser")
-            symbol = soup.find("td", {"class": "symb-col"}).text
-            last_price = soup.find("td", {"class": "last-col"}).text
-            high = soup.find("td", {"class": "high-col"}).text
-            low = soup.find("td", {"class": "low-col"}).text
-            volume = soup.find("td", {"class": "volume-col"}).text
-            investment = investment_and_url[symbol]
-            print(investment, high, low, last_price, volume)
-            # update_history(investment, high, low, last_price, volume)
-
-            # investment.live_price = last_price
-            # investment.save()
-
-
-def update_investment_and_history():
-    """
-    Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
-    There is no official API so data is scraped from their website. Not sure if this
-    breaks terms of use.
-
-    This is done asynchronously to improve speed.
-    """
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(scrape())
+    investment.live_price = last_price
+    investment.save()
 
 
 def nearest(items, pivot):

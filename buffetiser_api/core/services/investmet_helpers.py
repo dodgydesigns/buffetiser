@@ -1,6 +1,11 @@
+import asyncio
 import datetime
 
-from core.models import Purchase, Sale
+import aiohttp
+import requests
+from asgiref.sync import sync_to_async
+
+from core.models import Investment, Purchase, Sale
 
 
 def get_purchase_history(investment):
@@ -50,3 +55,60 @@ def get_units_held_at_date(investment, cut_off_date):
             units_held_at_date -= purchases[purchase_date][0][0]
 
     return int(units_held_at_date)
+
+
+# ***********************************************
+# **************** Async Scraper ****************
+# ***********************************************
+
+
+@sync_to_async
+def get_investment_and_urls():
+    """
+    Get each Investment and the URL containing the data for that investment. This information can then
+    be used to scrape the page and get the values needed.
+    """
+    investment_and_url = {}
+    for investment in list(Investment.objects.all()):
+        investment_and_url[investment.symbol] = {
+            "investment": investment,
+            "url": f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+",
+        }
+    return investment_and_url
+
+
+async def fetch(session, url):
+    """
+    Get all the data from the page.
+    """
+    async with session.get(url) as response:
+        return await response.text()
+
+
+async def scrape(scraper_function):
+    """
+    Scrape the source for each Investment. Update the the live price for each and create an entry
+    into the investment's value history.
+    """
+    investment_and_url = await get_investment_and_urls()
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for value in investment_and_url.values():
+            page_data = fetch(session, value["url"])
+            tasks.append(asyncio.ensure_future(page_data))
+        responses = await asyncio.gather(*tasks)
+
+        for response in responses:
+            await scraper_function(investment_and_url, response)
+
+
+def initiate_async_scape(scraper_function):
+    """
+    Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
+    There is no official API so data is scraped from their website. Not sure if this
+    breaks terms of use.
+
+    This is done asynchronously to improve speed.
+    """
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(scrape(scraper_function=scraper_function))

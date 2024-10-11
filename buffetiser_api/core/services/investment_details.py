@@ -2,11 +2,11 @@ import datetime
 import json
 import logging
 
+from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendReinvestment, History, Investment, Purchase
 from core.services.investmet_helpers import get_purchase_history, get_sale_history
-from core.services.update_investment import update_investment_and_history
 
 logging.basicConfig(
     filename="debug.log",
@@ -17,25 +17,52 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+current_daily_change_values = []
 
-def get_daily_change(investment):
-    """
-    Uses ASX data from BigCharts (MarketWatch) to get daily change data.
-    """
-    if len(History.objects.filter(investment=investment).all()) > 0:
-        last_update = History.objects.filter(investment=investment).order_by("-id")[0]
-    # Don't want to hammer (abuse) the service so only allow updates once a day.
-    daily_change = None
-    daily_change_percent = None
-    if not last_update or last_update.date != datetime.date.today():
-        logger.log(f"Getting live price for {investment.symbol}")
-        url = f"https://bigcharts.marketwatch.com/quotes/multi.asp?view=q&msymb=au:{investment.symbol}+"
-        page = requests.get(url)
-        soup = BeautifulSoup(page.content, "html.parser")
-        daily_change = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
-        daily_change_percent = soup.find("td", {"class": "percent-col"}).text
 
-    return {"daily_change": daily_change, "daily_change_percent": daily_change_percent}
+@sync_to_async
+def scraper_function_get_daily_change(investment_and_url, response):
+    """
+    This function is passed to the scraper functions that will asynchronously iterate through
+    Investments, pull the data from the Investments URLs and provide the data required below.
+    The results are stored in global so they can be pulled whenever required (this seems wrong).
+
+    To execute: initiate_async_scape(scraper_function_get_daily_change)
+    """
+    soup = BeautifulSoup(response, "html.parser")
+    symbol = soup.find("td", {"class": "symb-col"}).text
+    daily_change = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
+    daily_change_percent = soup.find("td", {"class": "percent-col"}).text
+
+    current_daily_change_values.append(
+        {
+            "symbol": investment_and_url[symbol]["investment"].symbol,
+            "daily_change": daily_change,
+            "daily_change_percent": daily_change_percent,
+        }
+    )
+
+
+@sync_to_async
+def scraper_function_investment_and_history(investment_and_url, response):
+    """
+    This function is passed to the scraper functions that will asynchronously iterate through
+    Investments, pull the data from the Investments URLs and provide the data required below.
+
+    To execute: initiate_async_scape(scraper_function_investment_and_history)
+    """
+    soup = BeautifulSoup(response, "html.parser")
+    symbol = soup.find("td", {"class": "symb-col"}).text
+    last_price = soup.find("td", {"class": "last-col"}).text
+    high = soup.find("td", {"class": "high-col"}).text
+    low = soup.find("td", {"class": "low-col"}).text
+    volume = soup.find("td", {"class": "volume-col"}).text
+    investment = investment_and_url[symbol]["investment"]
+    print(investment, high, low, last_price, volume)
+    # update_history(investment, high, low, last_price, volume)
+
+    investment.live_price = last_price
+    investment.save()
 
 
 def get_all_details_for_investment(investment):
@@ -44,10 +71,11 @@ def get_all_details_for_investment(investment):
     entry.
     """
     # update_investment_and_history()
+
     live_price = investment.live_price
     if len(History.objects.filter(investment=investment).all()) > 0:
         yesterday_price = (
-            History.objects.filter(investment=investment).order_by("-id")[0].close
+            History.objects.filter(investment=investment).order_by("-id")[1].close
         )
     else:
         yesterday_price = live_price
@@ -60,7 +88,7 @@ def get_all_details_for_investment(investment):
         "yesterday_price": yesterday_price,
         "last_price": live_price,
         "variation": live_price - yesterday_price,
-        "variation_percent": (live_price - yesterday_price) / yesterday_price,
+        "variation_percent": 100 * (live_price - yesterday_price) / yesterday_price,
         "daily_change": (
             daily_change["daily_change"] if daily_change["daily_change"] else 0
         ),
