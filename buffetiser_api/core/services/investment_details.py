@@ -6,7 +6,11 @@ from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendReinvestment, History, Investment, Purchase
-from core.services.investmet_helpers import get_purchase_history, get_sale_history, initiate_async_scape
+from core.services.investmet_helpers import (
+    get_purchase_history,
+    get_sale_history,
+    initiate_async_scape,
+)
 from core.services.update_investment import update_history
 
 logging.basicConfig(
@@ -18,7 +22,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-# This is used to hold the results of the async call to get the current deviation of price 
+# This is used to hold the results of the async call to get the current deviation of price
 # for stocks.
 current_daily_change_values = {}
 
@@ -36,7 +40,9 @@ def scraper_function_get_daily_change(investment_and_url, response):
     soup = BeautifulSoup(response, "html.parser")
     symbol = soup.find("td", {"class": "symb-col"}).text
     daily_change = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
-    daily_change_percent = float(soup.find("td", {"class": "percent-col"}).text.replace("%", ""))
+    daily_change_percent = float(
+        soup.find("td", {"class": "percent-col"}).text.replace("%", "")
+    )
 
     current_daily_change_values[investment_and_url[symbol]["investment"].symbol] = {
         "daily_change": daily_change,
@@ -88,10 +94,12 @@ def get_all_details_for_investment(investment):
         "symbol": investment.symbol,
         "yesterday_price": yesterday_price,
         "last_price": live_price,
-        "variation": live_price - yesterday_price,  
+        "variation": live_price - yesterday_price,
         "variation_percent": (live_price - yesterday_price) / yesterday_price,
         "daily_change": current_daily_change_values[investment.symbol]["daily_change"],
-        "daily_change_percent": current_daily_change_values[investment.symbol]["daily_change_percent"],
+        "daily_change_percent": current_daily_change_values[investment.symbol][
+            "daily_change_percent"
+        ],
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),
@@ -119,7 +127,12 @@ def get_investment_price_history(investment):
     """
     investment_price_history = {}
     for history in list(History.objects.filter(investment=investment)):
-        investment_price_history[history.date.strftime("%Y%m%d")] = {"low": history.low, "high": history.high, "close": history.close, "volume": history.volume}
+        investment_price_history[history.date.strftime("%Y%m%d")] = {
+            "low": history.low,
+            "high": history.high,
+            "close": history.close,
+            "volume": history.volume,
+        }
     return investment_price_history
 
 

@@ -128,7 +128,9 @@ def update_history(investment, high, low, last_price, volume):
     Add a new element to the History record.
     """
     (today := datetime.date.today())
-    if today not in [history_object.date for history_object in list(History.objects.all())]:
+    if today not in [
+        history_object.date for history_object in list(History.objects.all())
+    ]:
         history_entry = History(
             investment=investment,
             date=today,
