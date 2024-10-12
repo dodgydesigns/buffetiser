@@ -97,6 +97,7 @@ def get_all_details_for_investment(investment):
         "total_cost": get_total_cost(investment),
         "profit": profit_total[0],
         "profit_percent": profit_total[1],
+        "history": get_investment_price_history(investment),
     }
     return all_details
 
@@ -109,6 +110,17 @@ def get_details_for_all_investments():
     for investment in Investment.objects.all():
         all_investment_details.append(get_all_details_for_investment(investment))
     return json.dumps(all_investment_details)
+
+
+def get_investment_price_history(investment):
+    """
+    Return a list of the daily details of an Investment: low, high, close and volume. Used to create a
+    plot of the history of an Investment's value.
+    """
+    investment_price_history = {}
+    for history in list(History.objects.filter(investment=investment)):
+        investment_price_history[history.date.strftime("%Y%m%d")] = {"low": history.low, "high": history.high, "close": history.close, "volume": history.volume}
+    return investment_price_history
 
 
 def get_credit_debit_history():
