@@ -29,16 +29,19 @@ class Command(BaseCommand):
         parser.add_argument("file_path", type=str)
 
     def handle(self, *args, **options):
+        initiate_async_scape(scraper_function_investment_and_history)
+        initiate_async_scape(scraper_function_get_daily_change)
+
         # for inv in list(Investment.objects.all()):
-        print("*" * 60)
+        # print("*" * 60)
         # print(initiate_async_scape(scraper_function_investment_and_history))
         # print("************")
-        initiate_async_scape(scraper_function_get_daily_change)
-        print("poo", investment_details.current_daily_change_values)
-        print("*" * 60)
+        # initiate_async_scape(scraper_function_get_daily_change)
+        # print("poo", investment_details.current_daily_change_values)
+        # print("*" * 60)
         # initiate_async_scape(scraper_function_investment_and_history)
         # self.insert_dividends()
-        # self.get_all_investment_details()
+        self.get_all_investment_details()
         # self.get_money_in_out()
 
     def get_all_investment_details(self):

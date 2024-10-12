@@ -6,7 +6,8 @@ from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendReinvestment, History, Investment, Purchase
-from core.services.investmet_helpers import get_purchase_history, get_sale_history
+from core.services.investmet_helpers import get_purchase_history, get_sale_history, initiate_async_scape
+from core.services.update_investment import update_history
 
 logging.basicConfig(
     filename="debug.log",
@@ -17,7 +18,9 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-current_daily_change_values = []
+# This is used to hold the results of the async call to get the current deviation of price 
+# for stocks.
+current_daily_change_values = {}
 
 
 @sync_to_async
@@ -28,19 +31,17 @@ def scraper_function_get_daily_change(investment_and_url, response):
     The results are stored in global so they can be pulled whenever required (this seems wrong).
 
     To execute: initiate_async_scape(scraper_function_get_daily_change)
+    Does not need to implement a loop of Investments. The async functions do this.
     """
     soup = BeautifulSoup(response, "html.parser")
     symbol = soup.find("td", {"class": "symb-col"}).text
     daily_change = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
-    daily_change_percent = soup.find("td", {"class": "percent-col"}).text
+    daily_change_percent = float(soup.find("td", {"class": "percent-col"}).text.replace("%", ""))
 
-    current_daily_change_values.append(
-        {
-            "symbol": investment_and_url[symbol]["investment"].symbol,
-            "daily_change": daily_change,
-            "daily_change_percent": daily_change_percent,
-        }
-    )
+    current_daily_change_values[investment_and_url[symbol]["investment"].symbol] = {
+        "daily_change": daily_change,
+        "daily_change_percent": daily_change_percent,
+    }
 
 
 @sync_to_async
@@ -50,6 +51,7 @@ def scraper_function_investment_and_history(investment_and_url, response):
     Investments, pull the data from the Investments URLs and provide the data required below.
 
     To execute: initiate_async_scape(scraper_function_investment_and_history)
+    Does not need to implement a loop of Investments. The async functions do this.
     """
     soup = BeautifulSoup(response, "html.parser")
     symbol = soup.find("td", {"class": "symb-col"}).text
@@ -58,8 +60,7 @@ def scraper_function_investment_and_history(investment_and_url, response):
     low = soup.find("td", {"class": "low-col"}).text
     volume = soup.find("td", {"class": "volume-col"}).text
     investment = investment_and_url[symbol]["investment"]
-    print(investment, high, low, last_price, volume)
-    # update_history(investment, high, low, last_price, volume)
+    update_history(investment, high, low, last_price, volume)
 
     investment.live_price = last_price
     investment.save()
@@ -80,23 +81,17 @@ def get_all_details_for_investment(investment):
     else:
         yesterday_price = live_price
 
-    daily_change = get_daily_change(investment)
     profit_total = get_profit_total_and_percentage(investment)
+
     all_details = {
         "name": investment.name,
         "symbol": investment.symbol,
         "yesterday_price": yesterday_price,
         "last_price": live_price,
-        "variation": live_price - yesterday_price,
-        "variation_percent": 100 * (live_price - yesterday_price) / yesterday_price,
-        "daily_change": (
-            daily_change["daily_change"] if daily_change["daily_change"] else 0
-        ),
-        "daily_change_percent": (
-            daily_change["daily_change_percent"]
-            if daily_change["daily_change_percent"]
-            else 0
-        ),
+        "variation": live_price - yesterday_price,  
+        "variation_percent": (live_price - yesterday_price) / yesterday_price,
+        "daily_change": current_daily_change_values[investment.symbol]["daily_change"],
+        "daily_change_percent": current_daily_change_values[investment.symbol]["daily_change_percent"],
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),

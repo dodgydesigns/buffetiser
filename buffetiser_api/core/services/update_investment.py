@@ -10,6 +10,7 @@ from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendPayment, DividendReinvestment, History, Investment
+from core.services.investmet_helpers import get_units_held_at_date
 
 logging.basicConfig(
     filename="debug.log",
@@ -126,15 +127,17 @@ def update_history(investment, high, low, last_price, volume):
     """
     Add a new element to the History record.
     """
-    history_entry = History(
-        investment=investment,
-        date=datetime.datetime.now(),
-        high=high,
-        low=low,
-        close=last_price,
-        volume=int(volume.replace(",", "")),
-    )
-    history_entry.save()
+    (today := datetime.date.today())
+    if today not in [history_object.date for history_object in list(History.objects.all())]:
+        history_entry = History(
+            investment=investment,
+            date=today,
+            high=high,
+            low=low,
+            close=last_price,
+            volume=int(volume.replace(",", "")),
+        )
+        history_entry.save()
 
 
 def get_plot_data(investment):
