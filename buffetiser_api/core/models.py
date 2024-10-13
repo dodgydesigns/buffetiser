@@ -221,5 +221,8 @@ class History(Model):
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
 
+    def __str__(self):
+        return f"{self.investment.symbol, self.high, self.low, self.close}"
+
     class Meta:
         unique_together = ("date", "investment")

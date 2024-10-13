@@ -23,7 +23,8 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 # This is used to hold the results of the async call to get the current deviation of price
-# for stocks.
+# for stocks. Don't want it in the database but the async doesn't seem to return the results.
+# Don't think this is right but it works.
 current_daily_change_values = {}
 
 
@@ -76,9 +77,11 @@ def get_all_details_for_investment(investment):
     """
     Return a dictionary with all the details required by the front end to render an Investment
     entry.
-    """
-    # update_investment_and_history()
 
+    Before this is called, the following should be called to ensure the latest data is available:
+        - initiate_async_scape(scraper_function_get_daily_change)
+        - initiate_async_scape(scraper_function_investment_and_history)
+    """
     live_price = investment.live_price
     if len(History.objects.filter(investment=investment).all()) > 0:
         yesterday_price = (
@@ -108,16 +111,6 @@ def get_all_details_for_investment(investment):
         "history": get_investment_price_history(investment),
     }
     return all_details
-
-
-def get_details_for_all_investments():
-    """
-    Get the details for all Investments as JSON.
-    """
-    all_investment_details = []
-    for investment in Investment.objects.all():
-        all_investment_details.append(get_all_details_for_investment(investment))
-    return json.dumps(all_investment_details)
 
 
 def get_investment_price_history(investment):
