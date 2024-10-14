@@ -6,11 +6,8 @@ import datetime
 import logging
 from math import floor
 
-from asgiref.sync import sync_to_async
-from bs4 import BeautifulSoup
-
-from core.models import DividendPayment, DividendReinvestment, History, Investment
-from core.services.investmet_helpers import get_units_held_at_date
+from core.models import DividendPayment, DividendReinvestment, History
+from core.services.investment_helpers import get_units_held_at_date
 
 logging.basicConfig(
     filename="debug.log",
@@ -20,28 +17,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
-
-@sync_to_async
-def scraper_function_investment_and_history(investment_and_url, response):
-    """
-    This function is passed to the scraper functions that will asynchronously iterate through
-    Investments, pull the data from the Investments URLs and provide the data required below.
-
-    To execute: initiate_async_scape(scraper_function_investment_and_history)
-    """
-    soup = BeautifulSoup(response, "html.parser")
-    symbol = soup.find("td", {"class": "symb-col"}).text
-    last_price = soup.find("td", {"class": "last-col"}).text
-    high = soup.find("td", {"class": "high-col"}).text
-    low = soup.find("td", {"class": "low-col"}).text
-    volume = soup.find("td", {"class": "volume-col"}).text
-    investment = investment_and_url[symbol]["investment"]
-
-    update_history(investment, high, low, last_price, volume)
-
-    investment.live_price = last_price
-    investment.save()
 
 
 def nearest(items, pivot):

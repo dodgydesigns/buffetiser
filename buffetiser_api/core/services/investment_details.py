@@ -6,10 +6,9 @@ from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
 from core.models import DividendReinvestment, History, Investment, Purchase
-from core.services.investmet_helpers import (
+from core.services.investment_helpers import (
     get_purchase_history,
     get_sale_history,
-    initiate_async_scape,
 )
 from core.services.update_investment import update_history
 
@@ -41,9 +40,8 @@ def scraper_function_get_daily_change(investment_and_url, response):
     soup = BeautifulSoup(response, "html.parser")
     symbol = soup.find("td", {"class": "symb-col"}).text
     daily_change = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
-    daily_change_percent = float(
-        soup.find("td", {"class": "percent-col"}).text.replace("%", "")
-    )
+    daily_change_percent_string = soup.find("td", {"class": "percent-col"}).text.replace("%", "")
+    daily_change_percent = "N/A" if daily_change_percent_string == "n/a" else float(daily_change_percent_string)
 
     current_daily_change_values[investment_and_url[symbol]["investment"].symbol] = {
         "daily_change": daily_change,
