@@ -5,7 +5,7 @@ import logging
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
 
-from core.models import DividendReinvestment, History, Investment, Purchase
+from core.models import DailyChange, DividendReinvestment, History, Investment, Purchase
 from core.services.investment_helpers import (
     get_purchase_history,
     get_sale_history,
@@ -20,11 +20,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
-# This is used to hold the results of the async call to get the current deviation of price
-# for stocks. Don't want it in the database but the async doesn't seem to return the results.
-# Don't think this is right but it works.
-current_daily_change_values = {}
 
 
 @sync_to_async
@@ -43,10 +38,12 @@ def scraper_function_get_daily_change(investment_and_url, response):
     daily_change_percent_string = soup.find("td", {"class": "percent-col"}).text.replace("%", "")
     daily_change_percent = "N/A" if daily_change_percent_string == "n/a" else float(daily_change_percent_string)
 
-    current_daily_change_values[investment_and_url[symbol]["investment"].symbol] = {
-        "daily_change": daily_change,
-        "daily_change_percent": daily_change_percent,
-    }
+    daily_change = DailyChange.objects.create(
+        symbol=investment_and_url[symbol]["investment"].symbol,
+        daily_change=daily_change,
+        daily_change_percent=daily_change_percent,
+    )
+    daily_change.save()
 
 
 @sync_to_async
@@ -88,8 +85,8 @@ def get_all_details_for_investment(investment):
     else:
         yesterday_price = live_price
 
+    daily_change = DailyChange.objects.filter(symbol=investment.symbol).first()
     profit_total = get_profit_total_and_percentage(investment)
-
     all_details = {
         "name": investment.name,
         "symbol": investment.symbol,
@@ -97,16 +94,14 @@ def get_all_details_for_investment(investment):
         "last_price": live_price,
         "variation": live_price - yesterday_price,
         "variation_percent": (live_price - yesterday_price) / yesterday_price,
-        "daily_change": current_daily_change_values[investment.symbol]["daily_change"],
-        "daily_change_percent": current_daily_change_values[investment.symbol][
-            "daily_change_percent"
-        ],
+        "daily_change": daily_change.daily_change,
+        "daily_change_percent": daily_change.daily_change_percent,
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),
         "profit": profit_total[0],
         "profit_percent": profit_total[1],
-        "history": get_investment_price_history(investment),
+        # "history": get_investment_price_history(investment),
     }
     return all_details
 

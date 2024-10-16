@@ -7,6 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/topics/settings/
 
 For the full list of settings and their values, see
+
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
@@ -25,7 +26,7 @@ SECRET_KEY = "django-insecure-v93=j4&xk^edz&78gc@vir@y5v4q2egt9y=lbih_nzymamh*uj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.167.1.111", "127.0.0.1", "localhost"]
 
 
 # Application definition

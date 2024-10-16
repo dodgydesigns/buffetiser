@@ -237,3 +237,6 @@ class DailyChange(Model):
     symbol = CharField(default="")
     daily_change = FloatField(default=0)
     daily_change_percent = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.symbol, self.daily_change, self.daily_change_percent}"

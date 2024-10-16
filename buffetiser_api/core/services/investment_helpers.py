@@ -47,7 +47,6 @@ def get_units_held_at_date(investment, cut_off_date):
     units_held_at_date = 0
     for purchase_date in list(purchases.keys()):
         if datetime.datetime.strptime(purchase_date, "%d/%m/%Y") <= cut_off_date:
-            # import pdb; pdb.set_trace()
             units_held_at_date += purchases[purchase_date][0][0]
     for sales_date in list(sales.keys()):
         if datetime.datetime.strptime(sales_date, "%d/%m/%Y") <= cut_off_date:
@@ -109,5 +108,6 @@ def initiate_async_scape(scraper_function):
 
     This is done asynchronously to improve speed.
     """
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     loop.run_until_complete(scrape(scraper_function=scraper_function))
