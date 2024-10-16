@@ -226,3 +226,14 @@ class History(Model):
 
     class Meta:
         unique_together = ("date", "investment")
+
+
+class DailyChange(Model):
+    """
+    We need a place to hold the most up-to-date values of each investment. Although only
+    a temporary value, it should be held to provide the information on first start and
+    restart of the app.
+    """
+    symbol = CharField(default="")
+    daily_change = FloatField(default=0)
+    daily_change_percent = FloatField(default=0)
