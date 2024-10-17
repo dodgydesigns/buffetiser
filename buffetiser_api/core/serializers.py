@@ -6,7 +6,7 @@ from rest_framework import serializers
 class InvestmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Investment
-        fields = '__all__'
+        fields = "__all__"
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
