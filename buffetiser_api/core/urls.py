@@ -9,8 +9,8 @@ router.register(r"investments", InvestmentViewSet)
 urlpatterns = router.urls
 urlpatterns += [
     path("all/", AllInvestmentsDataView.as_view()),
-    path('update_daily/', views.update_daily_changes),
-    path('update_all/', views.update_all_investments),
+    path("update_daily/", views.update_daily_changes),
+    path("update_all/", views.update_all_investments),
 ]
 # from django.contrib import admin
 # from django.urls import path

@@ -8,18 +8,18 @@ from core.services.investment_details import (
 from core.services.investment_helpers import initiate_async_scape
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def update_daily_changes():
     """
     When hit, this endpoint updates the daily change values for ALL Investments.
     As this is just a temporary value that is updated constantly, the previous
     values are of no use and can be deleted.
     """
-    print("*"*900)
+    print("*" * 900)
     # Clear the current data
     DailyChange.objects.all().delete()
 
@@ -28,12 +28,12 @@ def update_daily_changes():
     return HttpResponse(status=204)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def update_all_investments():
     """
     This updates ALL the data for ALL investments.
     """
-    print("*"*900)
+    print("*" * 900)
     update_daily_changes()
     initiate_async_scape(scraper_function_investment_and_history)
 
@@ -46,6 +46,7 @@ class AllInvestmentsDataView(APIView):
     required for the UI to display all the data for each Investment. The History data
     for plots is handled separately.
     """
+
     def get(self, request):
         all_investment_data = []
         for investment in list(Investment.objects.all()):
