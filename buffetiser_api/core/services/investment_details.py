@@ -105,7 +105,6 @@ def get_all_details_for_investment(investment):
         "total_cost": get_total_cost(investment),
         "profit": profit_total[0],
         "profit_percent": profit_total[1],
-        # "history": get_investment_price_history(investment),
     }
     return all_details
 
