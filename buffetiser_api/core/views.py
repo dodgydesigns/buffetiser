@@ -13,13 +13,12 @@ from rest_framework.views import APIView
 
 
 @api_view(["POST"])
-def update_daily_changes():
+def update_daily_changes(request):
     """
     When hit, this endpoint updates the daily change values for ALL Investments.
     As this is just a temporary value that is updated constantly, the previous
     values are of no use and can be deleted.
     """
-    print("*" * 900)
     # Clear the current data
     DailyChange.objects.all().delete()
 
@@ -29,12 +28,11 @@ def update_daily_changes():
 
 
 @api_view(["POST"])
-def update_all_investments():
+def update_all_investments(request):
     """
     This updates ALL the data for ALL investments.
     """
-    print("*" * 900)
-    update_daily_changes()
+    update_daily_changes(request._request)
     initiate_async_scape(scraper_function_investment_and_history)
 
     return HttpResponse(status=204)

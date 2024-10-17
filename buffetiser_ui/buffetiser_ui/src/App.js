@@ -4,15 +4,42 @@ import axios from "axios";
 
 function Header() {
   return (
-    <>
-      <div className="right">
-        <span>Admin</span>
-        <span>New Investment</span>
-        <span>Reports</span>
-        <span>Sort</span>
-      </div>
-    </>
+    <div className="right">
+      <span>Admin</span>
+      <span>New Investment</span>
+      <span>Reports</span>
+      <span>Sort</span>
+      <button
+        onClick={() => {
+          axios.post("http://127.0.0.1:8000/update_daily/");
+        }}
+      >
+        Update Daily
+      </button>
+      <button
+        onClick={() => {
+          axios.post("http://127.0.0.1:8000/update_all/");
+        }}
+      >
+        Update All
+      </button>
+    </div>
   );
+}
+
+function UpdateData(url) {
+  useEffect(() => {
+    axios
+      .get(url)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        console.log(error.response);
+      });
+  });
 }
 
 function InvestmentCards({ allInvestments }) {
