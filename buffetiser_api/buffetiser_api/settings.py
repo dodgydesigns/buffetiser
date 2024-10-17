@@ -28,24 +28,24 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "192.168.1.108", "localhost"]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://192.168.1.108:3000",
-#     "http://192.168.1.108:8000",
-#     "http://127.0.0.1:8000",
-#     "http://127.0.0.1:3000",
-#     "http://127.0.0.1:80",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://192.168.1.108:3000",
+    "http://192.168.1.108:8000",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:80",
+]
 
-# CORS_ALLOW_ALL_ORIGINS: True
+CORS_ALLOW_ALL_ORIGINS: True
 
-# CORS_ALLOW_METHODS = (
-#     "DELETE",
-#     "GET",
-#     "OPTIONS",
-#     "PATCH",
-#     "POST",
-#     "PUT",
-# )
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 
 # Application definition
 
@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "corsheaders",
+    "corsheaders",
     'rest_framework',
     "core",
 ]
