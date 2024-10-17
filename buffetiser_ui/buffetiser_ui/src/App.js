@@ -122,39 +122,40 @@ function Footer() {
 export default function App() {
   const [allInvestments, setAllInvestments] = useState([]);
 
-  // axios({
-  //   method: "GET",
-  //   url: "http://192.167.1.111/all",
-  // })
-  //   .then((response) => {
-  //     const data = response.data;
-  //     console.log(data);
-  //   })
-  //   .catch((error) => {
-  //     if (error.response) {
-  //       console.log(error.response);
-  //       console.log(error.response.status);
-  //       console.log(error.response.headers);
-  //     }
-  //   });
+  axios({
+    method: "GET",
+    url: "http://127.0.0.1:8000/all",
+  })
+    .then((response) => {
+      const data = response.data;
+      console.log(data);
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.log(error.response);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      }
+    });
 
-  // // fetch("https://jsonplaceholder.typicode.com/todos/1")
-  // fetch("http://192.167.1.111/all")
+  // fetch("https://jsonplaceholder.typicode.com/todos/1")
+  // fetch("http://192.167.1.108:8000/all")
+  // fetch("http://192.168.1.108:8000/all")
   //   .then((response) => response.data.json())
   //   .then((json) => console.log(json));
 
-  useEffect(() => {
-    axios
-      .get("http://192.167.1.111/all")
-      .then((response) => response.data)
-      .then((data) => {
-        console.log("json", data);
-        // setAllInvestments(json.data.movies);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("http://127.0.0.1:8000/investments")
+  //     .then((response) => response)
+  //     .then((data) => {
+  //       console.log("json", data);
+  //       // setAllInvestments(json.data.movies);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
 
   // useEffect(() => {
   //   axios

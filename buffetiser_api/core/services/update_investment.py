@@ -104,7 +104,8 @@ def update_history(investment, high, low, last_price, volume):
     """
     (today := datetime.date.today())
     if today not in [
-        history_object.date for history_object in list(History.objects.filter(investment=investment))
+        history_object.date
+        for history_object in list(History.objects.filter(investment=investment))
     ]:
         history_entry = History(
             investment=investment,

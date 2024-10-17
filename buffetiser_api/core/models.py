@@ -1,17 +1,9 @@
 import datetime
 from typing import Union
 
-from django.db.models import (
-    CASCADE,
-    CharField,
-    DateField,
-    FloatField,
-    ForeignKey,
-    IntegerField,
-    Model,
-)
-
 from core.config import Constants
+from django.db.models import (CASCADE, CharField, DateField, FloatField,
+                              ForeignKey, IntegerField, Model)
 
 
 class Investment(Model):
@@ -234,6 +226,7 @@ class DailyChange(Model):
     a temporary value, it should be held to provide the information on first start and
     restart of the app.
     """
+
     symbol = CharField(default="")
     daily_change = FloatField(default=0)
     daily_change_percent = FloatField(default=0)
