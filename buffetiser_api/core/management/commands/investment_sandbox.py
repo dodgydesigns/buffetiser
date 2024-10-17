@@ -4,13 +4,14 @@ This command can be used to test various functions in core.
 
 import json
 
+from django.core.management.base import BaseCommand
+
 from core.models import Investment
 from core.services.investment_details import (
     get_all_details_for_investment, get_credit_debit_history,
     scraper_function_get_daily_change, scraper_function_investment_and_history)
 from core.services.investment_helpers import initiate_async_scape
 from core.services.update_investment import add_dividend
-from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

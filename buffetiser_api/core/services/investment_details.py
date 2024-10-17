@@ -4,10 +4,12 @@ import logging
 
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
+
 from core.models import (DailyChange, DividendReinvestment, History,
                          Investment, Purchase)
 from core.services.investment_helpers import (get_purchase_history,
-                                              get_sale_history, initiate_async_scape)
+                                              get_sale_history,
+                                              initiate_async_scape)
 from core.services.update_investment import update_history
 
 logging.basicConfig(
@@ -32,13 +34,17 @@ def scraper_function_get_daily_change(investment_and_url, response):
     """
     soup = BeautifulSoup(response, "html.parser")
     symbol = soup.find("td", {"class": "symb-col"}).text
-    daily_change_string = soup.find("td", {"class": "change-col"}).text.replace("\xa0", "")
+    daily_change_string = soup.find("td", {"class": "change-col"}).text.replace(
+        "\xa0", ""
+    )
     daily_change_percent_string = soup.find(
         "td", {"class": "percent-col"}
     ).text.replace("%", "")
 
     daily_change = float(daily_change_string) if daily_change_string != "UNCH" else 1.0
-    daily_change_percent = float(daily_change_percent_string) if daily_change_string != "UNCH" else 1.0
+    daily_change_percent = (
+        float(daily_change_percent_string) if daily_change_string != "UNCH" else 1.0
+    )
 
     daily_change = DailyChange.objects.create(
         symbol=investment_and_url[symbol]["investment"].symbol,
@@ -87,7 +93,7 @@ def get_all_details_for_investment(investment):
         )
     else:
         yesterday_price = live_price
-    
+
     daily_change = DailyChange.objects.filter(symbol=investment.symbol).first()
     profit_total = get_profit_total_and_percentage(investment)
 

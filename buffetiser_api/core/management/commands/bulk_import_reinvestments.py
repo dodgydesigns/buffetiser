@@ -9,8 +9,9 @@ e.g. VDHG,16/07/2024,3
 import csv
 from datetime import datetime
 
-from core.models import DividendReinvestment, Investment
 from django.core.management.base import BaseCommand
+
+from core.models import DividendReinvestment, Investment
 
 
 class Command(BaseCommand):

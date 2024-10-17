@@ -1,9 +1,10 @@
 import datetime
 from typing import Union
 
-from core.config import Constants
 from django.db.models import (CASCADE, CharField, DateField, FloatField,
                               ForeignKey, IntegerField, Model)
+
+from core.config import Constants
 
 
 class Investment(Model):

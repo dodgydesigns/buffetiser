@@ -3,6 +3,7 @@ import datetime
 
 import aiohttp
 from asgiref.sync import sync_to_async
+
 from core.models import Investment, Purchase, Sale
 
 
