@@ -22,10 +22,13 @@ code {
   --COLOUR2: #3282b8;
 }
 :root {
-  --COLOUR3: #bbe1fa;
+  --COLOUR3: #0276ef;
 }
 :root {
-  --COLOUR4: #aaaaaa;
+  --COLOUR4: #bbe1fa;
+}
+:root {
+  --COLOUR5: #aaaaaa;
 }
 :root {
   --RED: #ff7777;
@@ -34,7 +37,121 @@ code {
   --GREEN: #55ff55;
 }
 
-html,
+body {
+  font-family: "Arial";
+  width: 100%;
+  background-color: var(--COLOUR2);
+  display: flex;
+  justify-content: center;
+}
+
+.header {
+  height: 2.5vh;
+  padding-top: 0.5rem;
+  background-color: var(--COLOUR0);
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header_bar_div {
+  border-radius: 25px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  color: #ffffff;
+  background-color: var(--COLOUR0);
+}
+
+.header_bar_div:hover {
+  background-color: var(--COLOUR1);
+}
+/*
+
+
+
+
+*/
+.card_header {
+  cursor: pointer;
+  background-color: var(--COLOUR3);
+  padding: 0rem;
+  margin-top: 0.2rem;
+  margin-right: 10rem;
+  border-style: solid;
+  border-color: #ffffff;
+  border-width: 0.5px;
+  width: 99.9%;
+}
+
+.investment_symbol {
+  padding-left: 1rem;
+  padding-right: 3%;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+.investment_name {
+  font-size: 1.5rem;
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+/*
+
+
+
+
+*/
+Table {
+  width: 100%;
+  table-layout: fixed;
+}
+/*
+
+
+
+
+*/
+.header_header {
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+/*
+
+
+
+
+*/
+.daily_gain {
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+.profit_loss {
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+.last_price_plus_minus {
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+.last_price_percent {
+  color: #ffffff;
+  background-color: var(--COLOUR3);
+}
+
+/* .header:hover {
+  cursor: pointer;
+}
+.header.span {
+  background: "#FF0000";
+} */
+/* html,
 body {
   display: flex;
   height: 100%;
@@ -45,9 +162,7 @@ body {
   width: 100px;
 }
 
-/*  ----------------------------------------------------
-    LEFT PANEL
-    ----------------------------------------------------  */
+
 #left {
   display: block;
   background: var(--COLOUR0);
@@ -72,17 +187,13 @@ body {
   background-color: var(--COLOUR1);
 }
 
-/*  ----------------------------------------------------
 
-    ----------------------------------------------------  */
 #right {
   width: 100%;
   background-color: var(--COLOUR0);
 }
 
-/*  ----------------------------------------------------
 
-    ----------------------------------------------------  */
 #top {
   background-color: var(--COLOUR0);
   height: 74%;
@@ -92,9 +203,7 @@ body {
   text-align: center;
 }
 
-/*  ----------------------------------------------------
 
-    ----------------------------------------------------  */
 #top-inner-left {
   float: left;
   width: 86%;
@@ -134,9 +243,7 @@ table td {
   padding: 5px;
 }
 
-/*  ----------------------------------------------------
-    INDEX   BOTTOM SUMMARY PANEL
-    ----------------------------------------------------  */
+
 #bottom {
   height: 24%;
   border-style: solid;
@@ -169,9 +276,7 @@ table td {
   text-align: right;
 }
 
-/*  ----------------------------------------------------
-    NEW PURCHASE PAGE
-    ----------------------------------------------------  */
+
 .new_purchase {
   display: flex;
   flex-direction: row;
@@ -212,10 +317,8 @@ button.submit-btn {
   background-color: var(--COLOUR1);
 }
 
-/*  ----------------------------------------------------
 
-    ----------------------------------------------------  */
 .investmentDetails {
   display: flex;
   flex-direction: column;
-}
+} */

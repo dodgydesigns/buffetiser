@@ -58,8 +58,6 @@ def get_units_held_at_date(investment, cut_off_date):
 # ***********************************************
 # **************** Async Scraper ****************
 # ***********************************************
-
-
 @sync_to_async
 def get_investment_and_urls():
     """

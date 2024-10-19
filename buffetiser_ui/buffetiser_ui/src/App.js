@@ -2,44 +2,45 @@ import { useState, useEffect } from "react";
 import "./index.css";
 import axios from "axios";
 
+const baseURL = "127.0.0.1:8000";
+
 function Header() {
   return (
-    <div className="right">
-      <span>Admin</span>
-      <span>New Investment</span>
-      <span>Reports</span>
-      <span>Sort</span>
-      <button
+    <div className="header">
+      <span
+        className="header_bar_div"
         onClick={() => {
-          axios.post("http://127.0.0.1:8000/update_daily/");
+          axios.request(baseURL + "/config/");
         }}
       >
-        Update Daily
-      </button>
-      <button
+        Configuration
+      </span>
+      <span
+        className="header_bar_div"
         onClick={() => {
-          axios.post("http://127.0.0.1:8000/update_all/");
+          axios.post(baseURL + "/new_investment/");
         }}
       >
-        Update All
-      </button>
+        New Investment
+      </span>
+      <span
+        className="header_bar_div"
+        onClick={() => {
+          axios.post(baseURL + "/reports/");
+        }}
+      >
+        Reports
+      </span>
+      <span
+        className="header_bar_div"
+        onClick={() => {
+          axios.post(baseURL + "/help/");
+        }}
+      >
+        Help
+      </span>
     </div>
   );
-}
-
-function UpdateData(url) {
-  useEffect(() => {
-    axios
-      .get(url)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error.response.status);
-        console.log(error.response.headers);
-        console.log(error.response);
-      });
-  });
 }
 
 function InvestmentCards({ allInvestments }) {
@@ -51,30 +52,102 @@ function InvestmentCard(investment) {
 
   return (
     <div key={investment.symbol}>
-      <button onClick={() => setIsOpen((open) => !open)}>X</button>
-      <span>
-        <span>{investment.name}</span>
-        <span>{investment.symbol}</span>
-        <span>
-          <span>Last Price</span>
-          <span>+/-</span>
-          <span>%</span>
-          <span>Daily Gain</span>
-          <span>P&L</span>
-          <span>%</span>
-        </span>
-        <div>
-          {isOpen && (
-            <span>
-              <span>{investment.last_price}</span>
-              <span>{investment.variation}</span>
-              <span>{investment.variation_percent}</span>
-              <span>{investment.daily_change}</span>
-              <span>{investment.daily_change_percent}</span>
-            </span>
-          )}
-        </div>
-      </span>
+      <table className="card_header">
+        <tbody>
+          <tr onClick={() => setIsOpen((open) => !open)}>
+            <table>
+              <tbody>
+                <tr>
+                  <td width="40%"></td>
+                  <td className="header_header" width="5%">
+                    Last Price
+                  </td>
+                  <td className="header_header" width="5%">
+                    +/-
+                  </td>
+                  <td className="header_header" width="5%">
+                    %
+                  </td>
+                  <td width="6%"></td>
+                  <td className="header_header" width="6%">
+                    Daily Δ
+                  </td>
+                  <td className="header_header" width="3%">
+                    +/-
+                  </td>
+                  <td className="header_header" width="3%">
+                    %
+                  </td>
+                  <td className="header_header"></td>
+                </tr>
+                <tr>
+                  <td>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <td className="investment_symbol" width="8%">
+                            {investment.symbol}
+                          </td>
+                          <td className="investment_name">{investment.name}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                  <td className="header_header">
+                    {investment.last_price.toFixed(2)}
+                  </td>
+                  <td
+                    style={
+                      investment.variation < 0
+                        ? { color: "#ff9999" }
+                        : { color: "#55ff55" }
+                    }
+                  >
+                    {investment.variation.toFixed(2)}
+                  </td>
+                  <td
+                    style={
+                      investment.variation < 0
+                        ? { color: "#ff9999" }
+                        : { color: "#55ff55" }
+                    }
+                  >
+                    {investment.variation_percent.toFixed(2)}%
+                  </td>
+                  <td width="6%"></td>
+                  <td
+                    style={
+                      investment.variation < 0
+                        ? { color: "#ff9999" }
+                        : { color: "#55ff55" }
+                    }
+                  >
+                    {investment.variation.toFixed(2)}
+                  </td>
+                  <td
+                    style={
+                      investment.variation < 0
+                        ? { color: "#ff9999" }
+                        : { color: "#55ff55" }
+                    }
+                  >
+                    {investment.daily_change.toFixed(2)}
+                  </td>
+                  <td
+                    style={
+                      investment.variation < 0
+                        ? { color: "#ff9999" }
+                        : { color: "#55ff55" }
+                    }
+                  >
+                    {investment.daily_change_percent.toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
