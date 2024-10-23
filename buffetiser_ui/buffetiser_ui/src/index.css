@@ -31,10 +31,13 @@ code {
   --COLOUR5: #aaaaaa;
 }
 :root {
-  --RED: #ff7777;
+  --RED: #ff3333;
 }
 :root {
-  --GREEN: #55ff55;
+  --GREEN: #82ca9d;
+}
+:root {
+  --YELLOW: #f5e642;
 }
 
 body {
@@ -144,6 +147,19 @@ Table {
   color: #ffffff;
   background-color: var(--COLOUR3);
 }
+
+/*
+
+*/
+.chart {
+  width: 99%;
+  height: 20rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+/*
+
+*/
 
 /* .header:hover {
   cursor: pointer;

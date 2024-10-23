@@ -4,12 +4,12 @@ import logging
 
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
-
-from core.models import (DailyChange, DividendReinvestment, History,
-                         Investment, Purchase)
-from core.services.investment_helpers import (get_purchase_history,
-                                              get_sale_history,
-                                              initiate_async_scape)
+from core.models import DailyChange, DividendReinvestment, History, Investment, Purchase
+from core.services.investment_helpers import (
+    get_purchase_history,
+    get_sale_history,
+    initiate_async_scape,
+)
 from core.services.update_investment import update_history
 
 logging.basicConfig(
@@ -121,15 +121,18 @@ def get_investment_price_history(investment):
     Return a list of the daily details of an Investment: low, high, close and volume. Used to create a
     plot of the history of an Investment's value.
     """
-    investment_price_history = {}
+    price_history = []
     for history in list(History.objects.filter(investment=investment)):
-        investment_price_history[history.date.strftime("%Y%m%d")] = {
-            "low": history.low,
-            "high": history.high,
-            "close": history.close,
-            "volume": history.volume,
-        }
-    return investment_price_history
+        price_history.append(
+            {
+                "date": history.date.strftime("%d-%m-%Y"),
+                "low": history.low,
+                "high": history.high,
+                "close": history.close,
+                "volume": history.volume,
+            }
+        )
+    return price_history
 
 
 def get_credit_debit_history():

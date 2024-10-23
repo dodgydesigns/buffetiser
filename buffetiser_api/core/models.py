@@ -1,10 +1,16 @@
 import datetime
 from typing import Union
 
-from django.db.models import (CASCADE, CharField, DateField, FloatField,
-                              ForeignKey, IntegerField, Model)
-
 from core.config import Constants
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateField,
+    FloatField,
+    ForeignKey,
+    IntegerField,
+    Model,
+)
 
 
 class Investment(Model):

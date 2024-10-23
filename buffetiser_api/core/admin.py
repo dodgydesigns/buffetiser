@@ -1,7 +1,13 @@
+from core.models import (
+    DailyChange,
+    DividendPayment,
+    DividendReinvestment,
+    History,
+    Investment,
+    Purchase,
+    Sale,
+)
 from django.contrib import admin
-
-from core.models import (DailyChange, DividendPayment, DividendReinvestment,
-                         History, Investment, Purchase, Sale)
 
 # Register your models here.
 admin.site.register(Investment)

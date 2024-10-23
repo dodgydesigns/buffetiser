@@ -1,7 +1,13 @@
+from core.models import (
+    DailyChange,
+    DividendPayment,
+    DividendReinvestment,
+    History,
+    Investment,
+    Purchase,
+    Sale,
+)
 from rest_framework import serializers
-
-from core.models import (DailyChange, DividendPayment, DividendReinvestment,
-                         History, Investment, Purchase, Sale)
 
 
 class InvestmentSerializer(serializers.ModelSerializer):

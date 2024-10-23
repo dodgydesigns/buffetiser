@@ -1,16 +1,17 @@
 import json
 
+from core.models import DailyChange, Investment
+from core.serializers import InvestmentSerializer
+from core.services.investment_details import (
+    get_all_details_for_investment,
+    scraper_function_get_daily_change,
+    scraper_function_investment_and_history,
+)
+from core.services.investment_helpers import initiate_async_scape
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-
-from core.models import DailyChange, Investment
-from core.serializers import InvestmentSerializer
-from core.services.investment_details import (
-    get_all_details_for_investment, scraper_function_get_daily_change,
-    scraper_function_investment_and_history)
-from core.services.investment_helpers import initiate_async_scape
 
 
 @api_view(["POST"])
