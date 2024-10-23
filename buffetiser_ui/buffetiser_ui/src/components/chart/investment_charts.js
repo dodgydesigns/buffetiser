@@ -1,27 +1,28 @@
 import React, { PureComponent } from "react";
 import {
-  LineChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ComposedChart,
 } from "recharts";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
-        <p className="tooltip-desc" style={{ color: `${payload[0].color}` }}>
-          ${payload[0].value}
-        </p>
         <p className="tooltip-desc" style={{ color: `${payload[1].color}` }}>
           ${payload[1].value}
         </p>
         <p className="tooltip-desc" style={{ color: `${payload[2].color}` }}>
           ${payload[2].value}
+        </p>
+        <p className="tooltip-desc" style={{ color: `${payload[3].color}` }}>
+          ${payload[3].value}
         </p>
       </div>
     );
@@ -30,12 +31,11 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-export default class InvestmentSummary extends PureComponent {
+export default class InvestmentCharts extends PureComponent {
   render() {
-    // console.log(this.props.investment_history);
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={this.props.investment_history}>
+        <ComposedChart data={this.props.investment_history}>
           <CartesianGrid
             strokeDasharray="3 3"
             stroke="#ffffff"
@@ -44,31 +44,46 @@ export default class InvestmentSummary extends PureComponent {
           <XAxis
             dataKey="date"
             stroke="#ffffff"
-            // tickFormatter={(tickItem) => tickItem.format("MMM Do YY")}
-            tickCount="5"
+            padding={{ left: 50, right: 20 }}
           />
-          <YAxis stroke="#ffffff" domain={["dataMin", "auto"]} />
+          <YAxis yAxisId="left" stroke="#ffffff" domain={["dataMin", "auto"]} />
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            stroke="#ffffff"
+            domain={["dataMin", "auto"]}
+          />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
+          <Area
+            yAxisId="right"
+            type="monotone"
+            dataKey="volume"
+            fill="#8884d855"
+            stroke="#8884d8"
+          />
           <Line
+            yAxisId="left"
             type="monotone"
             dataKey="low"
             stroke="#ff3333"
             activeDot={{ r: 8 }}
           />
           <Line
+            yAxisId="left"
             type="monotone"
             dataKey="high"
             stroke="#82ca9d"
             activeDot={{ r: 8 }}
           />
           <Line
+            yAxisId="left"
             type="monotone"
             dataKey="close"
             stroke="#f5e642"
             activeDot={{ r: 8 }}
           />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     );
   }

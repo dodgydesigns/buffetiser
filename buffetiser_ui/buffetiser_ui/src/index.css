@@ -1,16 +1,4 @@
-/* body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-} */
+/*  */
 
 :root {
   --COLOUR0: #1b262c;
@@ -48,6 +36,9 @@ body {
   justify-content: center;
 }
 
+/* 
+Menu bar at the top of the page.
+*/
 .header {
   height: 2.5vh;
   padding-top: 0.5rem;
@@ -70,11 +61,14 @@ body {
 .header_bar_div:hover {
   background-color: var(--COLOUR1);
 }
+
+.investment_cards_container {
+  height: 95%;
+  overflow-y: scroll;
+}
 /*
-
-
-
-
+The card header is at the top of each investment card showing values
+for overall and daily changes. Click on this to show the chart and summary.
 */
 .card_header {
   cursor: pointer;
@@ -82,10 +76,11 @@ body {
   padding: 0rem;
   margin-top: 0.2rem;
   margin-right: 10rem;
+  margin-left: 0.2rem;
   border-style: solid;
   border-color: #ffffff;
   border-width: 0.5px;
-  width: 99.9%;
+  width: 99.5%;
 }
 
 .investment_symbol {
@@ -103,238 +98,60 @@ body {
 }
 
 /*
-
-
-
-
+The table the holds all the titles and values in the card header.
 */
 Table {
   width: 100%;
   table-layout: fixed;
 }
+
 /*
-
-
-
-
+The the tds for all the card header titles.
 */
 .header_header {
   color: #ffffff;
   background-color: var(--COLOUR3);
 }
-/*
-
-
-
-
-*/
-.daily_gain {
-  color: #ffffff;
-  background-color: var(--COLOUR3);
-}
-
-.profit_loss {
-  color: #ffffff;
-  background-color: var(--COLOUR3);
-}
-
-.last_price_plus_minus {
-  color: #ffffff;
-  background-color: var(--COLOUR3);
-}
-
-.last_price_percent {
-  color: #ffffff;
-  background-color: var(--COLOUR3);
-}
 
 /*
-
+Each investment card has a hidable chart and summary attached.
 */
-.chart {
-  width: 99%;
+.investment_summary {
+  display: flex;
   height: 20rem;
+}
+.chart {
+  flex: 5;
+  padding-top: 0.5rem;
+  background-color: var(--COLOUR1);
+}
+.summary {
+  flex: 1;
+  padding-left: 1rem;
   padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-/*
-
-*/
-
-/* .header:hover {
-  cursor: pointer;
-}
-.header.span {
-  background: "#FF0000";
-} */
-/* html,
-body {
-  display: flex;
-  height: 100%;
-  width: 100%;
-}
-
-#icon {
-  width: 100px;
-}
-
-
-#left {
-  display: block;
-  background: var(--COLOUR0);
-  min-width: 100px;
-  max-width: 100px;
-  height: 100%;
-  padding-left: 2px;
-}
-
-#left img {
-  padding: 10px 5px 20px;
-}
-
-#left .w3-btn {
-  margin: 2px;
-  width: 90px;
-  background-color: var(--COLOUR2);
-  color: white;
-}
-
-#left .w3-btn:hover {
+  color: #ffffff;
   background-color: var(--COLOUR1);
 }
-
-
-#right {
-  width: 100%;
-  background-color: var(--COLOUR0);
-}
-
-
-#top {
-  background-color: var(--COLOUR0);
-  height: 74%;
-  border: solid 1px white;
-  overflow-x: hidden;
-  overflow-y: auto;
-  text-align: center;
-}
-
-
-#top-inner-left {
-  float: left;
-  width: 86%;
-}
-
-#top-inner-right {
-  float: right;
-}
-
-.panel-title {
-  width: 100%;
-}
-
-a.btn.btn-primary.panel-title {
-  background-color: var(--COLOUR2);
-  border-color: var(--COLOUR0);
-}
-
-#panel-container {
-  background-color: var(--COLOUR0);
-  color: white;
-}
-
-.graph {
-  width: 100%;
-  height: inherit;
-}
-
-#summary-table,
-table th,
-table td {
-  width: 100%;
-  margin-right: 5px;
-  font-size: 80%;
-  text-align: right;
-  border: 1px solid var(--COLOUR3);
+.summary td {
   padding: 5px;
+  font-size: 18px;
 }
-
-
-#bottom {
-  height: 24%;
-  border-style: solid;
-  border-width: 1px;
-  border-color: white;
-  margin-top: 5px;
-  margin-bottom: 5px;
+.summary_buttons {
+  padding-top: 1rem;
+  /* display: block; */
 }
-
-#bottom-inner-left {
-  float: left;
-  width: 86%;
-  height: 100%;
-  padding-left: 10px;
+.summary_buttons button {
+  margin: 5px;
+  padding: 2px;
+  text-decoration: none;
+  display: block;
+  width: 6rem;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 12px;
+  background-color: var(--COLOUR3);
+  color: #ffffff;
 }
-
-#bottom-inner-right {
-  margin: 10px;
-  float: right;
-  width: 12%;
-  height: 100%;
-  color: white;
+.summary_buttons button:hover {
+  background-color: #3e8e41;
 }
-
-#summary-table {
-  color: white;
-  width: 100%;
-  margin-right: 50px;
-  font-size: 80%;
-  text-align: right;
-}
-
-
-.new_purchase {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  background: var(--COLOUR0);
-  color: white;
-  width: 100%;
-}
-
-.w3-container {
-  width: 800px;
-}
-
-.w3-input {
-  background-color: var(--COLOUR1);
-  color: var(--COLOUR4);
-  margin-bottom: 10px;
-}
-
-.w3-input[type="text"]:focus {
-  background-color: var(--COLOUR2);
-}
-
-select.w3-select {
-  background-color: var(--COLOUR1);
-  color: var(--COLOUR4);
-  margin-bottom: 10px;
-}
-
-button.submit-btn {
-  margin: 2px;
-  width: 90px;
-  background-color: var(--COLOUR2);
-  color: white;
-}
-
-.submit-btn:hover {
-  background-color: var(--COLOUR1);
-}
-
-
-.investmentDetails {
-  display: flex;
-  flex-direction: column;
-} */

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import InvestmentSummary from "./components/chart/investment_summary";
+import InvestmentCharts from "./components/chart/investment_charts";
+import InvestmentSummary from "./components/summary";
 import "./index.css";
 
 const baseURL = "127.0.0.1:8000";
@@ -45,7 +46,11 @@ function Header() {
 }
 
 function InvestmentCards({ allInvestments }) {
-  return allInvestments.map((item) => InvestmentCard(item));
+  return (
+    <div className="investment_cards_container">
+      {allInvestments.map((item) => InvestmentCard(item))};
+    </div>
+  );
 }
 
 function InvestmentCard(investment) {
@@ -154,8 +159,13 @@ function InvestmentCard(investment) {
           <tr>
             <td>
               {isOpen && (
-                <div className="chart">
-                  <InvestmentSummary investment_history={investment.history} />
+                <div className="investment_summary">
+                  <div className="chart">
+                    <InvestmentCharts investment_history={investment.history} />
+                  </div>
+                  <div className="summary">
+                    <InvestmentSummary investment={investment} />
+                  </div>
                 </div>
               )}
             </td>
