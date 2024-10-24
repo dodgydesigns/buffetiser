@@ -43,8 +43,8 @@ export default class InvestmentSummary extends PureComponent {
         <div className="summary_buttons">
           <button>Buy</button>
           <button>Sell</button>
-          <button style={{ backgroundColor: "#ff2222" }}>Remove</button>
         </div>
+        <button className="remove">Remove</button>
       </>
     );
   }

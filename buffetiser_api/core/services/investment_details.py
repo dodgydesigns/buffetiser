@@ -112,6 +112,7 @@ def get_all_details_for_investment(investment):
         "profit": profit_total[0],
         "profit_percent": profit_total[1],
         "history": get_investment_price_history(investment),
+        "credit_debit_history": get_credit_debit_history(),
     }
     return all_details
 
@@ -151,14 +152,14 @@ def get_credit_debit_history():
         key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y")
     )
 
-    credit_debit_history_by_date = {}
+    credit_debit_history_by_date = []
     total = 0
     for date in all_transaction_dates:
         if date in purchases:
             total += purchases[date][0][2]
         if date in sales:
             total -= sales[date][0][2]
-        credit_debit_history_by_date[date] = total
+        credit_debit_history_by_date.append({"date": total})
 
     return credit_debit_history_by_date
 

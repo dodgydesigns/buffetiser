@@ -1,49 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import InvestmentCharts from "./components/chart/investment_charts";
-import InvestmentSummary from "./components/summary";
+
+import MenuBar from "./components/menu_bar";
+import InvestmentCard from "./components/investment_card";
+import TotalsCard from "./components/totals_card";
+import Footer from "./components/footer";
+
 import "./index.css";
-
-const baseURL = "127.0.0.1:8000";
-
-function Header() {
-  return (
-    <div className="header">
-      <span
-        className="header_bar_div"
-        onClick={() => {
-          axios.request(baseURL + "/config/");
-        }}
-      >
-        Configuration
-      </span>
-      <span
-        className="header_bar_div"
-        onClick={() => {
-          axios.post(baseURL + "/new_investment/");
-        }}
-      >
-        New Investment
-      </span>
-      <span
-        className="header_bar_div"
-        onClick={() => {
-          axios.post(baseURL + "/reports/");
-        }}
-      >
-        Reports
-      </span>
-      <span
-        className="header_bar_div"
-        onClick={() => {
-          axios.post(baseURL + "/help/");
-        }}
-      >
-        Help
-      </span>
-    </div>
-  );
-}
 
 function InvestmentCards({ allInvestments }) {
   return (
@@ -53,137 +16,10 @@ function InvestmentCards({ allInvestments }) {
   );
 }
 
-function InvestmentCard(investment) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div key={investment.symbol}>
-      <table className="card_header">
-        <tbody>
-          <tr onClick={() => setIsOpen((open) => !open)}>
-            <td>
-              <table>
-                <tbody>
-                  <tr>
-                    <td width="40%"></td>
-                    <td className="header_header" width="5%">
-                      Last Price
-                    </td>
-                    <td className="header_header" width="5%">
-                      +/-
-                    </td>
-                    <td className="header_header" width="5%">
-                      %
-                    </td>
-                    <td width="6%"></td>
-                    <td className="header_header" width="6%">
-                      Daily Δ
-                    </td>
-                    <td className="header_header" width="3%">
-                      +/-
-                    </td>
-                    <td className="header_header" width="3%">
-                      %
-                    </td>
-                    <td className="header_header"></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td className="investment_symbol" width="8%">
-                              {investment.symbol}
-                            </td>
-                            <td className="investment_name">
-                              {investment.name}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
-                    <td className="header_header">
-                      {investment.last_price.toFixed(2)}
-                    </td>
-                    <td
-                      style={
-                        investment.variation < 0
-                          ? { color: "#ff9999" }
-                          : { color: "#55ff55" }
-                      }
-                    >
-                      {investment.variation.toFixed(2)}
-                    </td>
-                    <td
-                      style={
-                        investment.variation < 0
-                          ? { color: "#ff9999" }
-                          : { color: "#55ff55" }
-                      }
-                    >
-                      {investment.variation_percent.toFixed(2)}%
-                    </td>
-                    <td width="6%"></td>
-                    <td
-                      style={
-                        investment.variation < 0
-                          ? { color: "#ff9999" }
-                          : { color: "#55ff55" }
-                      }
-                    >
-                      {investment.variation.toFixed(2)}
-                    </td>
-                    <td
-                      style={
-                        investment.variation < 0
-                          ? { color: "#ff9999" }
-                          : { color: "#55ff55" }
-                      }
-                    >
-                      {investment.daily_change.toFixed(2)}
-                    </td>
-                    <td
-                      style={
-                        investment.variation < 0
-                          ? { color: "#ff9999" }
-                          : { color: "#55ff55" }
-                      }
-                    >
-                      {investment.daily_change_percent.toFixed(2)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              {isOpen && (
-                <div className="investment_summary">
-                  <div className="chart">
-                    <InvestmentCharts investment_history={investment.history} />
-                  </div>
-                  <div className="summary">
-                    <InvestmentSummary investment={investment} />
-                  </div>
-                </div>
-              )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function TotalsCard() {
-  return <></>;
-}
-
-function Footer() {
-  return <></>;
-}
-
+/*
+Pull all (most?) of the required information once and feed it to
+the child components.
+*/
 export default function App() {
   const [allInvestments, setAllInvestments] = useState([]);
 
@@ -202,7 +38,7 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      <MenuBar />
       <InvestmentCards allInvestments={allInvestments} />
       <TotalsCard />
       <Footer />

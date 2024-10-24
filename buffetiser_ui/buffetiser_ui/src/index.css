@@ -19,13 +19,22 @@
   --COLOUR5: #aaaaaa;
 }
 :root {
-  --RED: #ff3333;
+  --RED: #ff5555;
+}
+:root {
+  --RED_DARK: #ff0000;
 }
 :root {
   --GREEN: #82ca9d;
 }
 :root {
   --YELLOW: #f5e642;
+}
+:root {
+  --WHITE: #ffffff;
+}
+:root {
+  --BLACK: #000000;
 }
 
 body {
@@ -34,6 +43,7 @@ body {
   background-color: var(--COLOUR2);
   display: flex;
   justify-content: center;
+  overflow-y: hidden;
 }
 
 /* 
@@ -54,7 +64,7 @@ Menu bar at the top of the page.
   font-size: 1rem;
   cursor: pointer;
   margin-right: 1rem;
-  color: #ffffff;
+  color: var(--WHITE);
   background-color: var(--COLOUR0);
 }
 
@@ -63,7 +73,7 @@ Menu bar at the top of the page.
 }
 
 .investment_cards_container {
-  height: 95%;
+  height: 80%;
   overflow-y: scroll;
 }
 /*
@@ -78,7 +88,7 @@ for overall and daily changes. Click on this to show the chart and summary.
   margin-right: 10rem;
   margin-left: 0.2rem;
   border-style: solid;
-  border-color: #ffffff;
+  border-color: var(--WHITE);
   border-width: 0.5px;
   width: 99.5%;
 }
@@ -87,13 +97,13 @@ for overall and daily changes. Click on this to show the chart and summary.
   padding-left: 1rem;
   padding-right: 3%;
   font-size: 1rem;
-  color: #ffffff;
+  color: var(--WHITE);
   background-color: var(--COLOUR3);
 }
 
 .investment_name {
   font-size: 1.5rem;
-  color: #ffffff;
+  color: var(--WHITE);
   background-color: var(--COLOUR3);
 }
 
@@ -109,7 +119,7 @@ Table {
 The the tds for all the card header titles.
 */
 .header_header {
-  color: #ffffff;
+  color: var(--WHITE);
   background-color: var(--COLOUR3);
 }
 
@@ -129,29 +139,48 @@ Each investment card has a hidable chart and summary attached.
   flex: 1;
   padding-left: 1rem;
   padding-top: 1rem;
-  color: #ffffff;
+  color: var(--WHITE);
   background-color: var(--COLOUR1);
 }
 .summary td {
   padding: 5px;
   font-size: 18px;
 }
+
+/*
+Buttons in the summary to buy, sell and remove.
+*/
 .summary_buttons {
   padding-top: 1rem;
-  /* display: block; */
 }
 .summary_buttons button {
-  margin: 5px;
-  padding: 2px;
-  text-decoration: none;
+  margin: 0.2rem;
+  padding: 0.2rem;
   display: block;
   width: 6rem;
   font-size: 18px;
-  text-align: center;
   border-radius: 12px;
-  background-color: var(--COLOUR3);
-  color: #ffffff;
+  background-color: var(--COLOUR2);
+  color: var(--WHITE);
+  border-style: solid;
+  border-width: 0;
 }
 .summary_buttons button:hover {
-  background-color: #3e8e41;
+  background-color: var(--COLOUR3);
+}
+.remove {
+  margin: 0.2rem;
+  padding: 0.3rem;
+  display: block;
+  width: 6rem;
+  font-size: 18px;
+  border-radius: 12rem;
+  background-color: var(--RED);
+  color: var(--WHITE);
+  border-style: solid;
+  border-width: 0;
+}
+.remove:hover {
+  background-color: #ff0000;
+  color: var(--BLACK);
 }
