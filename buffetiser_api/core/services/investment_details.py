@@ -233,3 +233,10 @@ def get_total_reinvestment_units(investment):
     for reinvestment in reinvestments:
         total_reinvestment_units += reinvestment.units
     return total_reinvestment_units
+
+
+def get_portfolio_totals():
+    """
+    Get the profit and percent profit for the whole portfolio.
+    """
+    portfolio = {}

@@ -6,6 +6,7 @@ specific information about an Investment:
  - Total units held
  - Average cost over all purchases
  - Total cost of all purchases
+ - Total value
  - Profit info
 
 Does not include profit/loss due to sales. (maybe it should???)
