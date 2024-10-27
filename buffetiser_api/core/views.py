@@ -7,7 +7,7 @@ from core.services.investment_details import (
     scraper_function_get_daily_change,
     scraper_function_investment_and_history,
 )
-from core.services.investment_helpers import initiate_async_scape
+from core.services.investment_helpers import get_purchase_history, initiate_async_scape
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
@@ -47,7 +47,7 @@ class AllInvestmentsDataView(APIView):
     for plots is handled separately.
     """
 
-    def get(self, request):
+    def get(self, _):
         all_investment_data = []
         for investment in list(Investment.objects.all()):
             all_investment_data.append(get_all_details_for_investment(investment))
@@ -58,3 +58,26 @@ class AllInvestmentsDataView(APIView):
 class InvestmentViewSet(viewsets.ModelViewSet):
     queryset = Investment.objects.all()
     serializer_class = InvestmentSerializer
+
+
+class PortfolioTotals(APIView):
+    """
+    Aggregate all the purchases, sales and values by date for the chart and
+    the overall totals for the header.
+    """
+
+    # TODO: don't forget reinvestment and dividend payouts
+
+    portfolio_cost = 0
+    portfolio_value = 0
+    portfolio_value_by_date = []
+
+    # for investment in list(Investment.objects.all()):
+    #     portfolio_cost += get_purchase_history(investment)[2]
+
+    # Get the set of dates for purchases and sales combined. They are the keys for
+    # purchases and sales. TODO: look at changing get_purchase_history and sale
+    # to dictionaries from tuples.
+
+    # For each date, get a purchase if it exists or a sale if it exists and
+    # calculate total

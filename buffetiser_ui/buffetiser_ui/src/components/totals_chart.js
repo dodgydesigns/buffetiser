@@ -10,12 +10,11 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import "../../index.css";
+import "../index.css";
 // credit_debit_history;
 
 export default class TotalsChart extends PureComponent {
   render() {
-    console.log("hi");
-    return <div>hi</div>;
+    return <div>Totals Chart</div>;
   }
 }

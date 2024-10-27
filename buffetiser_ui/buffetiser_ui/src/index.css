@@ -10,7 +10,7 @@
   --COLOUR2: #3282b8;
 }
 :root {
-  --COLOUR3: #0276ef;
+  --COLOUR3: #163599;
 }
 :root {
   --COLOUR4: #bbe1fa;
@@ -19,7 +19,7 @@
   --COLOUR5: #aaaaaa;
 }
 :root {
-  --RED: #ff5555;
+  --RED: #ff4444;
 }
 :root {
   --RED_DARK: #ff0000;
@@ -76,6 +76,7 @@ Menu bar at the top of the page.
   height: 80%;
   overflow-y: scroll;
 }
+
 /*
 The card header is at the top of each investment card showing values
 for overall and daily changes. Click on this to show the chart and summary.
@@ -181,6 +182,23 @@ Buttons in the summary to buy, sell and remove.
   border-width: 0;
 }
 .remove:hover {
-  background-color: #ff0000;
+  background-color: var(--RED_DARK);
   color: var(--BLACK);
+}
+
+/*
+The chart and panel at the bottom showing the totals of the porfolio.
+*/
+.totals_header {
+  color: var(--WHITE);
+  font-size: 1.5rem;
+  padding-left: 1rem;
+  padding-top: 0.2rem;
+  background-color: var(--COLOUR3);
+  margin-top: 0.2rem;
+  margin-right: 10rem;
+  margin-left: 0.2rem;
+  border-style: solid;
+  border-color: var(--WHITE);
+  border-width: 0.5px;
 }

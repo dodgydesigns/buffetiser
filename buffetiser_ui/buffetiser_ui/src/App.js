@@ -40,7 +40,7 @@ export default function App() {
     <>
       <MenuBar />
       <InvestmentCards allInvestments={allInvestments} />
-      <TotalsCard />
+      <TotalsCard allInvestments={allInvestments} />
       <Footer />
     </>
   );

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import InvestmentCharts from "./charts/investment_charts";
-import InvestmentSummary from "./summary_panel";
+import InvestmentCharts from "./investment_charts";
+import InvestmentSummary from "./investment_summary_panel";
 
 function PositiveColour(comparisonValue) {
-  return comparisonValue >= 0 ? "#55ff55" : "#ff9999";
+  return comparisonValue >= 0 ? "#55ff55" : "#ff4444";
 }
 
 /*

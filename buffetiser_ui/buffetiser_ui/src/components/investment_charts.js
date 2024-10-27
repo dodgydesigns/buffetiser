@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import "../../index.css";
+import "../index.css";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
@@ -39,19 +39,26 @@ export default class InvestmentCharts extends PureComponent {
         <ComposedChart data={this.props.investment_history}>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="--WHITE"
+            stroke="#0f4c75"
             fill="#1b262c"
           />
           <XAxis
             dataKey="date"
             stroke="#ffffff"
+            fontSize="10"
             padding={{ left: 50, right: 20 }}
           />
-          <YAxis yAxisId="left" stroke="#ffffff" domain={["dataMin", "auto"]} />
+          <YAxis
+            yAxisId="left"
+            stroke="#ffffff"
+            fontSize="10"
+            domain={["dataMin", "auto"]}
+          />
           <YAxis
             yAxisId="right"
             orientation="right"
             stroke="#ffffff"
+            fontSize="10"
             domain={["dataMin", "auto"]}
           />
           <Tooltip content={<CustomTooltip />} />
