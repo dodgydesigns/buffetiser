@@ -32,16 +32,6 @@ function InvestmentCard(investment) {
                     <td className="header_header" width="5%">
                       Last Price
                     </td>
-                    <td className="header_header" width="5%">
-                      +/-
-                    </td>
-                    <td className="header_header" width="5%">
-                      %
-                    </td>
-                    <td width="6%"></td>
-                    <td className="header_header" width="6%">
-                      Daily Δ
-                    </td>
                     <td className="header_header" width="3%">
                       +/-
                     </td>
@@ -55,7 +45,7 @@ function InvestmentCard(investment) {
                       <table>
                         <tbody>
                           <tr>
-                            <td className="investment_symbol" width="8%">
+                            <td className="investment_symbol" width="10%">
                               {investment.symbol}
                             </td>
                             <td className="investment_name">
@@ -67,16 +57,6 @@ function InvestmentCard(investment) {
                     </td>
                     <td className="header_header">
                       {investment.last_price.toFixed(2)}
-                    </td>
-                    <td style={{ color: valueColour }}>
-                      {investment.variation.toFixed(2)}
-                    </td>
-                    <td style={{ color: valueColour }}>
-                      {investment.variation_percent.toFixed(2)}%
-                    </td>
-                    <td width="6%"></td>
-                    <td style={{ color: valueColour }}>
-                      {investment.variation.toFixed(2)}
                     </td>
                     <td style={{ color: valueColour }}>
                       {investment.daily_change.toFixed(2)}

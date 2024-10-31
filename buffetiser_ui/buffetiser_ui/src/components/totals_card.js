@@ -6,11 +6,11 @@ This hold the details showing overall changes of the portfolio over time. This
 includes a chart showing date vs (purchases and sales) and combined value of the 
 whole portfolio.
 */
-function TotalsCard() {
+function TotalsCard(portfolioTotals) {
   return (
     <>
-      <TotalsHeader />
-      {/* <TotalsChart /> */}
+      <TotalsHeader portfolioTotals={portfolioTotals} />
+      <TotalsChart />
     </>
   );
 }

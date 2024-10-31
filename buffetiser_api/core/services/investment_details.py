@@ -100,17 +100,15 @@ def get_all_details_for_investment(investment):
     all_details = {
         "name": investment.name,
         "symbol": investment.symbol,
-        "yesterday_price": yesterday_price,
         "last_price": live_price,
         "variation": live_price - yesterday_price,
-        "variation_percent": (live_price - yesterday_price) / yesterday_price,
         "daily_change": daily_change.daily_change,
         "daily_change_percent": daily_change.daily_change_percent,
         "units": get_total_units_held(investment),
         "average_cost": get_average_cost(investment),
         "total_cost": get_total_cost(investment),
-        "profit": profit_total[0],
-        "profit_percent": profit_total[1],
+        "profit": profit_total["total_profit"],
+        "profit_percent": profit_total["total_profit_percentage"],
         "history": get_investment_price_history(investment),
         "credit_debit_history": get_credit_debit_history(),
     }
@@ -216,11 +214,12 @@ def get_profit_total_and_percentage(investment):
     """
     Return the profit in dollars and as a percent.
     """
-    total_profit = (total_value := get_total_value(investment)) - (
-        total_cost := get_total_cost(investment)
-    )
-    total_profit_percentage = (total_value / total_cost - 1) * 100
-    return (total_profit, total_profit_percentage)
+    total_value = get_total_value(investment)
+    total_cost = get_total_cost(investment)
+    total_profit = total_value - total_cost
+        
+    total_profit_percentage = ((total_value / total_cost) - 1) * 100
+    return {"total_profit": total_profit, "total_profit_percentage": total_profit_percentage}
 
 
 def get_total_reinvestment_units(investment):
@@ -239,4 +238,11 @@ def get_portfolio_totals():
     """
     Get the profit and percent profit for the whole portfolio.
     """
-    portfolio = {}
+    portfolio = {"total_profit": 0, "total_profit_percentage": 0}
+    for investment in Investment.objects.all():
+        investment_profit = get_profit_total_and_percentage(investment)["total_profit"]
+        investment_profit_percent = get_profit_total_and_percentage(investment)["total_profit_percentage"]
+        portfolio["total_profit"] += investment_profit
+        portfolio["total_profit_percentage"] += investment_profit_percent
+
+    return portfolio
