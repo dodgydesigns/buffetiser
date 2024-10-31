@@ -46,7 +46,7 @@ export default class InvestmentCharts extends PureComponent {
             dataKey="date"
             stroke="#ffffff"
             fontSize="10"
-            padding={{ left: 50, right: 20 }}
+            padding={{ left: 20, right: 20 }}
           />
           <YAxis
             yAxisId="left"
