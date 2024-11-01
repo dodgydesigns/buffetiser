@@ -35,7 +35,7 @@ class Command(BaseCommand):
         all = []
         for inv in list(Investment.objects.all()):
             all.append(get_all_details_for_investment(inv))
-        print(json.dumps(all))
+        # print(json.dumps(all))
 
     # def insert_dividends(self):
     #     inv = Investment.objects.filter(symbol="VAS").first()

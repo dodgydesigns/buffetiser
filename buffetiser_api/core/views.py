@@ -4,6 +4,7 @@ from core.models import DailyChange, Investment
 from core.serializers import InvestmentSerializer
 from core.services.investment_details import (
     get_all_details_for_investment,
+    get_credit_debit_history,
     get_portfolio_totals,
     scraper_function_get_daily_change,
     scraper_function_investment_and_history,
@@ -64,18 +65,14 @@ class InvestmentViewSet(viewsets.ModelViewSet):
 class PortfolioTotals(APIView):
     """
     Aggregate all the purchases, sales and values by date for the chart and
-    the overall totals for the header.
+    the overall totals for the header and history for the chart.
     """
 
     # TODO: don't forget reinvestment and dividend payouts
 
-    # Get the set of dates for purchases and sales combined. They are the keys for
-    # purchases and sales. TODO: look at changing get_purchase_history and sale
-    # to dictionaries from tuples.
-
-    # For each date, get a purchase if it exists or a sale if it exists and
-    # calculate total
-
     def get(self, _):
         portfolio_totals = get_portfolio_totals()
-        return JsonResponse({"portfolio_totals": portfolio_totals}, status=200)
+        portfolio_history = get_credit_debit_history()
+        return JsonResponse({"portfolio_totals": portfolio_totals, 
+                             "portfolio_history": portfolio_history}, 
+                             status=200)

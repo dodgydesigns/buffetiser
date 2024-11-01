@@ -157,7 +157,7 @@ def get_credit_debit_history():
             total += purchases[date][0][2]
         if date in sales:
             total -= sales[date][0][2]
-        credit_debit_history_by_date.append({"date": total})
+        credit_debit_history_by_date.append({"date": date, "total": total})
 
     return credit_debit_history_by_date
 

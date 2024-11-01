@@ -4,7 +4,6 @@ import axios from "axios";
 import MenuBar from "./components/menu_bar";
 import InvestmentCard from "./components/investment_card";
 import TotalsCard from "./components/totals_card";
-import Footer from "./components/footer";
 
 import "./index.css";
 
@@ -30,8 +29,6 @@ export default function App() {
         setAllInvestments(response.data.all_investment_data);
       })
       .catch((error) => {
-        console.log(error.response.status);
-        console.log(error.response.headers);
         console.log(error.response);
       });
   }, []);
@@ -39,9 +36,13 @@ export default function App() {
   return (
     <>
       <MenuBar />
-      <InvestmentCards allInvestments={allInvestments} />
-      <TotalsCard allInvestments={allInvestments} />
-      <Footer />
+      <div className="content">
+        {" "}
+        <InvestmentCards allInvestments={allInvestments} />
+      </div>
+      <footer className="footer">
+        <TotalsCard />
+      </footer>
     </>
   );
 }
