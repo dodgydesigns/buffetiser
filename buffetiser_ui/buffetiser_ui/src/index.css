@@ -198,17 +198,45 @@ Buttons in the summary to buy, sell and remove.
 /*
 The chart and panel at the bottom showing the totals of the porfolio.
 */
-.totals_header {
-  width: 98.7%;
-  color: var(--WHITE);
-  font-size: 1.5rem;
-  padding-left: 1rem;
-  padding-top: 0.2rem;
-  background-color: var(--COLOUR3);
-  margin-right: 10rem;
-  margin-left: 0.2rem;
-  height: 50px;
+.totals_card_container {
+  display: flex;
+  width: 100%;
+  margin-left: 3px;
   border-style: solid;
   border-color: var(--WHITE);
   border-width: 0.5px;
+}
+.totals_header {
+  /* width: 99.9%; */
+}
+.totals_header_table {
+  width: 100%;
+  color: var(--WHITE);
+  font-size: 1.5rem;
+  background-color: var(--COLOUR3);
+  margin-right: 10rem;
+  margin-left: 0.2rem;
+  margin-top: 0.5rem;
+  height: 50px;
+  padding-left: 1rem;
+  padding-top: 0.2rem;
+  border-style: solid;
+  border-color: var(--WHITE);
+  border-width: 0.5px;
+}
+.totals_chart {
+  flex: 5;
+  padding-top: 0.5rem;
+  background-color: var(--COLOUR1);
+}
+.totals_summary {
+  flex: 1;
+  padding-left: 1rem;
+  padding-top: 1rem;
+  color: var(--WHITE);
+  background-color: var(--COLOUR1);
+}
+.totals_summary td {
+  padding: 5px;
+  font-size: 18px;
 }

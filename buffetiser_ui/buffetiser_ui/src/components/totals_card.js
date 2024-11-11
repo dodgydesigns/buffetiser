@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import TotalsChart from "./totals_chart";
 import TotalsHeader from "./totals_header";
-
 /*
 This hold the details showing overall changes of the portfolio over time. This 
 includes a chart showing date vs (purchases and sales) and combined value of the 
@@ -31,8 +30,15 @@ export default function TotalsCard() {
 
   return (
     <>
-      <TotalsHeader totalPortfolioValues={totalPortfolioValues} />
-      <TotalsChart portfolio_history={portfolio_history} />
+      <TotalsHeader
+        className="totals_header"
+        totalPortfolioValues={totalPortfolioValues}
+      />
+      <div className="totals_card_container">
+        <div className="totals_chart">
+          <TotalsChart portfolio_history={portfolio_history} />
+        </div>
+      </div>
     </>
   );
 }

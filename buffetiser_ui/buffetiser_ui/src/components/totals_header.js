@@ -7,16 +7,30 @@ export default function TotalsHeader({ totalPortfolioValues }) {
   const valueColour = PositiveColour(totalPortfolioValues.total_profit);
   return (
     <>
-      <table className="totals_header">
+      <table className="totals_header_table">
         <tbody>
           <tr>
-            <td width="10%">PORTFOLIO</td>
-            <td style={{ color: valueColour }} width="10%">
-              ${totalPortfolioValues.total_profit.toFixed(2)}
-            </td>
-            <td style={{ color: valueColour }}>
-              {totalPortfolioValues.total_profit_percentage.toFixed(2)}%
-            </td>
+            <td width="200rem">PORTFOLIO</td>
+            <tr>
+              <td width="30%" padding-left="5rem">
+                Cost
+              </td>
+              <td width="30%">Total Value</td>
+              <td width="30%">Profit</td>
+              <td>%</td>
+            </tr>
+            <tr>
+              <td>${totalPortfolioValues.total_cost.toFixed(2)}</td>
+              <td style={{ color: valueColour }}>
+                {totalPortfolioValues.total_value.toFixed(2)}%
+              </td>
+              <td style={{ color: valueColour }}>
+                ${totalPortfolioValues.total_profit.toFixed(2)}
+              </td>
+              <td style={{ color: valueColour }}>
+                {totalPortfolioValues.total_profit_percentage.toFixed(2)}%
+              </td>
+            </tr>
           </tr>
         </tbody>
       </table>

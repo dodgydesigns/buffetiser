@@ -238,11 +238,15 @@ def get_portfolio_totals():
     """
     Get the profit and percent profit for the whole portfolio.
     """
-    portfolio = {"total_profit": 0, "total_profit_percentage": 0}
+    portfolio = {"total_cost":0, "total_profit": 0, "total_profit_percentage": 0, "total_value": 0,}
     for investment in Investment.objects.all():
+        investment_cost = get_total_cost(investment)
         investment_profit = get_profit_total_and_percentage(investment)["total_profit"]
+        investment_value = get_total_value(investment)
         investment_profit_percent = get_profit_total_and_percentage(investment)["total_profit_percentage"]
+        portfolio["total_cost"] += investment_cost
         portfolio["total_profit"] += investment_profit
         portfolio["total_profit_percentage"] += investment_profit_percent
+        portfolio["total_value"] += investment_value
 
     return portfolio
