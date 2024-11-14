@@ -10,7 +10,7 @@ from core.services.investment_helpers import (
     get_sale_history,
     initiate_async_scape,
 )
-from core.services.update_investment import update_history
+from core.services.investment_updaters import update_history
 
 logging.basicConfig(
     filename="debug.log",

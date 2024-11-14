@@ -12,7 +12,7 @@ from core.services.investment_details import (
     scraper_function_investment_and_history,
 )
 from core.services.investment_helpers import initiate_async_scape
-from core.services.update_investment import add_dividend
+from core.services.investment_updaters import add_dividend
 from django.core.management.base import BaseCommand
 
 

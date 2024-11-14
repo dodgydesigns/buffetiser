@@ -12,7 +12,7 @@ import csv
 from datetime import datetime
 
 from core.models import Investment, Purchase, Sale
-from core.services.update_investment import update_investment_and_history
+from core.services.investment_updaters import update_investment_and_history
 from django.core.management.base import BaseCommand
 
 

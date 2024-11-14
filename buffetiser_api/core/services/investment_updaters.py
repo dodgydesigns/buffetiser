@@ -1,4 +1,47 @@
 """
+main.py
+====================================
+The core module of my example project currentmodule
+"""
+
+def about_me(your_name):
+    """
+    Return the most important thing about a person.
+
+    Parameters
+    ----------
+    your_name
+        A string indicating the name of the person.
+
+    """
+    return "The wise {} loves Python.".format(your_name)
+
+
+class ExampleClass:
+    """An example docstring for a class definition."""
+
+    def __init__(self, name):
+        """
+        Blah blah blah.
+
+        Parameters
+        ---------
+        name
+            A string to assign to the `name` instance attribute.
+
+        """
+        self.name = name
+
+    def about_self(self):
+        """
+        Return information about an instance created from ExampleClass.
+        """
+        return "I am a very smart {} object.".format(self.name)
+    
+    
+    
+    
+"""
 All the functions to update values for Investments.
 """
 
@@ -113,7 +156,7 @@ def update_history(investment, high, low, last_price, volume):
             high=high,
             low=low,
             close=last_price,
-            volume=int(volume.replace(",", "")),
+            volume= 0 if volume == "n/a" else int(volume.replace(",", "")),
         )
         history_entry.save()
 

@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buffetiser Documentation &mdash; Buffetiser 0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=db78e746"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Buffetiser
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Buffetiser Documentation</a><ul>
+<li><a class="reference internal" href="#module-core.services.investment_helpers">investment_helpers</a><ul>
+<li><a class="reference internal" href="#core.services.investment_helpers.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.get_investment_and_urls"><code class="docutils literal notranslate"><span class="pre">get_investment_and_urls()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.get_purchase_history"><code class="docutils literal notranslate"><span class="pre">get_purchase_history()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.get_sale_history"><code class="docutils literal notranslate"><span class="pre">get_sale_history()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.get_units_held_at_date"><code class="docutils literal notranslate"><span class="pre">get_units_held_at_date()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.initiate_async_scape"><code class="docutils literal notranslate"><span class="pre">initiate_async_scape()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_helpers.scrape"><code class="docutils literal notranslate"><span class="pre">scrape()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.services.investment_details">investment_details</a><ul>
+<li><a class="reference internal" href="#core.services.investment_details.get_all_details_for_investment"><code class="docutils literal notranslate"><span class="pre">get_all_details_for_investment()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_average_cost"><code class="docutils literal notranslate"><span class="pre">get_average_cost()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_credit_debit_history"><code class="docutils literal notranslate"><span class="pre">get_credit_debit_history()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_investment_price_history"><code class="docutils literal notranslate"><span class="pre">get_investment_price_history()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_portfolio_totals"><code class="docutils literal notranslate"><span class="pre">get_portfolio_totals()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_profit_total_and_percentage"><code class="docutils literal notranslate"><span class="pre">get_profit_total_and_percentage()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_total_cost"><code class="docutils literal notranslate"><span class="pre">get_total_cost()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_total_reinvestment_units"><code class="docutils literal notranslate"><span class="pre">get_total_reinvestment_units()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_total_units_held"><code class="docutils literal notranslate"><span class="pre">get_total_units_held()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.get_total_value"><code class="docutils literal notranslate"><span class="pre">get_total_value()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.scraper_function_get_daily_change"><code class="docutils literal notranslate"><span class="pre">scraper_function_get_daily_change()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_details.scraper_function_investment_and_history"><code class="docutils literal notranslate"><span class="pre">scraper_function_investment_and_history()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.services.investment_updaters">investment_updaters</a><ul>
+<li><a class="reference internal" href="#main-py">main.py</a></li>
+<li><a class="reference internal" href="#core.services.investment_updaters.ExampleClass"><code class="docutils literal notranslate"><span class="pre">ExampleClass</span></code></a><ul>
+<li><a class="reference internal" href="#core.services.investment_updaters.ExampleClass.about_self"><code class="docutils literal notranslate"><span class="pre">ExampleClass.about_self()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.services.investment_updaters.about_me"><code class="docutils literal notranslate"><span class="pre">about_me()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_updaters.add_dividend"><code class="docutils literal notranslate"><span class="pre">add_dividend()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_updaters.get_plot_data"><code class="docutils literal notranslate"><span class="pre">get_plot_data()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_updaters.nearest"><code class="docutils literal notranslate"><span class="pre">nearest()</span></code></a></li>
+<li><a class="reference internal" href="#core.services.investment_updaters.update_history"><code class="docutils literal notranslate"><span class="pre">update_history()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Buffetiser</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Buffetiser Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="buffetiser-documentation">
+<h1>Buffetiser Documentation<a class="headerlink" href="#buffetiser-documentation" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="module-core.services.investment_helpers">
+<span id="investment-helpers"></span><h2>investment_helpers<a class="headerlink" href="#module-core.services.investment_helpers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.fetch">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.fetch" title="Link to this definition"></a></dt>
+<dd><p>Get all the data from the page.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.get_investment_and_urls">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">get_investment_and_urls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.get_investment_and_urls" title="Link to this definition"></a></dt>
+<dd><p>Get each Investment and the URL containing the data for that investment. This information can then
+be used to scrape the page and get the values needed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.get_purchase_history">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">get_purchase_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.get_purchase_history" title="Link to this definition"></a></dt>
+<dd><p>All the purchases that have been made of this Investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.get_sale_history">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">get_sale_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.get_sale_history" title="Link to this definition"></a></dt>
+<dd><p>All the sales that have been made of this Investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.get_units_held_at_date">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">get_units_held_at_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_off_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.get_units_held_at_date" title="Link to this definition"></a></dt>
+<dd><p>This gets all the units held for an Investment up to (and including) a certain date.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.initiate_async_scape">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">initiate_async_scape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scraper_function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.initiate_async_scape" title="Link to this definition"></a></dt>
+<dd><p>Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
+There is no official API so data is scraped from their website. Not sure if this
+breaks terms of use.</p>
+<p>This is done asynchronously to improve speed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_helpers.scrape">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_helpers.</span></span><span class="sig-name descname"><span class="pre">scrape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scraper_function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_helpers.scrape" title="Link to this definition"></a></dt>
+<dd><p>Scrape the source for each Investment. Update the the live price for each and create an entry
+into the investment’s value history.</p>
+</dd></dl>
+
+</section>
+<section id="module-core.services.investment_details">
+<span id="investment-details"></span><h2>investment_details<a class="headerlink" href="#module-core.services.investment_details" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_all_details_for_investment">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_all_details_for_investment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_all_details_for_investment" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary with all the details required by the front end to render an Investment
+entry.</p>
+<dl class="simple">
+<dt>Before this is called, the following should be called to ensure the latest data is available:</dt><dd><ul class="simple">
+<li><p>initiate_async_scape(scraper_function_get_daily_change)</p></li>
+<li><p>initiate_async_scape(scraper_function_investment_and_history)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_average_cost">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_average_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_average_cost" title="Link to this definition"></a></dt>
+<dd><p>The average cost per unit of an investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_credit_debit_history">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_credit_debit_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_credit_debit_history" title="Link to this definition"></a></dt>
+<dd><p>Generates the money put into (purchases) and removed (sales) by date for all Investments.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_investment_price_history">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_investment_price_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_investment_price_history" title="Link to this definition"></a></dt>
+<dd><p>Return a list of the daily details of an Investment: low, high, close and volume. Used to create a
+plot of the history of an Investment’s value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_portfolio_totals">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_portfolio_totals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_portfolio_totals" title="Link to this definition"></a></dt>
+<dd><p>Get the profit and percent profit for the whole portfolio.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_profit_total_and_percentage">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_profit_total_and_percentage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_profit_total_and_percentage" title="Link to this definition"></a></dt>
+<dd><p>Return the profit in dollars and as a percent.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_total_cost">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_total_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_total_cost" title="Link to this definition"></a></dt>
+<dd><p>The sum of all purchases of an investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_total_reinvestment_units">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_total_reinvestment_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_total_reinvestment_units" title="Link to this definition"></a></dt>
+<dd><p>If an Investment has received reinvestment units, return the total number of units
+received.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_total_units_held">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_total_units_held</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_total_units_held" title="Link to this definition"></a></dt>
+<dd><p>Get the number of units held of a particular investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.get_total_value">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">get_total_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.get_total_value" title="Link to this definition"></a></dt>
+<dd><p>The current total value of an investment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.scraper_function_get_daily_change">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">scraper_function_get_daily_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment_and_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.scraper_function_get_daily_change" title="Link to this definition"></a></dt>
+<dd><p>This function is passed to the scraper functions that will asynchronously iterate through
+Investments, pull the data from the Investments URLs and provide the data required below.
+The results are stored in global so they can be pulled whenever required (this seems wrong).</p>
+<p>To execute: initiate_async_scape(scraper_function_get_daily_change)
+Does not need to implement a loop of Investments. The async functions do this.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_details.scraper_function_investment_and_history">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_details.</span></span><span class="sig-name descname"><span class="pre">scraper_function_investment_and_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment_and_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_details.scraper_function_investment_and_history" title="Link to this definition"></a></dt>
+<dd><p>This function is passed to the scraper functions that will asynchronously iterate through
+Investments, pull the data from the Investments URLs and provide the data required below.</p>
+<p>To execute: initiate_async_scape(scraper_function_investment_and_history)
+Does not need to implement a loop of Investments. The async functions do this.</p>
+</dd></dl>
+
+</section>
+<section id="module-core.services.investment_updaters">
+<span id="investment-updaters"></span><h2>investment_updaters<a class="headerlink" href="#module-core.services.investment_updaters" title="Link to this heading"></a></h2>
+<section id="main-py">
+<h3>main.py<a class="headerlink" href="#main-py" title="Link to this heading"></a></h3>
+<p>The core module of my example project currentmodule</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.services.investment_updaters.ExampleClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">ExampleClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.ExampleClass" title="Link to this definition"></a></dt>
+<dd><p>An example docstring for a class definition.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.services.investment_updaters.ExampleClass.about_self">
+<span class="sig-name descname"><span class="pre">about_self</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.ExampleClass.about_self" title="Link to this definition"></a></dt>
+<dd><p>Return information about an instance created from ExampleClass.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_updaters.about_me">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">about_me</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">your_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.about_me" title="Link to this definition"></a></dt>
+<dd><p>Return the most important thing about a person.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>your_name</strong> – A string indicating the name of the person.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_updaters.add_dividend">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">add_dividend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reinvest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reinvestment_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_per_unit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.add_dividend" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Inputs: investment: Investment</dt><dd><p>reinvest: whether re-investment is enabled for this Investment
+cutoff_date: the date the dividend price per unit is determined
+reinvestment_date: the date the dividend was paid
+units: the number of units of that Investment held at cutoff_date
+price_per_unit: the price per unit paid out</p>
+</dd>
+</dl>
+<p>A dividend can be either paid out or re-invested.
+Payout: no reinvestment plan setup, dividend is not enough to buy 1 share.
+(add dividend value to Financials).
+Reinvest: re-investment plan setup, dividend is enough to buy 1 or more shares.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_updaters.get_plot_data">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">get_plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.get_plot_data" title="Link to this definition"></a></dt>
+<dd><p>Return the history data: low, high, close for an investment. Used to plot value history.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_updaters.nearest">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">nearest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pivot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.nearest" title="Link to this definition"></a></dt>
+<dd><p>Find the nearest item (date) in a list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core.services.investment_updaters.update_history">
+<span class="sig-prename descclassname"><span class="pre">core.services.investment_updaters.</span></span><span class="sig-name descname"><span class="pre">update_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">investment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.services.investment_updaters.update_history" title="Link to this definition"></a></dt>
+<dd><p>Add a new element to the History record.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Graeme Muller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
