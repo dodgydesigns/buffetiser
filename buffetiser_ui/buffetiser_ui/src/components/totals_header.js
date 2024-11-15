@@ -22,7 +22,7 @@ export default function TotalsHeader({ totalPortfolioValues }) {
             <tr>
               <td>${totalPortfolioValues.total_cost.toFixed(2)}</td>
               <td style={{ color: valueColour }}>
-                {totalPortfolioValues.total_value.toFixed(2)}%
+                ${totalPortfolioValues.total_value.toFixed(2)}
               </td>
               <td style={{ color: valueColour }}>
                 ${totalPortfolioValues.total_profit.toFixed(2)}

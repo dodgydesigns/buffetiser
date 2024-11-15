@@ -6,6 +6,19 @@ from asgiref.sync import sync_to_async
 from core.models import Investment, Purchase, Sale
 
 
+def date_to_string(date):
+    """Ensure all dates are formatted the same."""
+    return datetime.datetime.strftime("%d/%m/%Y")
+
+def date_to_datetime(date):
+    """Ensure all dates are formatted the same."""
+    return datetime.datetime(date.year, date.month, date.day)
+
+def string_to_date(date_string):
+    """Ensure all dates are formatted the same."""
+    return datetime.datetime.strptime(date_string, "%d/%m/%Y")
+
+
 def get_purchase_history(investment):
     """
     All the purchases that have been made of this Investment.
@@ -13,12 +26,10 @@ def get_purchase_history(investment):
     investment_purchase_history = Purchase.objects.filter(investment=investment).all()
     purchases = {}
     for purchase in investment_purchase_history:
-        purchases.setdefault(purchase.date.strftime("%d/%m/%Y"), []).append(
-            (
-                purchase.units,
-                purchase.price_per_unit,
-                purchase.units * purchase.price_per_unit,
-            )
+        purchases.setdefault(purchase.date, []).append(
+            {"units": purchase.units,
+             "price_per_unit": purchase.price_per_unit,
+             "total_cost": purchase.units * purchase.price_per_unit,}
         )
     return purchases
 
@@ -30,8 +41,10 @@ def get_sale_history(investment):
     investment_sale_history = Sale.objects.filter(investment=investment).all()
     sales = {}
     for sale in investment_sale_history:
-        sales.setdefault(sale.date.strftime("%d/%m/%Y"), []).append(
-            (sale.units, sale.price_per_unit, sale.units * sale.price_per_unit)
+        sales.setdefault(sale.date, []).append(
+            {"units": sale.units,
+             "price_per_unit": sale.price_per_unit,
+             "total_cost": sale.units * sale.price_per_unit,}
         )
     return sales
 
