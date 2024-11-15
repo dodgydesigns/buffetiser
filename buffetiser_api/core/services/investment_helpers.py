@@ -8,7 +8,7 @@ from core.models import Investment, Purchase, Sale
 
 def date_to_string(date):
     """Ensure all dates are formatted the same."""
-    return datetime.datetime.strftime("%d/%m/%Y")
+    return date.strftime("%d/%m/%Y")
 
 def date_to_datetime(date):
     """Ensure all dates are formatted the same."""

@@ -250,83 +250,68 @@ def get_total_reinvestment_units_on_date(investment, date):
     return total_reinvestment_units
 
 
-def get_portfolio_totals():
+def get_portfolio_value_history():
     """
-    Get the profit and percent profit for the whole portfolio.
+    Get the value of all shares for each date for the whole portfolio.
     """
     # List of all purchases and sales made over the years
     # List of dividends reinvested ***
     # For each date in each investment (the dates will be the same for all) history, get: total units * day value
-    # purchases_dict = {}
-    # sales_dict = {}
-    for investment in Investment.objects.all():
-        get_total_units_held_on_date(investment, datetime.datetime.now())
-    #     purchases_dict.update(get_purchase_history(investment))
-    #     sales_dict.update(get_sale_history(investment))
-
-    # history_dates = set()
-    # # Declaring this here make the search faster: Python is a 
-    # # dynamic language, and resolving seen.add each iteration is more costly than resolving a local variable.
-    # history_dates_add = history_dates.add   
-    # history_dates = [history.date for history in History.objects.all().order_by("date") 
-    #                  if not (history.date in history_dates or history_dates_add(history.date))]
-
-    # # # It's important to remember that there could be more than one purchase per date. Same with sales. This is
-    # # # why they are in a list. We have to iterate over each 'potential' purchase per day.
-    # total_value_on_date = {}
-    # for history_date in history_dates:
-    #     total_value_on_date[history_date] = 0
-    #     for purchase_date in purchases_dict.keys():
-    #         purchase_date = string_to_date(purchase_date)
-    #         history_date = date_to_string(history_date)
-    #         history_start_date = history_dates[0]
-    #         history_end_date = history_dates[-1]
-
-    #         # Purchase happened before history started: units*price_per_unit
-    #         # if purchase_date <= history_start_date:
-    #         #     for purchase in purchases_dict[purchase_date]:
-    #         #         total_value_on_date[history_date] += int(purchase["units"]) * float(purchase["price_per_unit"])
-
-    #     # Purchase happened after history started: unit*close
-    #         if history_start_date >= purchase_date < history_end_date:
-    #             for investment in Investment.objects.all():
-    #                 total_value_on_date[history_date] += investment.total_units * History.objects.filter(investment=investment, date=history_date)
-
-
-        
-    #             # for purchase in purchases_dict[purchase_date]:
-    #             #     # This is going to be none of them.
-    #             #     total_value_on_date[history_date] += int(purchase["units"]) * float(purchase["price_per_unit"])
-
-    #     # Make sure all new history additions re-calculate the totals
-
-
-
-
-
-
-
-
-
-
-
-    # for history_date in history_dates:
-    #     total_value_on_date[history_date] = 0
-    #     for purchase_date in purchases_dict.keys():
-    #         if string_to_date(purchase_date) <= date_to_string(history_date):
-    #             for purchase in purchases_dict[purchase_date]:
-    #                 total_value_on_date[history_date] += int(purchase["units"]) * float(purchase["price_per_unit"])
-
-
-
-    # vvv = json.dumps(units_held_on_date)
-    # 
-
-
 
     date = datetime.datetime.now()
 
+    # Remove duplicate history dates
+    history_dates = set()
+    # Declaring this here make the search faster: Python is a 
+    # dynamic language, and resolving seen.add each iteration is more costly than resolving a local variable.
+    history_dates_add = history_dates.add   
+    history_dates = [history.date for history in History.objects.all().order_by("date") 
+                     if not (history.date in history_dates or history_dates_add(history.date))]
+    history_start_date = history_dates[0]
 
+    purchases_dict = {}
+    sales_dict = {}
+    for investment in Investment.objects.all():
+        purchases_dict.update(get_purchase_history(investment))
+        sales_dict.update(get_sale_history(investment))
+
+
+    # Purchase happened before history started: units*price_per_unit
+    pre_history_value_on_date = {}
+    cumulative_value = 0
+    for purchase_date in sorted(purchases_dict.keys()):
+        pre_history_value_on_date[date_to_string(purchase_date)] = 0
+        if purchase_date < history_start_date:
+            for purchase in purchases_dict[purchase_date]:
+                cumulative_value += int(purchase["units"]) * float(purchase["price_per_unit"])
+                pre_history_value_on_date[date_to_string(purchase_date)] = cumulative_value
+
+    # Purchase happened after history started: unit*close
+    history_value_on_date = {}
+    for history_date in history_dates:
+        cumulative_value = 0
+        history_value_on_date[date_to_string(history_date)] = 0
+        for investment in Investment.objects.all():
+            units = get_total_units_held_on_date(investment, date_to_datetime(history_date))
+            close_value = History.objects.filter(investment=investment, date=history_date).first().close
+            cumulative_value += units * close_value
+        history_value_on_date[date_to_string(history_date)] = cumulative_value
+
+    value_history_dict = pre_history_value_on_date
+    value_history_dict.update(history_value_on_date)
+
+    value_history = []
+    for date, total in value_history_dict.items():
+        value_history.append({"date": date, "total": total})
+    return value_history
+
+
+def get_portfolio_totals():
+    """
+    Get the profit and percent profit for the whole portfolio.
+    """
+    date = datetime.datetime.now()
+    
     portfolio = {"total_cost":0, "total_profit": 0, "total_profit_percentage": 0, "total_value": 0,}
     for investment in Investment.objects.all():
         investment_cost = get_total_cost_on_date(investment, date)

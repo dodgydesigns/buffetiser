@@ -6,6 +6,7 @@ from core.services.investment_details import (
     get_all_details_for_investment,
     get_credit_debit_history,
     get_portfolio_totals,
+    get_portfolio_value_history,
     scraper_function_get_daily_change,
     scraper_function_investment_and_history,
 )
@@ -72,7 +73,7 @@ class PortfolioTotals(APIView):
 
     def get(self, _):
         portfolio_totals = get_portfolio_totals()
-        portfolio_history = get_credit_debit_history()
-        return JsonResponse({"portfolio_totals": portfolio_totals, 
-                             "portfolio_history": portfolio_history}, 
+        portfolio_history = get_portfolio_value_history()
+        return JsonResponse({"portfolio_totals": portfolio_totals,
+                             "portfolio_history": portfolio_history},
                              status=200)
