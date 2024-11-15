@@ -7,14 +7,13 @@ import os
 import sys
 import django
 
+# Set path so project can be found
 sys.path.insert(0, os.path.abspath('..'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'buffetiser_api.settings')
+# Now set path so settings can be found
 sys.path.insert(0, os.path.abspath('../buffetiser_api/'))
-# print("----------------------------------------------------------")
-# print(sys.path)
-# print(os.listdir(os.path.abspath('../buffetiser_api/')))
-# print("----------------------------------------------------------")
 django.setup()
+# Now set path back so project apps can be found again
 sys.path.insert(0, os.path.abspath('..'))
 
 # 
