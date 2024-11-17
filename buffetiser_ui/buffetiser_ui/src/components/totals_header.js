@@ -11,26 +11,25 @@ export default function TotalsHeader({ totalPortfolioValues }) {
         <tbody>
           <tr>
             <td width="200rem">PORTFOLIO</td>
-            <tr>
-              <td width="30%" padding-left="5rem">
-                Cost
-              </td>
-              <td width="30%">Total Value</td>
-              <td width="30%">Profit</td>
-              <td>%</td>
-            </tr>
-            <tr>
-              <td>${totalPortfolioValues.total_cost.toFixed(2)}</td>
-              <td style={{ color: valueColour }}>
-                ${totalPortfolioValues.total_value.toFixed(2)}
-              </td>
-              <td style={{ color: valueColour }}>
-                ${totalPortfolioValues.total_profit.toFixed(2)}
-              </td>
-              <td style={{ color: valueColour }}>
-                {totalPortfolioValues.total_profit_percentage.toFixed(2)}%
-              </td>
-            </tr>
+            <td width="10%" padding-left="5rem">
+              Cost
+            </td>
+            <td width="10%">Total Value</td>
+            <td width="10%">Profit</td>
+            <td>%</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>${totalPortfolioValues.total_cost.toFixed(2)}</td>
+            <td style={{ color: valueColour }}>
+              ${totalPortfolioValues.total_value.toFixed(2)}
+            </td>
+            <td style={{ color: valueColour }}>
+              ${totalPortfolioValues.total_profit.toFixed(2)}
+            </td>
+            <td style={{ color: valueColour }}>
+              {totalPortfolioValues.total_profit_percentage.toFixed(2)}%
+            </td>
           </tr>
         </tbody>
       </table>

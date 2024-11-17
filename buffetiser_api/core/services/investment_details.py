@@ -177,8 +177,8 @@ def get_total_units_held_on_date(investment, date):
     purchases_dict = get_purchase_history(investment).items()
     for purchase_date, purchases in purchases_dict:
         for purchase in purchases:
+            # There can be multiple purchases per day.
             if date_to_datetime(purchase_date) <= date:
-                # There can be multiple purchases per day.
                 units_held += int(purchase["units"])
 
     reinvestment_units = get_total_reinvestment_units_on_date(investment, date)
@@ -190,6 +190,7 @@ def get_total_units_held_on_date(investment, date):
         for sale in sales:
             if date_to_datetime(sale_date) <= date:
                 units_held -= int(sale["units"])
+
     return units_held
 
 
@@ -209,10 +210,6 @@ def get_total_value_on_date(investment, date):
     """
     The current total value of an investment.
     """
-    # TODO: this needs attention
-    # Make sure live price and history are the latest values.
-    # update_investment_and_history()
-    # Get the latest History entry
     return get_total_units_held_on_date(investment, date) * float(
         list(History.objects.filter(investment=investment))[-1].close
     )
@@ -232,7 +229,6 @@ def get_profit_total_and_percentage_on_date(investment, date):
     total_value = get_total_value_on_date(investment, date)
     total_cost = get_total_cost_on_date(investment, date)
     total_profit = total_value - total_cost
-        
     total_profit_percentage = ((total_value / total_cost) - 1) * 100
     return {"total_profit": total_profit, "total_profit_percentage": total_profit_percentage}
 
@@ -254,16 +250,14 @@ def get_portfolio_value_history():
     """
     Get the value of all shares for each date for the whole portfolio.
     """
-    # List of all purchases and sales made over the years
-    # List of dividends reinvested ***
-    # For each date in each investment (the dates will be the same for all) history, get: total units * day value
+    # TODO: List of dividends reinvested ***
 
     date = datetime.datetime.now()
 
     # Remove duplicate history dates
     history_dates = set()
     # Declaring this here make the search faster: Python is a 
-    # dynamic language, and resolving seen.add each iteration is more costly than resolving a local variable.
+    # dynamic language, and resolving history_dates.add each iteration is more costly than resolving a local variable.
     history_dates_add = history_dates.add   
     history_dates = [history.date for history in History.objects.all().order_by("date") 
                      if not (history.date in history_dates or history_dates_add(history.date))]
@@ -275,8 +269,7 @@ def get_portfolio_value_history():
         purchases_dict.update(get_purchase_history(investment))
         sales_dict.update(get_sale_history(investment))
 
-
-    # Purchase happened before history started: units*price_per_unit
+    # Purchase happened before history started: units*price_per_unit #TODO: This isn't right! it should be units*current price???????
     pre_history_value_on_date = {}
     cumulative_value = 0
     for purchase_date in sorted(purchases_dict.keys()):
@@ -317,10 +310,10 @@ def get_portfolio_totals():
         investment_cost = get_total_cost_on_date(investment, date)
         investment_profit = get_profit_total_and_percentage_on_date(investment, date)["total_profit"]
         investment_value = get_total_value_on_date(investment, date)
-        investment_profit_percent = get_profit_total_and_percentage_on_date(investment, date)["total_profit_percentage"]
         portfolio["total_cost"] += investment_cost
         portfolio["total_profit"] += investment_profit
-        portfolio["total_profit_percentage"] += investment_profit_percent
         portfolio["total_value"] += investment_value
+
+    portfolio["total_profit_percentage"] = ((portfolio["total_value"] / portfolio["total_cost"]) -1 ) * 100
 
     return portfolio

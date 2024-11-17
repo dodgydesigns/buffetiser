@@ -11,12 +11,27 @@ import {
 } from "recharts";
 import "../index.css";
 
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    console.log(payload);
+    return (
+      <div className="custom-tooltip">
+        <p className="tooltip-desc" style={{ color: "white" }}>
+          ${payload[0].value.toFixed(2)}
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+};
 export default class InvestmentCharts extends PureComponent {
   render() {
+    console.log(this.props.portfolioHistory.totals);
     return (
       <ResponsiveContainer width="98%" height={300}>
         <LineChart
-          data={this.props.portfolio_history}
+          data={this.props.portfolioHistory}
           margin={{
             top: 5,
             right: 30,
@@ -41,7 +56,7 @@ export default class InvestmentCharts extends PureComponent {
             fontSize="10"
             domain={["dataMin", "auto"]}
           />
-          <Tooltip />
+          <Tooltip content={<CustomTooltip />} />
           <Legend />
           <Line
             yAxisId="left"
@@ -55,3 +70,5 @@ export default class InvestmentCharts extends PureComponent {
     );
   }
 }
+
+// portfolio_in_out

@@ -72,8 +72,6 @@ class PortfolioTotals(APIView):
     # TODO: don't forget reinvestment and dividend payouts
 
     def get(self, _):
-        portfolio_totals = get_portfolio_totals()
-        portfolio_history = get_portfolio_value_history()
-        return JsonResponse({"portfolio_totals": portfolio_totals,
-                             "portfolio_history": portfolio_history},
-                             status=200)
+        payload = {"portfolio_totals": get_portfolio_totals(), 
+                   "portfolio_history": get_portfolio_value_history(),}
+        return JsonResponse(payload, status=200)
