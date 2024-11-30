@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import "../index.css";
+import "../../index.css";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {

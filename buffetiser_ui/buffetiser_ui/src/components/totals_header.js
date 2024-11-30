@@ -16,7 +16,7 @@ export default function TotalsHeader({ totalPortfolioValues }) {
             </td>
             <td width="10%">Total Value</td>
             <td width="10%">Profit</td>
-            <td>%</td>
+            <td></td>
           </tr>
           <tr>
             <td></td>

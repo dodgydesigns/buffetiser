@@ -13,7 +13,6 @@ import "../index.css";
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
-    console.log(payload);
     return (
       <div className="custom-tooltip">
         <p className="tooltip-desc" style={{ color: "white" }}>
@@ -27,7 +26,6 @@ const CustomTooltip = ({ active, payload }) => {
 };
 export default class InvestmentCharts extends PureComponent {
   render() {
-    console.log(this.props.portfolioHistory.totals);
     return (
       <ResponsiveContainer width="98%" height={300}>
         <LineChart

@@ -269,15 +269,16 @@ def get_portfolio_value_history():
         purchases_dict.update(get_purchase_history(investment))
         sales_dict.update(get_sale_history(investment))
 
-    # Purchase happened before history started: units*price_per_unit #TODO: This isn't right! it should be units*current price???????
+    # Purchase happened before history started: units*price_per_unit #TODO: This could be a separate chart
+    # but doesn't fit in well with the history chart.
     pre_history_value_on_date = {}
-    cumulative_value = 0
-    for purchase_date in sorted(purchases_dict.keys()):
-        pre_history_value_on_date[date_to_string(purchase_date)] = 0
-        if purchase_date < history_start_date:
-            for purchase in purchases_dict[purchase_date]:
-                cumulative_value += int(purchase["units"]) * float(purchase["price_per_unit"])
-                pre_history_value_on_date[date_to_string(purchase_date)] = cumulative_value
+    # cumulative_value = 0
+    # for purchase_date in sorted(purchases_dict.keys()):
+    #     pre_history_value_on_date[date_to_string(purchase_date)] = 0
+    #     if purchase_date < history_start_date:
+    #         for purchase in purchases_dict[purchase_date]:
+    #             cumulative_value += int(purchase["units"]) * float(purchase["price_per_unit"])
+    #             pre_history_value_on_date[date_to_string(purchase_date)] = cumulative_value
 
     # Purchase happened after history started: unit*close
     history_value_on_date = {}

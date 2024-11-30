@@ -3,7 +3,7 @@ import InvestmentCharts from "./investment_charts";
 import InvestmentSummary from "./investment_summary_panel";
 
 function PositiveColour(comparisonValue) {
-  return comparisonValue >= 0 ? "#55ff55" : "#ff4444";
+  return comparisonValue > 0 ? "#55ff55" : "#ff4444";
 }
 
 /*
@@ -15,7 +15,6 @@ This component holds all the details of an Investment:
 */
 function InvestmentCard(investment) {
   const [isOpen, setIsOpen] = useState(false);
-  const valueColour = PositiveColour(investment.variation);
 
   return (
     <div key={investment.symbol}>
@@ -58,11 +57,27 @@ function InvestmentCard(investment) {
                     <td className="header_header">
                       {investment.last_price.toFixed(2)}
                     </td>
-                    <td style={{ color: valueColour }}>
+                    <td
+                      style={{ color: PositiveColour(investment.daily_change) }}
+                    >
                       {investment.daily_change.toFixed(2)}
                     </td>
-                    <td style={{ color: valueColour }}>
+                    <td
+                      style={{
+                        color: PositiveColour(investment.daily_change_percent),
+                      }}
+                    >
                       {investment.daily_change_percent.toFixed(2)}
+                    </td>
+                    <td
+                      style={{
+                        paddingLeft: "5rem",
+                        paddingBottom: "1rem",
+                        color: PositiveColour(investment.profit_percent),
+                        fontSize: "1.3rem",
+                      }}
+                    >
+                      {investment.profit_percent.toFixed(2)}%
                     </td>
                   </tr>
                 </tbody>

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-import MenuBar from "./components/menu_bar";
-import InvestmentCard from "./components/investment_card";
+import MenuBar from "./components/menu/menu_bar";
+import InvestmentCard from "./components/investment_cards/investment_card";
 import TotalsCard from "./components/totals_card";
 
 import "./index.css";

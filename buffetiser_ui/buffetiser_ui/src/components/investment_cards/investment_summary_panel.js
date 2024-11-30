@@ -11,7 +11,7 @@ specific information about an Investment:
 
 Does not include profit/loss due to sales. (maybe it should???)
 */
-import "../index.css";
+import "../../index.css";
 
 export default class InvestmentSummary extends PureComponent {
   render() {
@@ -47,15 +47,6 @@ export default class InvestmentSummary extends PureComponent {
                 {data.profit > 0
                   ? "$" + data.profit.toFixed(2)
                   : "-$" + data.profit.toFixed(2).replace("-", "")}
-              </td>
-              <td
-                style={
-                  data.profit_percent < 0
-                    ? { color: "#ff4444" }
-                    : { color: "#82ca9d" }
-                }
-              >
-                {data.profit_percent.toFixed(2)}%
               </td>
             </tr>
           </tbody>
