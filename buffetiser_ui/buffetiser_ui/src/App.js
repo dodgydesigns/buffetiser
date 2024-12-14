@@ -21,6 +21,7 @@ the child components.
 */
 export default function App() {
   const [allInvestments, setAllInvestments] = useState([]);
+  const [constants, setConstants] = useState([]);
 
   useEffect(() => {
     axios
@@ -31,13 +32,21 @@ export default function App() {
       .catch((error) => {
         console.log(error.response);
       });
+
+    axios
+      .get("http://127.0.0.1:8000/constants")
+      .then((response) => {
+        setConstants(response.data);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
   }, []);
 
   return (
     <>
-      <MenuBar />
+      <MenuBar constants={constants} />
       <div className="content">
-        {" "}
         <InvestmentCards allInvestments={allInvestments} />
       </div>
       <footer className="footer">

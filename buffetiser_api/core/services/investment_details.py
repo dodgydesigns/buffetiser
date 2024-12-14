@@ -98,7 +98,7 @@ def get_all_details_for_investment(investment):
     else:
         yesterday_price = live_price
 
-    daily_change = DailyChange.objects.filter(symbol=investment.symbol).first()
+    variation = DailyChange.objects.filter(symbol=investment.symbol).first()
     profit_total = get_profit_total_and_percentage_on_date(investment, date)
 
     all_details = {
@@ -106,8 +106,8 @@ def get_all_details_for_investment(investment):
         "symbol": investment.symbol,
         "last_price": live_price,
         "variation": live_price - yesterday_price,
-        "daily_change": daily_change.daily_change,
-        "daily_change_percent": daily_change.daily_change_percent,
+        "daily_change": variation.daily_change if variation else 0,
+        "daily_change_percent": variation.daily_change_percent if variation else 0,
         "units": get_total_units_held_on_date(investment, date),
         "average_cost": get_average_cost_on_date(investment, date),
         "total_cost": get_total_cost_on_date(investment, date),
@@ -210,26 +210,37 @@ def get_total_value_on_date(investment, date):
     """
     The current total value of an investment.
     """
-    return get_total_units_held_on_date(investment, date) * float(
-        list(History.objects.filter(investment=investment))[-1].close
-    )
+    total_value_on_date = 0
+    if len(list(History.objects.filter(investment=investment))) >= 1:
+        total_value_on_date = get_total_units_held_on_date(investment, date) * float(
+            list(History.objects.filter(investment=investment))[-1].close
+        )
+    return total_value_on_date
 
 
 def get_average_cost_on_date(investment, date):
     """
     The average cost per unit of an investment.
     """
-    return get_total_cost_on_date(investment, date) / get_total_units_held_on_date(investment, date)
+    # We can have zero units held if the Investment is just being watched
+    total_cost_on_date = 0
+    if get_total_units_held_on_date(investment, date) > 0:
+        total_cost_on_date = get_total_cost_on_date(investment, date) / get_total_units_held_on_date(investment, date)
+    return total_cost_on_date
 
 
 def get_profit_total_and_percentage_on_date(investment, date):
     """
     Return the profit in dollars and as a percent.
     """
+    # We can have zero value if the Investment is just being watched
+    total_profit = 0
+    total_profit_percentage = 0
     total_value = get_total_value_on_date(investment, date)
     total_cost = get_total_cost_on_date(investment, date)
-    total_profit = total_value - total_cost
-    total_profit_percentage = ((total_value / total_cost) - 1) * 100
+    if total_value > 0 and total_cost > 0:
+        total_profit = total_value - total_cost
+        total_profit_percentage = ((total_value / total_cost) - 1) * 100
     return {"total_profit": total_profit, "total_profit_percentage": total_profit_percentage}
 
 
@@ -285,9 +296,12 @@ def get_portfolio_value_history():
     for history_date in history_dates:
         cumulative_value = 0
         history_value_on_date[date_to_string(history_date)] = 0
+        close_value = 0
         for investment in Investment.objects.all():
             units = get_total_units_held_on_date(investment, date_to_datetime(history_date))
-            close_value = History.objects.filter(investment=investment, date=history_date).first().close
+            # We can have zero History if we are just watching the Investment
+            if len(History.objects.filter(investment=investment, date=history_date)) > 0:
+                close_value = History.objects.filter(investment=investment, date=history_date).first().close
             cumulative_value += units * close_value
         history_value_on_date[date_to_string(history_date)] = cumulative_value
 

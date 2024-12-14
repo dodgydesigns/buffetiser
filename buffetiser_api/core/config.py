@@ -11,10 +11,12 @@ class Constants:
         CRYPTO = ("Crypto", "Crypto")
 
     class Exchanges(models.TextChoices):
-        """ """
+        """ 
+        The exchanges around the world that can be used to buy and sell shares.
+        """
 
-        XAMS = ("XAMS", "AMS")
         XASX = ("XASX", "ASX")
+        XAMS = ("XAMS", "AMS")
         XBOM = ("XBOM", "BOM")
         XBRU = ("XBRU", "BRU")
         XFRA = ("XFRA", "FRA")
@@ -37,7 +39,9 @@ class Constants:
         XTSE = ("XTSE", "TSE")
 
     class Platforms(models.TextChoices):
-        """ """
+        """ 
+        The exchanges around the world that can be used to buy and sell shares.
+        """
 
         CMC = ("CMC", "CMC")
         LINK = ("LINK", "LINK")

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import PopupModal from "./popup_modal.js";
+import PopupModal from "./new_investment_modal.js";
 import axios from "axios";
 import "../../index.css";
 
-const baseURL = "127.0.0.1:8000";
+const baseURL = "http://127.0.0.1:8000";
 
-function MenuBar() {
+function MenuBar(constants) {
   const [showNewInvestment, setShowNewInvestment] = useState(false);
 
   const handleNewInvestmentClose = (ok, isOpen) => {
@@ -26,13 +26,12 @@ function MenuBar() {
         className="header_bar_div"
         onClick={() => {
           setShowNewInvestment(true);
-          // axios.post(baseURL + "/new_investment/");
         }}
       >
         {showNewInvestment && (
           <PopupModal
-            endpoint={"www.fuck.you.com"}
-            children="`<div>Hello</div>`"
+            props={constants}
+            endpoint={baseURL + "/new_investment/"}
             onClose={() => handleNewInvestmentClose()}
           ></PopupModal>
         )}

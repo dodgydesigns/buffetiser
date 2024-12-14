@@ -44,10 +44,10 @@ function InvestmentCard(investment) {
                       <table>
                         <tbody>
                           <tr>
-                            <td className="investment_symbol" width="10%">
+                            <td className="investment_symbol" width="100rem">
                               {investment.symbol}
                             </td>
-                            <td className="investment_name">
+                            <td className="investment_name" width="1500rem">
                               {investment.name}
                             </td>
                           </tr>

@@ -1,4 +1,3 @@
-import datetime
 from typing import Union
 
 from core.config import Constants
@@ -20,7 +19,6 @@ class Investment(Model):
     Each one of these however, can have multiple purchases and sales.
     """
 
-    # key will be exchange-symbol
     key = CharField(max_length=32, primary_key=True, default=None)
     name = CharField(max_length=128, default=None, null=True)
     symbol = CharField(max_length=32, default=None, null=True)
@@ -31,9 +29,6 @@ class Investment(Model):
         null=False,
     )
     live_price = FloatField(default=0)
-    plot_path = CharField(
-        max_length=512, default="./"
-    )  # hold the path of the last history plot. Hopefully can remove
 
     @staticmethod
     def generate_key(exchange, symbol):
