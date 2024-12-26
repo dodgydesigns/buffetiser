@@ -13,7 +13,7 @@ This component holds all the details of an Investment:
  - Price/Volume history chart and
  - Buttons to buy (add), sell (remove) and delete Investments
 */
-function InvestmentCard(investment) {
+function InvestmentCard(investment, constants) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -94,7 +94,7 @@ function InvestmentCard(investment) {
                   </div>
                   {/* The panel on the RHS with details of the investment and the buttons */}
                   <div className="summary">
-                    <InvestmentSummary investment={investment} />
+                    <InvestmentSummary investment={investment} constants={constants}/>
                   </div>
                 </div>
               )}

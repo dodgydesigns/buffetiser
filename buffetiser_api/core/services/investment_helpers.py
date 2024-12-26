@@ -110,7 +110,7 @@ async def scrape(scraper_function):
             await scraper_function(investment_and_url, response)
 
 
-def initiate_async_scape(scraper_function):
+def initiate_async_scrape(scraper_function):
     """
     Uses ASX data from BigCharts (MarketWatch) to propagate portfolio with share data.
     There is no official API so data is scraped from their website. Not sure if this

@@ -7,16 +7,16 @@ import TotalsCard from "./components/totals_card";
 
 import "./index.css";
 
-function InvestmentCards({ allInvestments }) {
+function InvestmentCards({ allInvestments, constants }) {
   return (
     <div className="investment_cards_container">
-      {allInvestments.map((item) => InvestmentCard(item))};
+      {allInvestments.map((item) => InvestmentCard(item, constants))};
     </div>
   );
 }
 
 /*
-Pull all (most?) of the required information once and feed it to
+Pull all of the required information once and feed it to
 the child components.
 */
 export default function App() {
@@ -43,11 +43,16 @@ export default function App() {
       });
   }, []);
 
+  // Make sure the data has been received.
+  if (allInvestments.length === 0 || constants.length === 0) {
+    return <div>Loading!</div>
+  }
+
   return (
     <>
       <MenuBar constants={constants} />
       <div className="content">
-        <InvestmentCards allInvestments={allInvestments} />
+        <InvestmentCards allInvestments={allInvestments} constants={constants}/>
       </div>
       <footer className="footer">
         <TotalsCard />

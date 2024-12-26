@@ -44,9 +44,9 @@ def scraper_function_get_daily_change(investment_and_url, response):
         "td", {"class": "percent-col"}
     ).text.replace("%", "")
 
-    daily_change = float(daily_change_string) if daily_change_string != "UNCH" else 1.0
+    daily_change = float(daily_change_string) if daily_change_string != "UNCH" else 0
     daily_change_percent = (
-        float(daily_change_percent_string) if daily_change_string != "UNCH" else 1.0
+        float(daily_change_percent_string) if daily_change_string != "UNCH" else 0
     )
 
     daily_change = DailyChange.objects.create(
