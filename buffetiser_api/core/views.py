@@ -1,4 +1,3 @@
-import datetime
 from core.config import Constants
 from core.models import DailyChange, Investment, Purchase
 from core.serializers import InvestmentSerializer
@@ -9,7 +8,7 @@ from core.services.investment_details import (
     scraper_function_get_daily_change,
     scraper_function_investment_and_history,
 )
-from core.services.investment_helpers import initiate_async_scrape
+from core.services.investment_helpers import fe_string_to_date, initiate_async_scrape
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
@@ -147,50 +146,29 @@ class PurchaseView(APIView):
     Create a new Investment object. A Purchase object will necessarily be created at the same time but 
     most values will be 0. This allows an Investment to be watched.
     Reply from the front end will be:
-    {"symbol":"","name":"","currency":"","exchange":"","platform":"","units":"","pricePerUnit":"","fee":""}
+        'symbol': 'VAS', 'currency': 'AUD', 'exchange': 'XASX', 'platform': 'CMC', 
+        'units': '49', 'pricePerUnit': '100.9050', 'fee': '11', 'date': '2024-12-23T09:29:49.000Z'
     """
 
     def post(self, request):
-        purchase = request.data
+        purchase_data = request.data
+        purchase_investment = Investment.objects.filter(symbol=purchase_data["symbol"]).first()
 
-        print("*"*10)
-        print(request)
-        print(purchase["symbol"])
-        # print("*"*60)
-        # print(Investment.objects.get(symbol=purchase["symbol"]))
-        # print("*"*60)
-        # print(get_all_details_for_investment(Investment.objects.get(symbol=purchase["symbol"])))
-
-        # try:
-        #     print("*1"*60)
-        #     if not new_investment_data["symbol"] in [inv.symbol for inv in Investment.objects.all()]:
-        #         new_investment = Investment.objects.create(key=new_investment_data["symbol"],
-        #                                                 name=new_investment_data["name"],
-        #                                                 symbol=new_investment_data["symbol"],
-        #                                             )
-        #         print("*"*60)
-        #         # print(get_all_details_for_investment(new_investment))
-        #         new_investment.live_price = get_all_details_for_investment(new_investment)["last_price"]
-        #         new_investment.live_price
-        #         print("*"*60)
-        #         # new_investment.save()
-
-                
-
-        #         purchase, created = Purchase.objects.get_or_create(
-        #             investment=new_investment,
-        #             units=0,
-        #             price_per_unit=new_investment.live_price[0],
-        #             fee=0,
-        #             date=datetime.datetime.now(),
-        #             trade_count=0,
-        #         )
-        #         if created:
-        #             purchase.save()
-        # except Exception as e:
-        #     print("*"*60)
-        #     print(e)
-        #     print("*"*60)
+        try:
+            purchase, created = Purchase.objects.get_or_create(
+                investment=purchase_investment,
+                units=float(purchase_data["units"]),
+                price_per_unit=float(purchase_data["pricePerUnit"]),
+                fee=purchase_data["fee"],
+                date=fe_string_to_date(purchase_data["date"]),
+                trade_count=1,
+            )
+            if created:
+                purchase.save()
+        except Exception as e:
+            print("*"*60)
+            print(e)
+            print("*"*60)
 
         return HttpResponse(HTTPStatus.OK)
     

@@ -1,5 +1,4 @@
 import { useState, React } from "react";
-import "../../index.css";
 import "./popup_styles.css";
 
 function PopupModal({ props, endpoint, onClose }) {
@@ -43,19 +42,8 @@ function PopupModal({ props, endpoint, onClose }) {
             </tr>
           </tbody>
         </table>
-        <div>
           <div
-            className="new_investment_cancel"
-            style={{ marginRight: "3rem" }}
-            onClick={(e) => {
-              e.stopPropagation();
-              HandleClose("cancel", false);
-            }}
-          >
-            Cancel
-          </div>
-          <div
-            className="new_investment_save"
+            className="save"
             onClick={(e) => {
               e.stopPropagation();
               HandleClose("ok", false);
@@ -77,6 +65,15 @@ function PopupModal({ props, endpoint, onClose }) {
           >
             Save
           </div>
+          <div
+            className="cancel"
+            style={{ marginRight: "3rem" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              HandleClose("cancel", false);
+            }}
+          >
+            Cancel
         </div>
       </div>
     </div>

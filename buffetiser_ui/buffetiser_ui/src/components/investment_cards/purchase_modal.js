@@ -1,6 +1,12 @@
 import { useState, React } from "react";
-import "../../index.css";
-import "./popup_styles.css";
+import DatePicker from "react-datepicker";
+import { registerLocale } from  "react-datepicker";
+import { enAU } from 'date-fns/locale/en-AU';
+
+import "../menu/popup_styles.css";
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale('enAU', enAU)
 
 function PurchaseModal({ investment, constants, endpoint, onClose }) {
   const [symbol] = useState(investment.symbol);
@@ -11,6 +17,7 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
   const [units, setUnits] = useState();
   const [pricePerUnit, setPricePerUnit] = useState();
   const [fee, setFee] = useState();
+  const [date, setDate] = useState(new Date());
 
   const HandleClose = (ok, isOpen) => {
     if (isOpen === "ok") {
@@ -30,7 +37,7 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
           <tbody>
             <tr>
               <td className="popup_modal_table_label">Symbol</td>
-              <td className="popup_modal_table_input">
+              <td className="popup_modal_table_value_label">
                 <label
                   className="popup_modal_table_text"
                   id={symbol}
@@ -39,9 +46,8 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
             </tr>
             <tr>
               <td className="popup_modal_table_label">Name</td>
-              <td className="popup_modal_table_input">
+              <td className="popup_modal_table_value_label">
                 <label
-                  className="popup_modal_table_text"
                 >{name}</label>
               </td>
             </tr>
@@ -93,19 +99,17 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
               <td className="popup_modal_table_label">Units</td>
               <td className="popup_modal_table_input">
                 <input
-                  style={{ width: "4rem" }}
                   className="popup_modal_table_text"
                   type="number"
                   onChange={(e) => setUnits(e.target.value)}
                 ></input>
-                <span style={{ paddingLeft: "1rem" }}>0 to watch</span>
               </td>
             </tr>
+            
             <tr>
-              <td className="popup_modal_table_label">Price/Unit $AU</td>
+              <td className="popup_modal_table_label">Price/Unit</td>
               <td className="popup_modal_table_input">
                 <input
-                  style={{ width: "4rem" }}
                   className="popup_modal_table_text"
                   type="number"
                   onChange={(e) => setPricePerUnit(e.target.value)}
@@ -113,62 +117,70 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
               </td>
             </tr>
             <tr>
-              <td className="popup_modal_table_label">Fee $AU</td>
+              <td className="popup_modal_table_label">Fee</td>
               <td className="popup_modal_table_input">
                 <input
-                  style={{ width: "4rem" }}
                   className="popup_modal_table_text"
                   type="number"
                   onChange={(e) => setFee(e.target.value)}
                 ></input>
               </td>
             </tr>
+            <tr>
+              <td className="popup_modal_table_label">Date</td>
+              <td className="popup_modal_table_input">
+                <DatePicker locale="enAU" 
+                            dateFormat="dd/MM/yyyy" 
+                            format="dd/MM/yyyy"
+                            selected={date} 
+                            onChange={(e) => setDate(e.target.value)} />
+              </td>
+            </tr>
           </tbody>
         </table>
         <div>
-        <div
-          className="new_purchase_cancel"
-          style={{ marginRight: "3rem" }}
-          onClick={(e) => {
-            e.stopPropagation();
-            HandleClose("cancel", false);
-          }}
-        >
-          Cancel
-        </div>
-        <div
-          className="new_purchase_save"
-          onClick={(e) => {
-            e.stopPropagation();
-            // HandleClose("ok", false);
+          <div
+            className="save"
+            onClick={(e) => {
+              e.stopPropagation();
+              // HandleClose("ok", false);
 
-            const result = {
-              symbol: symbol,
-              currency: currency,
-              exchange: exchange,
-              platform: platform,
-              units: units,
-              pricePerUnit: pricePerUnit,
-              fee: fee,
-            };
-
-            fetch("127.0.0.1/purchase/", {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(result),
-            });
-            console.log(JSON.stringify(result));
-          }}
-        >
+              const result = {
+                symbol: symbol,
+                currency: currency,
+                exchange: exchange,
+                platform: platform,
+                units: units,
+                pricePerUnit: pricePerUnit,
+                fee: fee,
+                date: date,
+              };
+              fetch("http://127.0.0.1:8000/purchase/", {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(result),
+              });
+              console.log(JSON.stringify(result));
+            }}
+          >
           Save
         </div>
+        <div
+            className="cancel"
+            style={{ marginRight: "3rem" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              HandleClose("cancel", false);
+            }}
+          >
+            Cancel
         </div>
       </div>
     </div>
-  );
+  </div>);
 }
 
 export default PurchaseModal;

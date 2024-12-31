@@ -240,6 +240,21 @@ The chart and panel at the bottom showing the totals of the portfolio.
 /*
 The popup modals.
 */
+.popup_modal {
+  position: fixed;
+  top: 10rem;
+  position: absolute;
+  color: #fff;
+  background-color: #163599;
+  padding: 1rem;
+  border-style: solid;
+  border-color: #fff;
+  border-width: 0.5px;
+  text-align: center;
+  font-family: "Arial";
+  cursor: "arrow";
+  z-index: 20;
+}
 .popup_overlay {
   position: fixed;
   top: 0;
@@ -260,6 +275,10 @@ The popup modals.
   text-align: right;
   padding-right: 1rem;
 }
+.popup_modal_table_value_label {
+  text-align: left;
+  padding-right: 1rem;
+}
 .popup_modal_table-input {
   text-align: left;
   padding-right: 1rem;
@@ -267,19 +286,4 @@ The popup modals.
 .popup_modal_table_text {
   width: 10rem;
   padding-right: 0.5rem;
-}
-.popup_modal {
-  position: fixed;
-  top: 10rem;
-  position: absolute;
-  color: #fff;
-  background-color: #163599;
-  padding: 1rem;
-  border-style: solid;
-  border-color: #fff;
-  border-width: 0.5px;
-  text-align: center;
-  font-family: "Arial";
-  cursor: "arrow";
-  z-index: 20;
 }

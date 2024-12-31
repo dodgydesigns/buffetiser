@@ -18,6 +18,10 @@ def string_to_date(date_string):
     """Ensure all dates are formatted the same."""
     return datetime.datetime.strptime(date_string, "%d/%m/%Y")
 
+def fe_string_to_date(date_string):
+    """Date string coming from the front end."""
+    date_string = date_string.split("T")[0]
+    return datetime.datetime.strptime(date_string, "%Y-%m-%d")
 
 def get_purchase_history(investment):
     """
