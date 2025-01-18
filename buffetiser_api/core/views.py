@@ -1,5 +1,6 @@
+import datetime
 from core.config import Constants
-from core.models import DailyChange, Investment, Purchase
+from core.models import DailyChange, Investment, Purchase, Sale
 from core.serializers import InvestmentSerializer
 from core.services.investment_details import (
     get_all_details_for_investment,
@@ -14,6 +15,20 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from http import HTTPStatus
+from itertools import count
+
+# class TradeCount(object):
+#   """
+#   Need to be able to increment the trade count for all trades
+#   """
+#   def __init__(self):
+#     self.counter = 0
+
+#   def __new__(cls):
+#     if not hasattr(cls, 'instance'):
+#       cls.instance = super(TradeCount, cls).__new__(cls)
+#     return cls.instance
+trade_counter = count()
 
 
 @api_view(["POST"])
@@ -101,53 +116,38 @@ class NewInvestmentView(APIView):
     def post(self, request):
         new_investment_data = request.data
 
-        print("*"*60)
-        print(new_investment_data["symbol"])
-        print("*"*60)
-        # print(Investment.objects.get(symbol=new_investment_data["symbol"]))
-        # print("*"*60)
-        # print(get_all_details_for_investment(Investment.objects.get(symbol=new_investment_data["symbol"])))
+        try:
+            if not new_investment_data["symbol"] in [inv.symbol for inv in Investment.objects.all()]:
+                new_investment = Investment.objects.create(key=new_investment_data["symbol"],
+                                                        name=new_investment_data["name"],
+                                                        symbol=new_investment_data["symbol"],
+                                                    )
+                new_investment.live_price = get_all_details_for_investment(new_investment)["last_price"]
+                new_investment.live_price
 
-        # try:
-        #     print("*1"*60)
-        #     if not new_investment_data["symbol"] in [inv.symbol for inv in Investment.objects.all()]:
-        #         new_investment = Investment.objects.create(key=new_investment_data["symbol"],
-        #                                                 name=new_investment_data["name"],
-        #                                                 symbol=new_investment_data["symbol"],
-        #                                             )
-        #         print("*"*60)
-        #         # print(get_all_details_for_investment(new_investment))
-        #         new_investment.live_price = get_all_details_for_investment(new_investment)["last_price"]
-        #         new_investment.live_price
-        #         print("*"*60)
-        #         # new_investment.save()
-
-                
-
-        #         purchase, created = Purchase.objects.get_or_create(
-        #             investment=new_investment,
-        #             units=0,
-        #             price_per_unit=new_investment.live_price[0],
-        #             fee=0,
-        #             date=datetime.datetime.now(),
-        #             trade_count=0,
-        #         )
-        #         if created:
-        #             purchase.save()
-        # except Exception as e:
-        #     print("*"*60)
-        #     print(e)
-        #     print("*"*60)
+                purchase, created = Purchase.objects.get_or_create(
+                    investment=new_investment,
+                    units=0,
+                    price_per_unit=new_investment.live_price[0],
+                    fee=0,
+                    date=datetime.datetime.now(),
+                    trade_count=next(trade_counter),
+                )
+                if created:
+                    purchase.save()
+        except Exception as e:
+            print("*"*60)
+            print(e)
+            print("*"*60)
 
         return HttpResponse(HTTPStatus.OK)
     
+
 class PurchaseView(APIView):
     """
-    Create a new Investment object. A Purchase object will necessarily be created at the same time but 
-    most values will be 0. This allows an Investment to be watched.
+    Create a purchase entry for an existing Investment.
     Reply from the front end will be:
-        'symbol': 'VAS', 'currency': 'AUD', 'exchange': 'XASX', 'platform': 'CMC', 
-        'units': '49', 'pricePerUnit': '100.9050', 'fee': '11', 'date': '2024-12-23T09:29:49.000Z'
+        'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
     """
 
     def post(self, request):
@@ -161,7 +161,7 @@ class PurchaseView(APIView):
                 price_per_unit=float(purchase_data["pricePerUnit"]),
                 fee=purchase_data["fee"],
                 date=fe_string_to_date(purchase_data["date"]),
-                trade_count=1,
+                trade_count=next(trade_counter),
             )
             if created:
                 purchase.save()
@@ -175,14 +175,60 @@ class PurchaseView(APIView):
 
 class SaleView(APIView):
     """
-    Create a new Investment object. A Purchase object will necessarily be created at the same time but 
-    most values will be 0. This allows an Investment to be watched.
+    Create a sal entry for an existing Investment.
     Reply from the front end will be:
-    {"symbol":"","name":"","currency":"","exchange":"","platform":"","units":"","pricePerUnit":"","fee":""}
+        'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
     """
 
     def post(self, request):
-        purchase = request.data
+        sale_data = request.data
+        sale_investment = Investment.objects.filter(symbol=sale_data["symbol"]).first()
 
+        try:
+            sale, created = Sale.objects.get_or_create(
+                investment=sale_investment,
+                units=float(sale_data["units"]),
+                price_per_unit=float(sale_data["pricePerUnit"]),
+                fee=sale_data["fee"],
+                date=fe_string_to_date(sale_data["date"]),
+                trade_count=next(trade_counter),
+            )
+            if created:
+                sale.save()
+        except Exception as e:
+            print("*"*60)
+            print(e)
+            print("*"*60)
+
+        return HttpResponse(HTTPStatus.OK)
+    
+class RemoveView(APIView):
+    """
+    Create a sal entry for an existing Investment.
+
+    """
+
+    def post(self, request):
         print("*"*60)
-        print(purchase["symbol"])
+        print("DELETE")
+        print("*"*60)
+        # sale_data = request.data
+        # sale_investment = Investment.objects.filter(symbol=sale_data["symbol"]).first()
+
+        # try:
+        #     sale, created = Sale.objects.get_or_create(
+        #         investment=sale_investment,
+        #         units=float(sale_data["units"]),
+        #         price_per_unit=float(sale_data["pricePerUnit"]),
+        #         fee=sale_data["fee"],
+        #         date=fe_string_to_date(sale_data["date"]),
+        #         trade_count=next(trade_counter),
+        #     )
+        #     if created:
+        #         sale.save()
+        # except Exception as e:
+        #     print("*"*60)
+        #     print(e)
+        #     print("*"*60)
+
+        return HttpResponse(HTTPStatus.OK)

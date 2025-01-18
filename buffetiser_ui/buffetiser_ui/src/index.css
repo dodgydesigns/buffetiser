@@ -141,7 +141,7 @@ Each investment card has a hidable chart and summary attached.
   flex: 5;
   padding-top: 0.5rem;
   background-color: var(--COLOUR1);
-  zindex: 0;
+  z-index: 0;
 }
 .summary {
   flex: 1;

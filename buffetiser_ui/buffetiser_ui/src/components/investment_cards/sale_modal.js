@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 registerLocale('enAU', enAU)
 
-function PurchaseModal({ investment, constants, endpoint, onClose }) {
+function SaleModal({ investment, constants, endpoint, onClose }) {
   const [symbol] = useState(investment.symbol);
   const [name] = useState(investment.name);
   const [currency, setCurrency] = useState();
@@ -20,19 +20,18 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
   const [date, setDate] = useState(new Date());
   const endpoint_string = endpoint;
 
-  const HandleClose = (button) => {
-    if (button === "ok") {
+  const HandleClose = (ok, isOpen) => {
+    if (isOpen === "ok") {
     }
     onClose(false);
   };
 
   return (
     <div className="popup_overlay">
-      <div className="popup_modal purchase_modal">
-        <h2 className="popup_heading">New Purchase</h2>
+      <div className="popup_modal sale_modal">
+        <h2 className="popup_heading">New Sale</h2>
         <p>
-          If you've purchased shares in an existing investment, use this dialog
-          to add the details of the purchase to your portfolio.
+
         </p>
         <table className="popup_modal_table">
           <tbody>
@@ -143,7 +142,7 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
             className="save"
             onClick={(e) => {
               e.stopPropagation();
-              HandleClose("ok");
+              // HandleClose("ok", false);
 
               const result = {
                 symbol: symbol,
@@ -173,7 +172,7 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
             style={{ marginRight: "3rem" }}
             onClick={(e) => {
               e.stopPropagation();
-              HandleClose("cancel");
+              HandleClose("cancel", false);
             }}
           >
             Cancel
@@ -183,4 +182,4 @@ function PurchaseModal({ investment, constants, endpoint, onClose }) {
   </div>);
 }
 
-export default PurchaseModal;
+export default SaleModal;

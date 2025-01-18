@@ -91,7 +91,11 @@ def get_all_details_for_investment(investment):
     """
     date = datetime.datetime.now()
     live_price = investment.live_price
-    if len(History.objects.filter(investment=investment).all()) > 0:
+    print("*"*60)
+    print(investment.symbol)
+    print(History.objects.filter(investment=investment).order_by("-id"))
+    print("*"*60)
+    if History.objects.filter(investment=investment) and len(History.objects.filter(investment=investment).all()) > 0:
         yesterday_price = (
             History.objects.filter(investment=investment).order_by("-id")[1].close
         )

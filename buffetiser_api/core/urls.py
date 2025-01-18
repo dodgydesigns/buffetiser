@@ -16,4 +16,5 @@ urlpatterns += [
     path("new_investment/", views.NewInvestmentView.as_view()),
     path("purchase/", views.PurchaseView.as_view()),
     path("sale/", views.SaleView.as_view()),
+    path("remove/", views.RemoveView.as_view()),
 ]

@@ -11,7 +11,9 @@ Does not include profit/loss due to sales. (maybe it should???)
 */
 import { React, useState } from "react";
 import "../../index.css";
-import PopupModal from "./purchase_modal.js";
+import PurchaseModal from "./purchase_modal.js";
+import SaleModal from "./sale_modal.js";
+import RemoveModal from "./remove_modal.js";
 
 const baseURL = "http://127.0.0.1:8000";
 
@@ -22,12 +24,16 @@ export default function InvestmentSummary(props) {
 
   const [showBuyInvestment, setShowBuyInvestment] = useState(false);
   const [showSellInvestment, setShowSellInvestment] = useState(false);
+  const [showRemoveInvestment, setShowRemoveInvestment] = useState(false);
   
-  const handleBuyInvestmentClose = (ok, isOpen) => {
+  const handleBuyInvestmentClose = (isOpen) => {
     setShowBuyInvestment(isOpen);
   };
-  const handleSellInvestmentClose = (ok, isOpen) => {
+  const handleSellInvestmentClose = (isOpen) => {
     setShowSellInvestment(isOpen);
+  };
+  const handleRemoveInvestmentClose = (isOpen) => {
+    setShowRemoveInvestment(isOpen);
   };
 
   return (
@@ -67,29 +73,40 @@ export default function InvestmentSummary(props) {
       <div className="summary_buttons">
         <button onClick={() => {
         setShowBuyInvestment(true);
-      }}>
+        }}>
         {showBuyInvestment && (
-        <PopupModal className="buy"
+        <PurchaseModal className="buy"
           investment={investment} 
           constants={constants}
           endpoint={baseURL + "/purchase/"}
           onClose={() => handleBuyInvestmentClose()}
-        ></PopupModal>
+        ></PurchaseModal>
       )}
         Buy</button>
         <button onClick={() => {
         setShowSellInvestment(true);
-      }}>
+        }}>
         {showSellInvestment && (
-        <PopupModal
-          props={constants}
-          endpoint={baseURL + "/sell/"}
+        <SaleModal
+          investment={investment} 
+          constants={constants}
+          endpoint={baseURL + "/sale/"}
           onClose={() => handleSellInvestmentClose()}
-        ></PopupModal>
+        ></SaleModal>
       )}
         Sell</button>
       </div>
-      <button className="remove">Remove</button>
+      <button className="remove" onClick={() => {
+        setShowRemoveInvestment(true);
+        }}>
+        {showRemoveInvestment && (
+          <RemoveModal
+          investment={investment} 
+          endpoint={baseURL + "/remove/"}
+          onClose={() => handleRemoveInvestmentClose()}
+          ></RemoveModal>
+        )}
+        Remove</button>
     </>
   );
 }
