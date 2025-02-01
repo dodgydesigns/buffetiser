@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: POSTGRES_DB
+      POSTGRES_USER: buffetiser
+      POSTGRES_PASSWORD: password
+    ports:
+        - "5432:5432"
+    networks:
+      - bridge
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      
+  backend:
+    build: ./backend
+    container_name: buffetiser_backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    networks:
+      - bridge
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://buffetiser:password@db:5432/buffetiser
+    depends_on:
+      - db
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      python manage.py loaddata fixtures/buffetiser_25-01-19_data.json &&
+      gunicorn buffetiser_api.wsgi:application --bind 0.0.0.0:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: react_frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5001:5001"
+    networks:
+      - bridge
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+
+networks:
+  bridge:
+    driver: bridge
