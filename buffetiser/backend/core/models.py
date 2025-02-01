@@ -238,3 +238,11 @@ class DailyChange(Model):
 
     def __str__(self):
         return f"{self.symbol, self.daily_change, self.daily_change_percent}"
+
+
+class Configuration(Model):
+    """
+    Hold any config values set by the user.
+    """
+    update_time = CharField(default="15:00")
+    update_time_zone = CharField(default="Australia/Perth")

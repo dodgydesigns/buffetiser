@@ -1,11 +1,12 @@
 import datetime
 from http import HTTPStatus
 from itertools import count
+from threading import Thread
 
 import schedule
 
 from core.config import Constants
-from core.models import DailyChange, Investment, Purchase, Sale
+from core.models import Configuration, DailyChange, Investment, Purchase, Sale
 from core.serializers import InvestmentSerializer
 from core.services.investment_details import (
     get_all_details_for_investment,
@@ -50,6 +51,7 @@ def update_all_investments(request):
     """
     update_daily_changes(request._request)
     initiate_async_scrape(scraper_function_investment_and_history)
+    print("Updated all investments prices")
 
     return JsonResponse({}, status=204)
 
@@ -88,11 +90,11 @@ class AllConstantsView(APIView):
 
 
 class ConfigView(APIView):
-    """ """
+    """Nothing to be done here at this point."""
 
+    def get(self, _):
+        return JsonResponse(status=200)
     def post(self, _):
-        print("*" * 60)
-        print("*" * 60)
         return JsonResponse(status=200)
 
 
@@ -107,44 +109,75 @@ class BackupDBView(APIView):
 
 
 class CronTimeView(APIView):
-    """ """
+    """ Controls a CRON like thread that updates all share prices at a certain time each day.
+        It wont update on weekends - save the price server some traffic :)
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.run_schedule = True
-        self.cron_time = "15:00"
-        self.cron_job = schedule.every().day.at("15:00").do(self.share_price_updater)
+        self.countdown = CountdownTask()
 
     def get(self, _):
-        print("GET "*60)
-        print(self.cron_time)
-        return JsonResponse({"cron_time": self.cron_time}, status=200)
+        if len(Configuration.objects.all()) == 0:
+            config = Configuration()
+            config.save()
+
+        return JsonResponse({"cron_time": Configuration.objects.all().first().update_time},
+                             status=200)
 
     def post(self, response):
         """
         Sets a daily schedule to update the prices for all investments. In case the scheduled time is changed,
         the schedule is cleared and restarted with the new run time.
         """
-        self.cron_time = response.data
-        self.run_schedule = False
-        schedule.clear()
-        self.cron_job = schedule.every().day.at(self.cron_time, "Australia/Perth").do(self.share_price_updater)
-        self.run_schedule = True
-        # Loop so that the scheduling task keeps on running all time.
-        while self.run_schedule:
-            print(schedule.idle_seconds())
-            schedule.run_pending()
-            time.sleep(1)
+        config = Configuration.objects.all().first()
+        config.update_time = response.data
+        config.save()
+
+        if self.countdown.running():
+            self.countdown.terminate()
+        self.countdown.setup(Configuration.objects.all().first().update_time,
+                             Configuration.objects.all().first().update_time_zone)
+        self.countdown_thread = Thread(target = self.countdown.run)
+        self.countdown_thread.start()
 
         return JsonResponse({}, status=200)
-    
+
+class CountdownTask:
+    """
+    This creates a threaded task that can be interrupted, updated and restarted.
+    """
+
+    def __init__(self):
+        self._running = True
+
+    def running(self):
+        return self._running
+
+    def terminate(self):
+        schedule.clear()
+        self._running = False
+
+    def setup(self, time, timezone):
+        print(f"setup*****************{time, timezone}**************")
+        # schedule.every().day.at(time, timezone).do(self.share_price_updater)
+        schedule.every(1).minutes.do(self.share_price_updater)
+        self._running = True
+
     def share_price_updater(self):
-        """
-        
-        """
-        print("RAN " * 60)
-        # update_all_investments()
+        day_number = datetime.today().weekday()
+        if day_number < 5:
+            print("RAN " * 60)
+            update_all_investments()
+        else:
+            print("Weekend. Not running updates")
+
+    def run(self):
+        """Loop so that the scheduling task keeps on running all time."""
+        while self._running:
+            print(f"{schedule.idle_seconds()}")
+            schedule.run_pending()
+            time.sleep(1)
 
 
 class InvestmentViewSet(viewsets.ModelViewSet):
