@@ -140,6 +140,7 @@ class Purchase(Model):
 
     def __str__(self):
         return f"{self.investment.symbol}: {self.units} units @ ${self.price_per_unit} with ${self.fee} fee on {self.date}"
+
     class Meta:
         unique_together = ("date", "trade_count", "investment")
 

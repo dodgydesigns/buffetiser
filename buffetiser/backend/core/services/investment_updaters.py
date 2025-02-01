@@ -113,7 +113,7 @@ def update_history(investment, high, low, last_price, volume):
             high=high,
             low=low,
             close=last_price,
-            volume= 0 if volume == "n/a" else int(volume.replace(",", "")),
+            volume=0 if volume == "n/a" else int(volume.replace(",", "")),
         )
         history_entry.save()
 

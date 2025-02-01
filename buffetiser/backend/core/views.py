@@ -1,4 +1,9 @@
 import datetime
+from http import HTTPStatus
+from itertools import count
+
+import schedule
+
 from core.config import Constants
 from core.models import DailyChange, Investment, Purchase, Sale
 from core.serializers import InvestmentSerializer
@@ -14,20 +19,12 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from http import HTTPStatus
-from itertools import count
 
-# class TradeCount(object):
-#   """
-#   Need to be able to increment the trade count for all trades
-#   """
-#   def __init__(self):
-#     self.counter = 0
+from datetime import datetime
+import time
 
-#   def __new__(cls):
-#     if not hasattr(cls, 'instance'):
-#       cls.instance = super(TradeCount, cls).__new__(cls)
-#     return cls.instance
+# There can be multiple purchases/sales of an Investment in a single day. The records
+# only keep date not time so we need to be able to differentiate.
 trade_counter = count()
 
 
@@ -54,7 +51,7 @@ def update_all_investments(request):
     update_daily_changes(request._request)
     initiate_async_scrape(scraper_function_investment_and_history)
 
-    return HttpResponse(status=204)
+    return JsonResponse({}, status=204)
 
 
 class AllInvestmentsDataView(APIView):
@@ -71,21 +68,85 @@ class AllInvestmentsDataView(APIView):
 
         return JsonResponse({"all_investment_data": all_investment_data}, status=200)
 
+
 class AllConstantsView(APIView):
     """
     Get all the constants required for adding, buying and selling Investments.
     """
+
     Constants.InvestmentType.choices
+
     def get(self, _):
         constants = {
-            "type": Constants.InvestmentType.choices, 
-            "currency": Constants.Currencies.choices, 
-            "exchange": Constants.Exchanges.choices, 
-            "platform": Constants.Platforms.choices, 
+            "type": Constants.InvestmentType.choices,
+            "currency": Constants.Currencies.choices,
+            "exchange": Constants.Exchanges.choices,
+            "platform": Constants.Platforms.choices,
         }
 
         return JsonResponse(constants, status=200)
+
+
+class ConfigView(APIView):
+    """ """
+
+    def post(self, _):
+        print("*" * 60)
+        print("*" * 60)
+        return JsonResponse(status=200)
+
+
+class BackupDBView(APIView):
+    """ """
+
+    def post(self, _):
+        print("*" * 60)
+        print("BackupDBView")
+        print("*" * 60)
+        return JsonResponse({}, status=200)
+
+
+class CronTimeView(APIView):
+    """ """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.run_schedule = True
+        self.cron_time = "15:00"
+        self.cron_job = schedule.every().day.at("15:00").do(self.share_price_updater)
+
+    def get(self, _):
+        print("GET "*60)
+        print(self.cron_time)
+        return JsonResponse({"cron_time": self.cron_time}, status=200)
+
+    def post(self, response):
+        """
+        Sets a daily schedule to update the prices for all investments. In case the scheduled time is changed,
+        the schedule is cleared and restarted with the new run time.
+        """
+        self.cron_time = response.data
+        self.run_schedule = False
+        schedule.clear()
+        self.cron_job = schedule.every().day.at(self.cron_time, "Australia/Perth").do(self.share_price_updater)
+        self.run_schedule = True
+        # Loop so that the scheduling task keeps on running all time.
+        while self.run_schedule:
+            print(schedule.idle_seconds())
+            schedule.run_pending()
+            time.sleep(1)
+
+        return JsonResponse({}, status=200)
     
+    def share_price_updater(self):
+        """
+        
+        """
+        print("RAN " * 60)
+        # update_all_investments()
+
+
 class InvestmentViewSet(viewsets.ModelViewSet):
     queryset = Investment.objects.all()
     serializer_class = InvestmentSerializer
@@ -100,14 +161,16 @@ class PortfolioTotals(APIView):
     # TODO: don't forget reinvestment and dividend payouts
 
     def get(self, _):
-        payload = {"portfolio_totals": get_portfolio_totals(), 
-                   "portfolio_history": get_portfolio_value_history(),}
+        payload = {
+            "portfolio_totals": get_portfolio_totals(),
+            "portfolio_history": get_portfolio_value_history(),
+        }
         return JsonResponse(payload, status=200)
-    
+
 
 class NewInvestmentView(APIView):
     """
-    Create a new Investment object. A Purchase object will necessarily be created at the same time but 
+    Create a new Investment object. A Purchase object will necessarily be created at the same time but
     most values will be 0. This allows an Investment to be watched.
     Reply from the front end will be:
     {"symbol":"","name":"","currency":"","exchange":"","platform":"","units":"","pricePerUnit":"","fee":""}
@@ -117,12 +180,17 @@ class NewInvestmentView(APIView):
         new_investment_data = request.data
 
         try:
-            if not new_investment_data["symbol"] in [inv.symbol for inv in Investment.objects.all()]:
-                new_investment = Investment.objects.create(key=new_investment_data["symbol"],
-                                                        name=new_investment_data["name"],
-                                                        symbol=new_investment_data["symbol"],
-                                                    )
-                new_investment.live_price = get_all_details_for_investment(new_investment)["last_price"]
+            if not new_investment_data["symbol"] in [
+                inv.symbol for inv in Investment.objects.all()
+            ]:
+                new_investment = Investment.objects.create(
+                    key=new_investment_data["symbol"],
+                    name=new_investment_data["name"],
+                    symbol=new_investment_data["symbol"],
+                )
+                new_investment.live_price = get_all_details_for_investment(
+                    new_investment
+                )["last_price"]
                 new_investment.live_price
 
                 purchase, created = Purchase.objects.get_or_create(
@@ -136,12 +204,12 @@ class NewInvestmentView(APIView):
                 if created:
                     purchase.save()
         except Exception as e:
-            print("*"*60)
+            print("*" * 60)
             print(e)
-            print("*"*60)
+            print("*" * 60)
 
         return HttpResponse(HTTPStatus.OK)
-    
+
 
 class PurchaseView(APIView):
     """
@@ -152,7 +220,9 @@ class PurchaseView(APIView):
 
     def post(self, request):
         purchase_data = request.data
-        purchase_investment = Investment.objects.filter(symbol=purchase_data["symbol"]).first()
+        purchase_investment = Investment.objects.filter(
+            symbol=purchase_data["symbol"]
+        ).first()
 
         try:
             purchase, created = Purchase.objects.get_or_create(
@@ -166,12 +236,12 @@ class PurchaseView(APIView):
             if created:
                 purchase.save()
         except Exception as e:
-            print("*"*60)
+            print("*" * 60)
             print(e)
-            print("*"*60)
+            print("*" * 60)
 
         return HttpResponse(HTTPStatus.OK)
-    
+
 
 class SaleView(APIView):
     """
@@ -196,12 +266,13 @@ class SaleView(APIView):
             if created:
                 sale.save()
         except Exception as e:
-            print("*"*60)
+            print("*" * 60)
             print(e)
-            print("*"*60)
+            print("*" * 60)
 
         return HttpResponse(HTTPStatus.OK)
-    
+
+
 class RemoveView(APIView):
     """
     Create a sal entry for an existing Investment.
@@ -209,9 +280,9 @@ class RemoveView(APIView):
     """
 
     def post(self, request):
-        print("*"*60)
+        print("*" * 60)
         print("DELETE")
-        print("*"*60)
+        print("*" * 60)
         # sale_data = request.data
         # sale_investment = Investment.objects.filter(symbol=sale_data["symbol"]).first()
 

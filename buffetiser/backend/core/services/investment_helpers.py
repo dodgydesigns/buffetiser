@@ -10,18 +10,22 @@ def date_to_string(date):
     """Ensure all dates are formatted the same."""
     return date.strftime("%d/%m/%Y")
 
+
 def date_to_datetime(date):
     """Ensure all dates are formatted the same."""
     return datetime.datetime(date.year, date.month, date.day)
+
 
 def string_to_date(date_string):
     """Ensure all dates are formatted the same."""
     return datetime.datetime.strptime(date_string, "%d/%m/%Y")
 
+
 def fe_string_to_date(date_string):
     """Date string coming from the front end."""
     date_string = date_string.split("T")[0]
     return datetime.datetime.strptime(date_string, "%Y-%m-%d")
+
 
 def get_purchase_history(investment):
     """
@@ -31,9 +35,11 @@ def get_purchase_history(investment):
     purchases = {}
     for purchase in investment_purchase_history:
         purchases.setdefault(purchase.date, []).append(
-            {"units": purchase.units,
-             "price_per_unit": purchase.price_per_unit,
-             "total_cost": purchase.units * purchase.price_per_unit,}
+            {
+                "units": purchase.units,
+                "price_per_unit": purchase.price_per_unit,
+                "total_cost": purchase.units * purchase.price_per_unit,
+            }
         )
     return purchases
 
@@ -46,9 +52,11 @@ def get_sale_history(investment):
     sales = {}
     for sale in investment_sale_history:
         sales.setdefault(sale.date, []).append(
-            {"units": sale.units,
-             "price_per_unit": sale.price_per_unit,
-             "total_cost": sale.units * sale.price_per_unit,}
+            {
+                "units": sale.units,
+                "price_per_unit": sale.price_per_unit,
+                "total_cost": sale.units * sale.price_per_unit,
+            }
         )
     return sales
 

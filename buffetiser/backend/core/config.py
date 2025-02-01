@@ -11,7 +11,7 @@ class Constants:
         CRYPTO = ("Crypto", "Crypto")
 
     class Exchanges(models.TextChoices):
-        """ 
+        """
         The exchanges around the world that can be used to buy and sell shares.
         """
 
@@ -39,7 +39,7 @@ class Constants:
         XTSE = ("XTSE", "TSE")
 
     class Platforms(models.TextChoices):
-        """ 
+        """
         The exchanges around the world that can be used to buy and sell shares.
         """
 
