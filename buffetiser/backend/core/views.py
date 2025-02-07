@@ -1,6 +1,7 @@
 import datetime
 from http import HTTPStatus
 from itertools import count
+import subprocess
 from threading import Thread
 
 import schedule
@@ -30,7 +31,7 @@ trade_counter = count()
 
 
 @api_view(["POST"])
-def update_daily_changes(request):
+def update_daily_changes():
     """
     When hit, this endpoint updates the daily change values for ALL Investments.
     As this is just a temporary value that is updated constantly, the previous
@@ -49,7 +50,7 @@ def update_all_investments(request):
     """
     This updates ALL the data for ALL investments.
     """
-    update_daily_changes(request._request)
+    update_daily_changes()
     initiate_async_scrape(scraper_function_investment_and_history)
     print("Updated all investments prices")
 
@@ -105,12 +106,58 @@ class BackupDBView(APIView):
         print("*" * 60)
         print("BackupDBView")
         print("*" * 60)
+
+        # Database credentials
+        DB_NAME = "your_db_name"
+        DB_USER = "your_db_user"
+        DB_HOST = "localhost"  # Change if your DB is hosted remotely
+        DB_PORT = "5432"
+        BACKUP_DIR = "/path/to/backup/directory/"
+
+        # Generate backup file name with timestamp
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        backup_file = f"{BACKUP_DIR}backup_{timestamp}.sql"
+
+        # Command to dump the database
+        dump_cmd = f"pg_dump -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -F c -f {backup_file}"
+
+        try:
+            subprocess.run(dump_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"})
+            print(f"Backup successful: {backup_file}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error during backup: {e}")
+
         return JsonResponse({}, status=200)
 
 
+class RestoreDBView(APIView):
+    """ """
+
+    def post(self, _):
+        print("*" * 60)
+        print("RestoreDBView")
+        print("*" * 60)
+    # Database credentials
+    DB_NAME = "your_db_name"
+    DB_USER = "your_db_user"
+    DB_HOST = "localhost"
+    DB_PORT = "5432"
+    BACKUP_FILE = "/path/to/backup/directory/backup_xxxxxx.sql"  # Replace with actual backup filename
+
+    # Command to restore the database
+    restore_cmd = f"pg_restore -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -c {BACKUP_FILE}"
+
+    try:
+        subprocess.run(restore_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"})
+        print(f"Database restored from {BACKUP_FILE}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during restoration: {e}")
+
+
 class CronTimeView(APIView):
-    """ Controls a CRON like thread that updates all share prices at a certain time each day.
-        It wont update on weekends - save the price server some traffic :)
+    """ 
+    Controls a CRON like thread that updates all share prices at a certain time each day.
+    It wont update on weekends - save the price server some traffic :)
     """
 
     def __init__(self, **kwargs):
@@ -138,8 +185,9 @@ class CronTimeView(APIView):
             self.countdown.terminate()
         self.countdown.setup(Configuration.objects.all().first().update_time,
                              Configuration.objects.all().first().update_time_zone)
-        self.countdown_thread = Thread(target = self.countdown.run)
-        self.countdown_thread.start()
+        countdown_thread = Thread(target = self.countdown.run)
+        countdown_thread.setDaemon(True) 
+        countdown_thread.start()
 
         return JsonResponse({}, status=200)
 
@@ -159,16 +207,17 @@ class CountdownTask:
         self._running = False
 
     def setup(self, time, timezone):
-        print(f"setup*****************{time, timezone}**************")
-        # schedule.every().day.at(time, timezone).do(self.share_price_updater)
-        schedule.every(1).minutes.do(self.share_price_updater)
+        schedule.every().day.at(time, timezone).do(self.share_price_updater)
+        # schedule.every(1).minutes.do(self.share_price_updater)
         self._running = True
 
     def share_price_updater(self):
         day_number = datetime.today().weekday()
         if day_number < 5:
             print("RAN " * 60)
-            update_all_investments()
+            # update_daily_changes()
+            initiate_async_scrape(scraper_function_investment_and_history)
+            print("Updated all investments prices")
         else:
             print("Weekend. Not running updates")
 

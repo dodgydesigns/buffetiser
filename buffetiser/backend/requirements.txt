@@ -8,3 +8,4 @@ beautifulsoup4
 aiohttp
 gunicorn
 schedule
+pytz
