@@ -7,7 +7,7 @@ from threading import Thread
 import schedule
 
 from core.config import Constants
-from core.models import Configuration, DailyChange, Investment, Purchase, Sale
+from core.models import Configuration, DailyChange, DividendPayment, DividendReinvestment, Investment, Purchase, Sale
 from core.serializers import InvestmentSerializer
 from core.services.investment_details import (
     get_all_details_for_investment,
@@ -108,21 +108,27 @@ class BackupDBView(APIView):
         print("*" * 60)
 
         # Database credentials
-        DB_NAME = "your_db_name"
-        DB_USER = "your_db_user"
+        DB_NAME = "buffetiser"
+        DB_USER = "buffetiser"
+        DB_PASSWORD = "buffetiser"
         DB_HOST = "localhost"  # Change if your DB is hosted remotely
         DB_PORT = "5432"
-        BACKUP_DIR = "/path/to/backup/directory/"
+        BACKUP_DIR = "./db_bk/"
 
         # Generate backup file name with timestamp
-        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         backup_file = f"{BACKUP_DIR}backup_{timestamp}.sql"
 
         # Command to dump the database
+        psql_bin = "export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/16/bin"
         dump_cmd = f"pg_dump -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -F c -f {backup_file}"
-
+        print("*"*60)
+        print(psql_bin)
+        print(dump_cmd)
+        print("*"*60)
         try:
-            subprocess.run(dump_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"})
+            subprocess.run(psql_bin, shell=True, check=True)
+            subprocess.run(dump_cmd, shell=True, check=True, env={"PGPASSWORD": DB_PASSWORD})
             print(f"Backup successful: {backup_file}")
         except subprocess.CalledProcessError as e:
             print(f"Error during backup: {e}")
@@ -355,10 +361,39 @@ class SaleView(APIView):
         return HttpResponse(HTTPStatus.OK)
 
 
+class ReportsView(APIView):
+    """
+    Get all the details of each investment for a comprehensive report.
+    """  
+    def get(self, request):
+
+        self.sales = ""
+        self.dividend_reinvestment = ""
+        self.dividend_payment = ""
+
+        all_details = {}
+        for investment in Investment.objects.all():
+            if len(Sale.objects.filter(investment=investment)) > 0:
+                self.sales = Sale.objects.filter(investment=investment).first().to_json(),
+            if len(DividendReinvestment.objects.filter(investment=investment)) > 0:
+                self.dividend_reinvestment = DividendReinvestment.objects.filter(investment=investment).first().to_json(),
+            if len(DividendPayment.objects.filter(investment=investment)) > 0:
+                self.dividend_payment = DividendPayment.objects.filter(investment=investment).first().to_json(),
+
+            all_details[investment.name] = {
+                "purchases": Purchase.objects.filter(investment=investment).first().to_json(),
+                "sales": self.sales,
+                "dividend_reinvestment": self.dividend_reinvestment,
+                "dividend_payment": self.dividend_payment,
+            }
+
+        return JsonResponse(all_details, status=200)
+
+
+
 class RemoveView(APIView):
     """
     Create a sal entry for an existing Investment.
-
     """
 
     def post(self, request):

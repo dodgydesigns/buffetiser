@@ -11,6 +11,9 @@ from django.db.models import (
     Model,
 )
 
+def date_to_string(date):
+    """Ensure all dates are formatted the same."""
+    return date.strftime("%d/%m/%Y")
 
 class Investment(Model):
     """
@@ -138,6 +141,18 @@ class Purchase(Model):
     date = DateField()
     trade_count = IntegerField()
 
+    def to_json(self):
+        return {
+            "symbol": self.investment.symbol,
+            "currency": self.currency,
+            "exchange": self.exchange,
+            "platform": self.platform,
+            "units": self.units,
+            "price_per_unit": self.price_per_unit,
+            "fee": self.fee,
+            "date": date_to_string(self.date),
+        }
+
     def __str__(self):
         return f"{self.investment.symbol}: {self.units} units @ ${self.price_per_unit} with ${self.fee} fee on {self.date}"
 
@@ -163,6 +178,16 @@ class Sale(Model):
     date = DateField()
     trade_count = IntegerField()
 
+    def to_json(self):
+        return {
+            "symbol": self.investment.symbol,
+            "currency": self.currency,
+            "exchange": self.exchange,
+            "units": self.units,
+            "price_per_unit": self.price_per_unit,
+            "fee": self.fee,
+            "date": date_to_string(self.date),
+        }
     class Meta:
         unique_together = ("date", "trade_count", "investment")
 
@@ -179,6 +204,12 @@ class DividendReinvestment(Model):
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
 
+    def to_json(self):
+        return {
+            "units": self.units,
+            "reinvestment_date": date_to_string(self.reinvestment_date),
+        }
+    
     def __str__(self):
         return f"{self.investment.key}"
 
@@ -198,6 +229,12 @@ class DividendPayment(Model):
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
 
+    def to_json(self):
+        return {
+            "value": self.value,
+            "payment_date": date_to_string(self.payment_date),
+        }
+    
     def __str__(self):
         return f"{self.investment.key}"
 

@@ -20,10 +20,8 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
   const [date, setDate] = useState(new Date());
   const endpoint_string = endpoint;
 
-  const HandleClose = (ok, isOpen) => {
-    if (isOpen === "ok") {
-    }
-    onClose(false);
+  const HandleClose = () => {
+    onClose();
   };
 
   return (
@@ -142,7 +140,7 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
             className="save"
             onClick={(e) => {
               e.stopPropagation();
-              // HandleClose("ok", false);
+              HandleClose();
 
               const result = {
                 symbol: symbol,
@@ -172,7 +170,7 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
             style={{ marginRight: "3rem" }}
             onClick={(e) => {
               e.stopPropagation();
-              HandleClose("cancel", false);
+              HandleClose();
             }}
           >
             Cancel

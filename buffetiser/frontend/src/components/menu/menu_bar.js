@@ -53,7 +53,7 @@ function MenuBar(constants) {
       <span
         className="header_bar_div"
         onClick={() => {
-          axios.post(baseURL + "/reports/");
+          axios.get(baseURL + "/reports/");
         }}
       >
         Reports
