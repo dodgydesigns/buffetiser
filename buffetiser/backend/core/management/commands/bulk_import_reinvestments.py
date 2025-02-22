@@ -1,5 +1,5 @@
 """
-This command takes a file containing CSV data and creates DividendReinvestment 
+This command takes a file containing CSV data and creates DividendReinvestment
 object from each row. Each row is of the form:
                  VDHG,          16/07/2024  3
     Description: stock code     Date        Units

@@ -1,19 +1,14 @@
 from typing import Union
 
 from core.config import Constants
-from django.db.models import (
-    CASCADE,
-    CharField,
-    DateField,
-    FloatField,
-    ForeignKey,
-    IntegerField,
-    Model,
-)
+from django.db.models import (CASCADE, CharField, DateField, FloatField,
+                              ForeignKey, IntegerField, Model)
+
 
 def date_to_string(date):
     """Ensure all dates are formatted the same."""
     return date.strftime("%d/%m/%Y")
+
 
 class Investment(Model):
     """
@@ -188,6 +183,7 @@ class Sale(Model):
             "fee": self.fee,
             "date": date_to_string(self.date),
         }
+
     class Meta:
         unique_together = ("date", "trade_count", "investment")
 
@@ -209,7 +205,7 @@ class DividendReinvestment(Model):
             "units": self.units,
             "reinvestment_date": date_to_string(self.reinvestment_date),
         }
-    
+
     def __str__(self):
         return f"{self.investment.key}"
 
@@ -234,7 +230,7 @@ class DividendPayment(Model):
             "value": self.value,
             "payment_date": date_to_string(self.payment_date),
         }
-    
+
     def __str__(self):
         return f"{self.investment.key}"
 
@@ -281,5 +277,6 @@ class Configuration(Model):
     """
     Hold any config values set by the user.
     """
+
     update_time = CharField(default="15:00")
     update_time_zone = CharField(default="Australia/Perth")

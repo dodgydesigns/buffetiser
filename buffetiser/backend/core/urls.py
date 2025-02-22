@@ -1,12 +1,6 @@
 from core import views
-from core.views import (
-    AllConstantsView,
-    AllInvestmentsDataView,
-    BackupDBView,
-    ConfigView,
-    InvestmentViewSet,
-    CronTimeView,
-)
+from core.views import (AllConstantsView, AllInvestmentsDataView, BackupDBView,
+                        ConfigView, CronTimeView, InvestmentViewSet)
 from django.urls import path
 from rest_framework import routers
 

@@ -1,30 +1,27 @@
 import datetime
-from http import HTTPStatus
-from itertools import count
 import json
 import subprocess
+import time
+from datetime import datetime
+from http import HTTPStatus
+from itertools import count
 from threading import Thread
 
 import schedule
-
 from core.config import Constants
-from core.models import Configuration, DailyChange, DividendPayment, DividendReinvestment, Investment, Purchase, Sale
+from core.models import (Configuration, DailyChange, DividendPayment,
+                         DividendReinvestment, Investment, Purchase, Sale)
 from core.serializers import InvestmentSerializer
 from core.services.investment_details import (
-    get_all_details_for_investment,
-    get_portfolio_totals,
-    get_portfolio_value_history,
-    scraper_function_get_daily_change,
-    scraper_function_investment_and_history,
-)
-from core.services.investment_helpers import fe_string_to_date, initiate_async_scrape
+    get_all_details_for_investment, get_portfolio_totals,
+    get_portfolio_value_history, scraper_function_get_daily_change,
+    scraper_function_investment_and_history)
+from core.services.investment_helpers import (fe_string_to_date,
+                                              initiate_async_scrape)
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-
-from datetime import datetime
-import time
 
 # There can be multiple purchases/sales of an Investment in a single day. The records
 # only keep date not time so we need to be able to differentiate.
@@ -96,6 +93,7 @@ class ConfigView(APIView):
 
     def get(self, _):
         return JsonResponse(status=200)
+
     def post(self, _):
         return JsonResponse(status=200)
 
@@ -121,15 +119,19 @@ class BackupDBView(APIView):
         backup_file = f"{BACKUP_DIR}backup_{timestamp}.sql"
 
         # Command to dump the database
-        psql_bin = "export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/16/bin"
+        psql_bin = (
+            "export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/16/bin"
+        )
         dump_cmd = f"pg_dump -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -F c -f {backup_file}"
-        print("*"*60)
+        print("*" * 60)
         print(psql_bin)
         print(dump_cmd)
-        print("*"*60)
+        print("*" * 60)
         try:
             subprocess.run(psql_bin, shell=True, check=True)
-            subprocess.run(dump_cmd, shell=True, check=True, env={"PGPASSWORD": DB_PASSWORD})
+            subprocess.run(
+                dump_cmd, shell=True, check=True, env={"PGPASSWORD": DB_PASSWORD}
+            )
             print(f"Backup successful: {backup_file}")
         except subprocess.CalledProcessError as e:
             print(f"Error during backup: {e}")
@@ -144,6 +146,7 @@ class RestoreDBView(APIView):
         print("*" * 60)
         print("RestoreDBView")
         print("*" * 60)
+
     # Database credentials
     DB_NAME = "your_db_name"
     DB_USER = "your_db_user"
@@ -155,14 +158,16 @@ class RestoreDBView(APIView):
     restore_cmd = f"pg_restore -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -c {BACKUP_FILE}"
 
     try:
-        subprocess.run(restore_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"})
+        subprocess.run(
+            restore_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"}
+        )
         print(f"Database restored from {BACKUP_FILE}")
     except subprocess.CalledProcessError as e:
         print(f"Error during restoration: {e}")
 
 
 class CronTimeView(APIView):
-    """ 
+    """
     Controls a CRON like thread that updates all share prices at a certain time each day.
     It wont update on weekends - save the price server some traffic :)
     """
@@ -176,8 +181,9 @@ class CronTimeView(APIView):
             config = Configuration()
             config.save()
 
-        return JsonResponse({"cron_time": Configuration.objects.all().first().update_time},
-                             status=200)
+        return JsonResponse(
+            {"cron_time": Configuration.objects.all().first().update_time}, status=200
+        )
 
     def post(self, response):
         """
@@ -190,13 +196,16 @@ class CronTimeView(APIView):
 
         if self.countdown.running():
             self.countdown.terminate()
-        self.countdown.setup(Configuration.objects.all().first().update_time,
-                             Configuration.objects.all().first().update_time_zone)
-        countdown_thread = Thread(target = self.countdown.run)
-        countdown_thread.setDaemon(True) 
+        self.countdown.setup(
+            Configuration.objects.all().first().update_time,
+            Configuration.objects.all().first().update_time_zone,
+        )
+        countdown_thread = Thread(target=self.countdown.run)
+        countdown_thread.setDaemon(True)
         countdown_thread.start()
 
         return JsonResponse({}, status=200)
+
 
 class CountdownTask:
     """
@@ -365,7 +374,8 @@ class SaleView(APIView):
 class ReportsView(APIView):
     """
     Get all the details of each investment for a comprehensive report.
-    """  
+    """
+
     def get(self, _):
 
         all_details = f"<table style='text-align: center;'>"
@@ -380,10 +390,8 @@ class ReportsView(APIView):
 
         all_details += f"</tbody></table>"
 
-
         print(all_details)
         return JsonResponse({}, status=200)
-
 
 
 class RemoveView(APIView):

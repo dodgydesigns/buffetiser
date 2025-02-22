@@ -22,7 +22,6 @@ from netrc import netrc
 
 import click
 
-
 FILENAME_FORMAT = "backup-%Y-%m-%dT%H:%M"
 
 REMOTE_RETENTION_PERIOD = timedelta(days=30)

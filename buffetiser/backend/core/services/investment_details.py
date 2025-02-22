@@ -4,13 +4,11 @@ import logging
 
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
-from core.models import DailyChange, DividendReinvestment, History, Investment, Purchase
-from core.services.investment_helpers import (
-    date_to_datetime,
-    date_to_string,
-    get_purchase_history,
-    get_sale_history,
-)
+from core.models import (DailyChange, DividendReinvestment, History,
+                         Investment, Purchase)
+from core.services.investment_helpers import (date_to_datetime, date_to_string,
+                                              get_purchase_history,
+                                              get_sale_history)
 from core.services.investment_updaters import update_history
 
 logging.basicConfig(

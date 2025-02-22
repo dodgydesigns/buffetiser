@@ -1,12 +1,5 @@
-from core.models import (
-    DailyChange,
-    DividendPayment,
-    DividendReinvestment,
-    History,
-    Investment,
-    Purchase,
-    Sale,
-)
+from core.models import (DailyChange, DividendPayment, DividendReinvestment,
+                         History, Investment, Purchase, Sale)
 from rest_framework import serializers
 
 
