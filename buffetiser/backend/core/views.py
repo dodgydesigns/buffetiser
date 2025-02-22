@@ -1,6 +1,7 @@
 import datetime
 from http import HTTPStatus
 from itertools import count
+import json
 import subprocess
 from threading import Thread
 
@@ -365,29 +366,23 @@ class ReportsView(APIView):
     """
     Get all the details of each investment for a comprehensive report.
     """  
-    def get(self, request):
+    def get(self, _):
 
-        self.sales = ""
-        self.dividend_reinvestment = ""
-        self.dividend_payment = ""
-
-        all_details = {}
+        all_details = f"<table style='text-align: center;'>"
         for investment in Investment.objects.all():
-            if len(Sale.objects.filter(investment=investment)) > 0:
-                self.sales = Sale.objects.filter(investment=investment).first().to_json(),
-            if len(DividendReinvestment.objects.filter(investment=investment)) > 0:
-                self.dividend_reinvestment = DividendReinvestment.objects.filter(investment=investment).first().to_json(),
-            if len(DividendPayment.objects.filter(investment=investment)) > 0:
-                self.dividend_payment = DividendPayment.objects.filter(investment=investment).first().to_json(),
+            all_details += f"<thead>{investment.name}</thead><tbody>"
 
-            all_details[investment.name] = {
-                "purchases": Purchase.objects.filter(investment=investment).first().to_json(),
-                "sales": self.sales,
-                "dividend_reinvestment": self.dividend_reinvestment,
-                "dividend_payment": self.dividend_payment,
-            }
+            for purchase in Purchase.objects.filter(investment=investment).all():
+                all_details += f"<td>Purchase</td> \
+                                 <tr><td>{purchase.date}</td> \
+                                 <td>{purchase.units} units @ ${purchase.price_per_unit}0</td> \
+                                 <td>${purchase.fee}0 fee</td></tr>"
 
-        return JsonResponse(all_details, status=200)
+        all_details += f"</tbody></table>"
+
+
+        print(all_details)
+        return JsonResponse({}, status=200)
 
 
 

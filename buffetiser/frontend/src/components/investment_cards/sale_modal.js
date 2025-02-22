@@ -29,7 +29,6 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
       <div className="popup_modal sale_modal">
         <h2 className="popup_heading">New Sale</h2>
         <p>
-
         </p>
         <table className="popup_modal_table">
           <tbody>
@@ -130,7 +129,7 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
                 <DatePicker locale="enAU" 
                             dateFormat="dd/MM/yyyy" 
                             selected={date} 
-                            onChange={(e) => setDate(e.target.value)} />
+                            onChange={(e) => setDate(e)} />
               </td>
             </tr>
           </tbody>
@@ -160,7 +159,6 @@ function SaleModal({ investment, constants, endpoint, onClose }) {
                 },
                 body: JSON.stringify(result),
               });
-              console.log(JSON.stringify(result));
             }}
           >
           Save
