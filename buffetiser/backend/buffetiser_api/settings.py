@@ -124,17 +124,29 @@ WSGI_APPLICATION = "buffetiser_api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Docker
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "buffetiser",
+        "NAME": "BUFFETISER_DB",
         "USER": "buffetiser",
         "PASSWORD": "password",
-        "HOST": "127.0.0.1",
-        # "HOST": "db",
+        "HOST": "db",
         "PORT": "5432",  # default PostgreSQL port
     }
 }
+
+# # Local
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "BUFFETISER_DB",
+#         "USER": "buffetiser",
+#         "PASSWORD": "password",
+#         "HOST": "127.0.0.1",
+#         "PORT": "5432",  # default PostgreSQL port
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
