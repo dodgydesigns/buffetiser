@@ -43,36 +43,34 @@ if DEBUG:
 SECRET_KEY = "django-insecure-v93=j4&xk^edz&78gc@vir@y5v4q2egt9y=lbih_nzymamh*uj"
 
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5000",
-    "http://127.0.0.1:5000",
-    "http://localhost:5001",
-    "http://127.0.0.1:5001",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "192.168.1.2"]
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:5000",
-    "http://127.0.0.1:5000",
     "http://localhost:5001",
-    "http://127.0.0.1:5001",
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://192.168.1.2:81",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-)
+# CORS_ORIGIN_WHITELIST = [
+#     "http://localhost:5000",
+#     "http://127.0.0.1:5000",
+#     "http://localhost:5001",
+#     "http://127.0.0.1:5001",
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+# ]
+
+# CORS_ALLOW_METHODS = (
+#     "DELETE",
+#     "GET",
+#     "OPTIONS",
+#     "PATCH",
+#     "POST",
+#     "PUT",
+# )
 
 # Application definition
 
@@ -83,6 +81,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework.authtoken",
     "corsheaders",
     "rest_framework",
     "rest_framework_swagger",
@@ -125,28 +124,28 @@ WSGI_APPLICATION = "buffetiser_api.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Docker
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "BUFFETISER_DB",
-        "USER": "buffetiser",
-        "PASSWORD": "password",
-        "HOST": "db",
-        "PORT": "5432",  # default PostgreSQL port
-    }
-}
-
-# # Local
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
 #         "NAME": "BUFFETISER_DB",
 #         "USER": "buffetiser",
 #         "PASSWORD": "password",
-#         "HOST": "127.0.0.1",
+#         "HOST": "db",
 #         "PORT": "5432",  # default PostgreSQL port
 #     }
 # }
+
+# # Local
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "buffetiser_db",
+        "USER": "buffetiser",
+        "PASSWORD": "password",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",  # default PostgreSQL port
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -193,3 +192,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DOCS_ACCESS = "public"
 # Swagger
 # REST_FRAMEWORK = { "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema" }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
