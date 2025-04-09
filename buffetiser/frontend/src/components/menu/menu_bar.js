@@ -71,16 +71,29 @@ function MenuBar(constants) {
       <span
         className="header_bar_div"
         onClick={() => {
-          axios.post(baseURL + "/logout/", {}, {
+          const refreshToken = localStorage.getItem("refresh_token");
+          if (!refreshToken) {
+            alert("No refresh token found. Please log in again.");
+            navigate('/login/');
+            return;
+          }
+
+          axios.post(baseURL + "/logout/", { refresh_token: refreshToken }, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("access_token")}`
             }
           }).then(() => {
-            localStorage.removeItem("access_token"); // Remove token from local storage
+            localStorage.removeItem("access_token"); // Remove access token
+            localStorage.removeItem("refresh_token"); // Remove refresh token
             navigate('/login/');
           }).catch((error) => {
-            console.error("Logout failed:", error);
-            alert("Failed to log out. Please try again.");
+            if (error.response && error.response.status === 400) {
+              alert("Invalid or expired refresh token. Please log in again.");
+            } else {
+              console.error("Logout failed:", error);
+              alert("Are you sure you want to leave this awesome App?");
+            }
+            navigate('/login/');
           });
         }}
       >

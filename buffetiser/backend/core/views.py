@@ -112,10 +112,10 @@ class BackupDBView(APIView):
         # Database credentials
         DB_NAME = "buffetiser"
         DB_USER = "buffetiser"
-        DB_PASSWORD = "buffetiser"
+        DB_PASSWORD = "password"
         DB_HOST = "localhost"  # Change if your DB is hosted remotely
         DB_PORT = "5432"
-        BACKUP_DIR = "./db_bk/"
+        BACKUP_DIR = "~/Downloads/db_bk/"
 
         # Generate backup file name with timestamp
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -399,7 +399,7 @@ class ReportsView(APIView):
 
 class RemoveView(APIView):
     """
-    Create a sal entry for an existing Investment.
+
     """
 
     def post(self, request):
@@ -434,8 +434,13 @@ class LogoutAndBlacklistRefreshTokenView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh_token")
+            if not refresh_token:
+                return Response({"error": "Refresh token is required."}, status=400)
+            
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({"message": "Successfully logged out."}, status=200)
+        except AttributeError:
+            return Response({"error": "Token blacklisting is not enabled. Ensure 'rest_framework_simplejwt.token_blacklist' is in INSTALLED_APPS."}, status=500)
         except Exception as e:
-            return Response({"error": str(e)}, status=400)
+            return Response({"error": f"An error occurred: {str(e)}"}, status=400)

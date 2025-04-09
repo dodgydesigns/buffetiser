@@ -139,7 +139,7 @@ WSGI_APPLICATION = "buffetiser_api.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "buffetiser_db",
+        "NAME": "buffetiser",
         "USER": "buffetiser",
         "PASSWORD": "password",
         "HOST": "127.0.0.1",

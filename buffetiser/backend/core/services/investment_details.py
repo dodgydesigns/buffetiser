@@ -87,10 +87,6 @@ def get_all_details_for_investment(investment):
     """
     date = datetime.datetime.now()
     live_price = investment.live_price
-    print("*" * 60)
-    print(investment.symbol)
-    print(History.objects.filter(investment=investment).order_by("-id"))
-    print("*" * 60)
     if (
         History.objects.filter(investment=investment)
         and len(History.objects.filter(investment=investment).all()) > 0
@@ -311,10 +307,7 @@ def get_portfolio_value_history():
                 investment, date_to_datetime(history_date)
             )
             # We can have zero History if we are just watching the Investment
-            if (
-                len(History.objects.filter(investment=investment, date=history_date))
-                > 0
-            ):
+            if (len(History.objects.filter(investment=investment, date=history_date)) > 0):
                 close_value = (
                     History.objects.filter(investment=investment, date=history_date)
                     .first()
