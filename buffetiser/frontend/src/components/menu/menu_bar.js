@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import NewInvestmentModal from "./new_investment_modal.js";
 import ConfigModal from "./config_modal.js";
+import InvestmentTransactions from "./reports.js";
 import axios from "axios";
 import "../../index.css";
 
@@ -55,7 +56,7 @@ function MenuBar(constants) {
       <span
         className="header_bar_div"
         onClick={() => {
-          axios.get(baseURL + "/reports/");
+          navigate("/reports/");
         }}
       >
         Reports

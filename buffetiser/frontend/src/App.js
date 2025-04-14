@@ -5,7 +5,7 @@ import LoginPage from "./components/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
 
 import Dashboard from "./components/dashboard";
-
+import InvestmentTransactions from "./components/menu/reports";
 import "./index.css";
 
 export default function App() {
@@ -15,9 +15,10 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
+          {/* <Route element={<PrivateRoute />}> */}
             <Route path="/" element={<Dashboard />} />
-          </Route>
+            <Route path="/reports/" element={<InvestmentTransactions />} />
+          {/* </Route> */}
         </Routes>
       </Router>
     </AuthProvider>

@@ -1,5 +1,4 @@
 import datetime
-import json
 import subprocess
 import time
 from datetime import datetime
@@ -378,23 +377,37 @@ class ReportsView(APIView):
     """
     Get all the details of each investment for a comprehensive report.
     """
+    def get(self, request):
 
-    def get(self, _):
-
-        all_details = f"<table style='text-align: center;'>"
+        report_dict = {}
         for investment in Investment.objects.all():
-            all_details += f"<thead>{investment.name}</thead><tbody>"
+            purchases = [p.to_json() | {"type": "purchase"} for p in Purchase.objects.filter(investment=investment)]
+            sales = [s.to_json() | {"type": "sale"} for s in Sale.objects.filter(investment=investment)]
+            dividends = [d.to_json() | {"type": "dividend"} for d in DividendPayment.objects.filter(investment=investment)]
+            reinvestments = [r.to_json() | {"type": "reinvestment"} for r in DividendReinvestment.objects.filter(investment=investment)]
 
-            for purchase in Purchase.objects.filter(investment=investment).all():
-                all_details += f"<td>Purchase</td> \
-                                 <tr><td>{purchase.date}</td> \
-                                 <td>{purchase.units} units @ ${purchase.price_per_unit}0</td> \
-                                 <td>${purchase.fee}0 fee</td></tr>"
+            # Combine all and sort by date
+            all_transactions = purchases + sales + dividends + reinvestments
+            all_transactions.sort(key=lambda x: x.get("date") or x.get("payment_date") or x.get("reinvestment_date"))
 
-        all_details += f"</tbody></table>"
+            report_dict[investment.key] = {
+                "key": investment.key,
+                "name": investment.name,
+                "symbol": investment.symbol,
+                "transactions": all_transactions,
+            }
 
-        print(all_details)
-        return JsonResponse({}, status=200)
+        # Return the report data as JSON
+        return JsonResponse(report_dict, status=200)
+
+        # return JsonResponse({
+        #     "investment": {
+        #         "key": investment.key,
+        #         "name": investment.name,
+        #         "symbol": investment.symbol,
+        #     },
+        #     "transactions": all_transactions,
+        # })
 
 
 class RemoveView(APIView):
