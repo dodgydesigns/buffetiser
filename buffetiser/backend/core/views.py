@@ -5,8 +5,8 @@ from datetime import datetime
 from http import HTTPStatus
 from itertools import count
 from threading import Thread
-
 import schedule
+
 from core.config import Constants
 from core.models import (Configuration, DailyChange, DividendPayment,
                          DividendReinvestment, Investment, Purchase, Sale)
@@ -18,6 +18,7 @@ from core.services.investment_details import (
 from core.services.investment_helpers import (fe_string_to_date,
                                               initiate_async_scrape)
 from django.http import HttpResponse, JsonResponse
+from django.core.cache import cache
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
@@ -257,14 +258,29 @@ class PortfolioTotals(APIView):
     Aggregate all the purchases, sales and values by date for the chart and
     the overall totals for the header and history for the chart.
     """
-
     # TODO: don't forget reinvestment and dividend payouts
 
+    # from django.db.models.signals import post_save, post_delete
+    # from django.dispatch import receiver
+    # from myapp.models import ExpensiveModel
+    # from django.core.cache import cache
+
+    # @receiver([post_save, post_delete], sender=ExpensiveModel)
+    # def clear_expensive_cache(sender, **kwargs):
+    # cache.delete('expensive_query_result')
+    
     def get(self, _):
-        payload = {
-            "portfolio_totals": get_portfolio_totals(),
-            "portfolio_history": get_portfolio_value_history(),
-        }
+        cache_key = 'expensive_query_result'
+        payload = cache.get(cache_key)
+
+        if payload is None:
+            payload = {
+                "portfolio_totals": get_portfolio_totals(),
+                "portfolio_history": get_portfolio_value_history(),
+            }
+            cache.set(cache_key, payload, timeout=300)  # Cache for 5 minutes
+
+
         return JsonResponse(payload, status=200)
 
 
@@ -377,7 +393,7 @@ class ReportsView(APIView):
     """
     Get all the details of each investment for a comprehensive report.
     """
-    def get(self, request):
+    def get(self, _):
 
         report_dict = {}
         for investment in Investment.objects.all():
@@ -399,15 +415,6 @@ class ReportsView(APIView):
 
         # Return the report data as JSON
         return JsonResponse(report_dict, status=200)
-
-        # return JsonResponse({
-        #     "investment": {
-        #         "key": investment.key,
-        #         "name": investment.name,
-        #         "symbol": investment.symbol,
-        #     },
-        #     "transactions": all_transactions,
-        # })
 
 
 class RemoveView(APIView):
@@ -457,3 +464,51 @@ class LogoutAndBlacklistRefreshTokenView(APIView):
             return Response({"error": "Token blacklisting is not enabled. Ensure 'rest_framework_simplejwt.token_blacklist' is in INSTALLED_APPS."}, status=500)
         except Exception as e:
             return Response({"error": f"An error occurred: {str(e)}"}, status=400)
+
+
+# class DividendPaymentView(APIView):
+#     """
+#     Create a dividend payment entry for an existing Investment.
+#     Reply from the front end will be:
+#         'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
+#     """
+#     def post(self, request):
+#         dividend_data = request.data
+#         dividend_investment = Investment.objects.filter(symbol=dividend_data["symbol"]).first()
+#
+#         try:
+#             dividend, created = DividendPayment.objects.get_or_create(                    
+#                 investment=dividend_investment,
+#                 units=float(dividend_data["units"]),
+#                 price_per_unit=float(dividend_data["pricePerUnit"]),
+#                 fee=dividend_data["fee"],
+#                 date=fe_string_to_date(dividend_data["date"]),
+#                 trade_count=next(trade_counter),
+#             )
+#             if created:
+#                 dividend.save()
+#         except Exception as e:
+#             print("*" * 60)
+#             print(e)
+#             print("*" * 60)
+#         return HttpResponse(HTTPStatus.OK)
+
+
+class DividendReinvestmentView(APIView):
+    """
+    Create a dividend reinvestment entry for an existing Investment.
+    Reply from the front end will be:
+        'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
+    """
+    def post(self, request):
+        reinvestment_data = request.data
+        reinvestment_investment = Investment.objects.filter(symbol=reinvestment_data["symbol"]).first()
+
+        reinvestment = DividendReinvestment.objects.create(                    
+            investment=reinvestment_investment,
+            units=float(reinvestment_data["units"]),
+            reinvestment_date=fe_string_to_date(reinvestment_data["date"]),
+        )
+        reinvestment.save()
+        
+        return HttpResponse(HTTPStatus.OK)

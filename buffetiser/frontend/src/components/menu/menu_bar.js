@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import NewInvestmentModal from "./new_investment_modal.js";
+import NewReinvestmentModal from "./new_reinvestment_modal.js";
 import ConfigModal from "./config_modal.js";
-import InvestmentTransactions from "./reports.js";
 import axios from "axios";
 import "../../index.css";
 
@@ -10,12 +10,34 @@ const baseURL = "http://127.0.0.1:8000";
 
 function MenuBar(constants) {
   const [showNewInvestment, setShowNewInvestment] = useState(false);
+  const [showNewReinvestment, setShowNewReinvestment] = useState(false);
+  const [showNewDividend, setShowNewDividend] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
+  const [newDropdownOpen, setNewDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  
+
+  const handleNewDropdownOpen = () => {
+    setNewDropdownOpen(!newDropdownOpen);
+  };
+
+  const handleNewInvestment = () => {
+    setShowNewInvestment(true);
+  }
   const handleNewInvestmentClose = () => {
     setShowNewInvestment(false);
   };
+  const handleNewReinvestment = () => {
+    setShowNewReinvestment(true);
+  }
+  const handleNewReinvestmentClose = () => {
+    setShowNewReinvestment(false);
+  };
+  const handleNewDividend = () => {
+    setShowNewDividend(true);
+  }
+  const handleNewDividendClose = () => {
+    setShowNewDividend(false);
+  }
 
   const handleConfigClose = () => {
     setShowConfig(false);
@@ -41,9 +63,22 @@ function MenuBar(constants) {
       <span
         className="header_bar_div"
         onClick={() => {
-          setShowNewInvestment(true);
+          handleNewDropdownOpen();
         }}
       >
+        {newDropdownOpen && (
+          <ul className="menu">
+            <li className="menu-item">
+              <button onClick={handleNewInvestment}>Investment</button>
+            </li>
+            <li className="menu-item">
+              <button onClick={handleNewReinvestment}>Reinvestment</button>
+            </li>
+            <li className="menu-item">
+              <button onClick={handleNewDividend}>Dividend</button>
+            </li>
+          </ul>
+        )}
         {showNewInvestment && (
           <NewInvestmentModal
             props={constants}
@@ -51,7 +86,35 @@ function MenuBar(constants) {
             onClose={() => handleNewInvestmentClose()}
           ></NewInvestmentModal>
         )}
-        New Investment
+
+
+
+        {showNewReinvestment && (
+          <NewReinvestmentModal
+            props={constants}
+            endpoint={baseURL + "/add_reinvestment/"}
+            onClose={() => handleNewReinvestmentClose()}
+          ></NewReinvestmentModal>
+        )}
+
+
+
+
+        {showNewDividend && (
+          <NewInvestmentModal
+            props={constants}
+            endpoint={baseURL + "/new_investment/"}
+            onClose={() => handleNewDividendClose()}
+          ></NewInvestmentModal>
+        )}
+
+
+
+
+
+
+
+        Add New
       </span>
       <span
         className="header_bar_div"

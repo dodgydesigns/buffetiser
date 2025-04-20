@@ -207,7 +207,7 @@ class DividendReinvestment(Model):
         }
 
     def __str__(self):
-        return f"{self.investment.key}"
+        return f"{self.investment.symbol}, {self.units} units on {self.reinvestment_date}"
 
     class Meta:
         unique_together = ("reinvestment_date", "investment")

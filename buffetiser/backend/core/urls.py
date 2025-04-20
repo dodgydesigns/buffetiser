@@ -22,4 +22,5 @@ urlpatterns += [
     path("sale/", views.SaleView.as_view()),
     path("remove/", views.RemoveView.as_view()),
     path("reports/", views.ReportsView.as_view()),
+    path("add_reinvestment/", views.DividendReinvestmentView.as_view()),
 ]

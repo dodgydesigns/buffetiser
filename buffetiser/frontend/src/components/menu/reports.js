@@ -7,9 +7,13 @@ const baseURL = "http://127.0.0.1:8000";
 const InvestmentTransactions = () => {
   const [investments, setInvestments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortColumn, setSortColumn] = useState(null); // Column to sort by
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" or "desc"
 
   function getDate(transaction) {
-    return transaction.date || transaction.reinvestment_date || transaction.payment_date;
+    const dateStr = transaction.date || transaction.reinvestment_date || transaction.payment_date;
+    const [day, month, year] = dateStr.split('/');
+    return `${year}/${month}/${day}`;
   }
 
   function getTransactionType(transaction) {
@@ -33,11 +37,54 @@ const InvestmentTransactions = () => {
     return "-";
   }
 
+  const sortTransactions = (transactions) => {
+    if (!sortColumn) return transactions;
+
+    return transactions.sort((a, b) => {
+      let valA = null;
+      let valB = null;
+
+      switch (sortColumn) {
+        case "date":
+          valA = getDate(a);
+          valB = getDate(b);
+          break;
+        case "type":
+          valA = getTransactionType(a);
+          valB = getTransactionType(b);
+          break;
+        case "units":
+          valA = getUnits(a);
+          valB = getUnits(b);
+          break;
+        case "price":
+          valA = getPrice(a);
+          valB = getPrice(b);
+          break;
+        case "fee":
+          valA = getFee(a);
+          valB = getFee(b);
+          break;
+        default:
+          return 0;
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  };
+
+  const handleSort = (column) => {
+    setSortOrder(prevOrder => (sortColumn === column && prevOrder === "asc" ? "desc" : "asc"));
+    setSortColumn(column);
+  };
+
   useEffect(() => {
     axios.get(baseURL + "/reports/")
       .then((response) => {
         const data = response.data;
-        const values = Object.values(data); // Convert object to array
+        const values = Object.values(data);
         setInvestments(values);
         setLoading(false);
       })
@@ -63,15 +110,25 @@ const InvestmentTransactions = () => {
             <table>
                 <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Units</th>
-                    <th>Price</th>
-                    <th>Fee</th>
+                    <th onClick={() => handleSort("date")}>
+                      Date {sortColumn === "date" && (sortOrder === "asc" ? "↓" : "↑")}
+                    </th>
+                    <th onClick={() => handleSort("type")}>
+                      Type {sortColumn === "type" && (sortOrder === "asc" ? "↓" : "↑")}
+                    </th>
+                    <th onClick={() => handleSort("units")}>
+                      Units {sortColumn === "units" && (sortOrder === "asc" ? "↓" : "↑")}
+                    </th>
+                    <th onClick={() => handleSort("price")}>
+                      Price {sortColumn === "price" && (sortOrder === "asc" ? "↓" : "↑")}
+                    </th>
+                    <th onClick={() => handleSort("fee")}>
+                      Fee {sortColumn === "fee" && (sortOrder === "asc" ? "↓" : "↑")}
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
-                {investment.transactions.map((transaction, tIndex) => (
+                {sortTransactions(investment.transactions).map((transaction, tIndex) => (
                     <tr key={`transaction-${index}-${tIndex}`}>
                     <td>{getDate(transaction)}</td>
                     <td>{getTransactionType(transaction)}</td>
