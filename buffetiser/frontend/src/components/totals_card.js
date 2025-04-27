@@ -14,7 +14,7 @@ export default function TotalsCard() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/portfolio")
+      .get("http://localhost:8000/portfolio")
       .then((response) => {
         setTotalPortfolioValues(response.data.portfolio_totals);
         setPortfolioHistory(response.data.portfolio_history);

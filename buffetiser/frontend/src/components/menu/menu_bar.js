@@ -6,7 +6,7 @@ import ConfigModal from "./config_modal.js";
 import axios from "axios";
 import "../../index.css";
 
-const baseURL = "http://127.0.0.1:8000";
+const baseURL = "http://localhost:8000";
 
 function MenuBar(constants) {
   const [showNewInvestment, setShowNewInvestment] = useState(false);

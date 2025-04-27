@@ -21,6 +21,3 @@ COPY . /app/
 
 # Expose the Django port (default is 8000)
 EXPOSE 8000
-
-# Run migrations and start the app using Gunicorn
-# CMD ["gunicorn", "buffetiser_api.wsgi:application", "--bind", "0.0.0.0:8000"]

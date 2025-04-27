@@ -12,8 +12,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+print("*"*60)
+print(f"POSTGRES_DB env var: {os.getenv('POSTGRES_DB')}")
+print(f"POSTGRES_USER env var: {os.getenv('POSTGRES_USER')}")
+print(f"POSTGRES_PASSWORD env var: {os.getenv('POSTGRES_PASSWORD')}")
+print(f"POSTGRES_HOST env var: {os.getenv('POSTGRES_HOST')}")
+print(f"POSTGRES_PORT env var: {os.getenv('POSTGRES_PORT')}")
+print(f"DJANGO_DEBUG env var: {os.getenv('DJANGO_DEBUG')}")
+print(f"DEBUG calculated: {os.getenv('DJANGO_DEBUG', '0') == '1'}")
+print("*"*60)
 
 # SECURITY WARNING: don"t run with debug turned on in production!
+DEBUG = os.getenv('DJANGO_DEBUG', '0') == '1'
 DEBUG = True
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -43,34 +53,16 @@ if DEBUG:
 SECRET_KEY = "django-insecure-v93=j4&xk^edz&78gc@vir@y5v4q2egt9y=lbih_nzymamh*uj"
 
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "192.168.1.2"]
+ALLOWED_HOSTS = ["localhost"]
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5000",
-    "http://localhost:5001",
-    "http://localhost:3000",
-    "http://192.168.1.2:81",
-]
-CORS_ALLOW_CREDENTIALS = True
-
-# CORS_ORIGIN_WHITELIST = [
+# CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:5000",
-#     "http://127.0.0.1:5000",
 #     "http://localhost:5001",
-#     "http://127.0.0.1:5001",
 #     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
+#     "http://192.168.1.2:81",
 # ]
-
-# CORS_ALLOW_METHODS = (
-#     "DELETE",
-#     "GET",
-#     "OPTIONS",
-#     "PATCH",
-#     "POST",
-#     "PUT",
-# )
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -125,27 +117,28 @@ WSGI_APPLICATION = "buffetiser_api.wsgi.application"
 
 # Docker
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "BUFFETISER_DB",
-#         "USER": "buffetiser",
-#         "PASSWORD": "password",
-#         "HOST": "db",
-#         "PORT": "5432",  # default PostgreSQL port
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('POSTGRES_DB'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('POSTGRES_HOST'),
+#         'PORT': os.getenv('POSTGRES_PORT'),
 #     }
 # }
 
-# # Local
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "BUFFETISER_17",
+        "NAME": "BUFFETISER_DB",
         "USER": "buffetiser",
         "PASSWORD": "password",
-        "HOST": "127.0.0.1",
+        "HOST": "db",
         "PORT": "5432",  # default PostgreSQL port
     }
 }
+
 
 CACHES = {
     "default": {
@@ -184,7 +177,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -207,6 +199,7 @@ REST_FRAMEWORK = {
 }
 
 from datetime import timedelta
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),

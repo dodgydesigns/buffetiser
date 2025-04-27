@@ -15,7 +15,7 @@ import PurchaseModal from "./purchase_modal.js";
 import SaleModal from "./sale_modal.js";
 import RemoveModal from "./remove_modal.js";
 
-const baseURL = "http://127.0.0.1:8000";
+const baseURL = "http://localhost:8000";
 
 export default function InvestmentSummary(props) {
   

@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/all")
+      .get("http://localhost:8000/all")
       .then((response) => {
         setAllInvestments(response.data.all_investment_data);
       })
@@ -34,7 +34,7 @@ export default function Dashboard() {
       });
 
     axios
-      .get("http://127.0.0.1:8000/constants")
+      .get("http://localhost:8000/constants")
       .then((response) => {
         setConstants(response.data);
       })

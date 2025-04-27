@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./reports.css";
 
-const baseURL = "http://127.0.0.1:8000";
+const baseURL = "http://localhost:8000";
 
 const InvestmentTransactions = () => {
   const [investments, setInvestments] = useState([]);

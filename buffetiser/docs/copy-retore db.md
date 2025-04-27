@@ -59,7 +59,7 @@ apt install vim
 18. 
 
 *************************UPDATE BACKEND AND FRONTEND******************************
-1. Change Django setting to use db instead of 127.0.0.1
+1. Change Django setting to use db instead of lo
 2. Copy buffetiser to mullsysmedia/dev
 3. ssh mullsy@192.168.1.2 -p 2323
 4. cd volume1/dev/buffetiser - get to docker-compose file
