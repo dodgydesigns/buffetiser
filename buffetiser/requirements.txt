@@ -1,6 +1,7 @@
 django
 django-cors-headers
 django-redis
+dj-database-url
 psycopg2-binary
 djangorestframework
 django-rest-swagger
