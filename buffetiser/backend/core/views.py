@@ -105,68 +105,49 @@ class BackupDBView(APIView):
     """ """
 
     def post(self, _):
-        print("*" * 60)
-        print("BackupDBView")
-        print("*" * 60)
-
-        # Database credentials
-        DB_NAME = "buffetiser"
-        DB_USER = "buffetiser"
-        DB_PASSWORD = "password"
-        DB_HOST = "localhost"  # Change if your DB is hosted remotely
-        DB_PORT = "5432"
-        BACKUP_DIR = "~/Downloads/db_bk/"
-
         # Generate backup file name with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        backup_file = f"{BACKUP_DIR}backup_{timestamp}.sql"
+        BACKUP_DIR = "fixtures/"
+        timestamp = datetime.now().strftime("%y-%m-%d")
+        backup_file = f"{BACKUP_DIR}buffetiser_{timestamp}_data.json"
 
-        # Command to dump the database
-        psql_bin = (
-            "export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/16/bin"
-        )
-        dump_cmd = f"pg_dump -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -F c -f {backup_file}"
-        print("*" * 60)
-        print(psql_bin)
-        print(dump_cmd)
-        print("*" * 60)
+        # Command to dump the data
+        dump_cmd = f"python manage.py dumpdata \
+                     --exclude contenttypes \
+                     --exclude auth.permission \
+                     --exclude sessions \
+                     --indent 2 > {backup_file}"
+
         try:
-            subprocess.run(psql_bin, shell=True, check=True)
-            subprocess.run(
-                dump_cmd, shell=True, check=True, env={"PGPASSWORD": DB_PASSWORD}
-            )
+            subprocess.run(dump_cmd, shell=True, check=True)
             print(f"Backup successful: {backup_file}")
         except subprocess.CalledProcessError as e:
             print(f"Error during backup: {e}")
 
         return JsonResponse({}, status=200)
 
-
+# import subprocess
+# import tkinter as tk
+# from tkinter import filedialog, messagebox
 class RestoreDBView(APIView):
     """ """
 
-    def post(self, _):
+    def post(self, _, path):
         print("*" * 60)
-        print("RestoreDBView")
+        print(f"...{path}...")
         print("*" * 60)
+        # Generate backup file name with timestamp
+        BACKUP_DIR = "fixtures/"
 
-    # Database credentials
-    DB_NAME = "your_db_name"
-    DB_USER = "your_db_user"
-    DB_HOST = "localhost"
-    DB_PORT = "5432"
-    BACKUP_FILE = "/path/to/backup/directory/backup_xxxxxx.sql"  # Replace with actual backup filename
+        # Command to dump the data
+        dump_cmd = f"python manage.py loaddata \
+                     fixtures/{path}"
+        try:
+            subprocess.run(dump_cmd, shell=True, check=True)
+            print(f"Backup successful: {path}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error during backup: {e}")
 
-    # Command to restore the database
-    restore_cmd = f"pg_restore -U {DB_USER} -h {DB_HOST} -p {DB_PORT} -d {DB_NAME} -c {BACKUP_FILE}"
-
-    try:
-        subprocess.run(
-            restore_cmd, shell=True, check=True, env={"PGPASSWORD": "your_db_password"}
-        )
-        print(f"Database restored from {BACKUP_FILE}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during restoration: {e}")
+        return JsonResponse({}, status=200)
 
 
 class CronTimeView(APIView):
@@ -259,15 +240,6 @@ class PortfolioTotals(APIView):
     the overall totals for the header and history for the chart.
     """
     # TODO: don't forget reinvestment and dividend payouts
-
-    # from django.db.models.signals import post_save, post_delete
-    # from django.dispatch import receiver
-    # from myapp.models import ExpensiveModel
-    # from django.core.cache import cache
-
-    # @receiver([post_save, post_delete], sender=ExpensiveModel)
-    # def clear_expensive_cache(sender, **kwargs):
-    # cache.delete('expensive_query_result')
     
     def get(self, _):
         cache_key = 'expensive_query_result'
@@ -413,37 +385,18 @@ class ReportsView(APIView):
                 "transactions": all_transactions,
             }
 
-        # Return the report data as JSON
         return JsonResponse(report_dict, status=200)
 
 
 class RemoveView(APIView):
     """
-
+    Hide an Investment from the font end.
     """
 
     def post(self, request):
-        print("*" * 60)
-        print("DELETE")
-        print("*" * 60)
-        # sale_data = request.data
-        # sale_investment = Investment.objects.filter(symbol=sale_data["symbol"]).first()
-
-        # try:
-        #     sale, created = Sale.objects.get_or_create(
-        #         investment=sale_investment,
-        #         units=float(sale_data["units"]),
-        #         price_per_unit=float(sale_data["pricePerUnit"]),
-        #         fee=sale_data["fee"],
-        #         date=fe_string_to_date(sale_data["date"]),
-        #         trade_count=next(trade_counter),
-        #     )
-        #     if created:
-        #         sale.save()
-        # except Exception as e:
-        #     print("*"*60)
-        #     print(e)
-        #     print("*"*60)
+        remove_investment = Investment.objects.get(symbol=request.data["symbol"])
+        remove_investment.visible = False
+        remove_investment.save()
 
         return HttpResponse(HTTPStatus.OK)
 
@@ -466,32 +419,22 @@ class LogoutAndBlacklistRefreshTokenView(APIView):
             return Response({"error": f"An error occurred: {str(e)}"}, status=400)
 
 
-# class DividendPaymentView(APIView):
-#     """
-#     Create a dividend payment entry for an existing Investment.
-#     Reply from the front end will be:
-#         'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
-#     """
-#     def post(self, request):
-#         dividend_data = request.data
-#         dividend_investment = Investment.objects.filter(symbol=dividend_data["symbol"]).first()
-#
-#         try:
-#             dividend, created = DividendPayment.objects.get_or_create(                    
-#                 investment=dividend_investment,
-#                 units=float(dividend_data["units"]),
-#                 price_per_unit=float(dividend_data["pricePerUnit"]),
-#                 fee=dividend_data["fee"],
-#                 date=fe_string_to_date(dividend_data["date"]),
-#                 trade_count=next(trade_counter),
-#             )
-#             if created:
-#                 dividend.save()
-#         except Exception as e:
-#             print("*" * 60)
-#             print(e)
-#             print("*" * 60)
-#         return HttpResponse(HTTPStatus.OK)
+class DividendPaymentView(APIView):
+    """
+    Create a dividend payment entry for an existing Investment.
+    Reply from the front end will be:
+        'symbol', 'currency', 'exchange', 'platform', 'units', 'pricePerUnit', 'fee', 'date'
+    """
+    def post(self, request):
+        dividend_data = request.data
+        dividend_investment = Investment.objects.filter(symbol=dividend_data["symbol"]).first()
+        dividend= DividendPayment.objects.create(                    
+            investment=dividend_investment,
+            value=float(dividend_data["amount"]),
+            payment_date=fe_string_to_date(dividend_data["date"]))
+        dividend.save()
+
+        return HttpResponse(HTTPStatus.OK)
 
 
 class DividendReinvestmentView(APIView):

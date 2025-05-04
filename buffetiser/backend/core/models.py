@@ -2,7 +2,7 @@ from typing import Union
 
 from core.config import Constants
 from django.db.models import (CASCADE, CharField, DateField, FloatField,
-                              ForeignKey, IntegerField, Model)
+                              ForeignKey, IntegerField, Model, BooleanField)
 
 
 def date_to_string(date):
@@ -27,6 +27,7 @@ class Investment(Model):
         null=False,
     )
     live_price = FloatField(default=0)
+    visible = BooleanField(default=True)
 
     @staticmethod
     def generate_key(exchange, symbol):

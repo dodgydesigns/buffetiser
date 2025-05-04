@@ -12,16 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
-
-# print("*"*60)
-# print(f"POSTGRES_DB env var: {os.getenv('POSTGRES_DB')}")
-# print(f"POSTGRES_USER env var: {os.getenv('POSTGRES_USER')}")
-# print(f"POSTGRES_PASSWORD env var: {os.getenv('POSTGRES_PASSWORD')}")
-# print(f"POSTGRES_HOST env var: {os.getenv('POSTGRES_HOST')}")
-# print(f"POSTGRES_PORT env var: {os.getenv('POSTGRES_PORT')}")
-# print(f"DJANGO_DEBUG env var: {os.getenv('DJANGO_DEBUG')}")
-# print(f"DEBUG calculated: {os.getenv('DJANGO_DEBUG', '0') == '1'}")
-# print("*"*60)
+print("*"*60)
+print(f"POSTGRES_DB env var: {os.getenv('POSTGRES_DB')}")
+print(f"POSTGRES_USER env var: {os.getenv('POSTGRES_USER')}")
+print(f"POSTGRES_PASSWORD env var: {os.getenv('POSTGRES_PASSWORD')}")
+print(f"POSTGRES_HOST env var: {os.getenv('POSTGRES_HOST')}")
+print(f"POSTGRES_PORT env var: {os.getenv('POSTGRES_PORT')}")
+print(f"DJANGO_DEBUG env var: {os.getenv('DJANGO_DEBUG')}")
+print(f"DEBUG calculated: {os.getenv('DJANGO_DEBUG', '0') == '1'}")
+print("*"*60)
 
 # SECURITY WARNING: don"t run with debug turned on in production!
 # DEBUG = os.getenv('DJANGO_DEBUG', '0') == '1'
@@ -57,12 +56,12 @@ SECRET_KEY = "django-insecure-v93=j4&xk^edz&78gc@vir@y5v4q2egt9y=lbih_nzymamh*uj
 ALLOWED_HOSTS = ["localhost"]
 
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5000",
-#     "http://localhost:5001",
-#     "http://localhost:3000",
-#     "http://192.168.1.2:81",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5000",
+    "http://localhost:5001",
+    "http://localhost:3000",
+    "http://192.168.1.2:81",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
@@ -135,7 +134,7 @@ DATABASES = {
         "NAME": "BUFFETISER_DB",
         "USER": "buffetiser",
         "PASSWORD": "password",
-        "HOST": "db",
+        "HOST": "localhost",
         "PORT": "5432",  # default PostgreSQL port
     }
 }

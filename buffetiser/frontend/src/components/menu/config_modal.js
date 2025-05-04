@@ -4,7 +4,7 @@ import "./popup_styles.css";
 function ConfigModal({ props, baseURL, onClose }) {
   const [cronTime, setCronTime] = useState();
   const [updateAllSuccess, setUpdateAllSuccess] = useState(false);
-
+  const [restoreFilePath, setRestoreFilePath] = useState();
   /* Close the dialog window */
   const HandleClose = () => {
     onClose();
@@ -55,11 +55,15 @@ function ConfigModal({ props, baseURL, onClose }) {
             <tr>
               <td className="popup_modal_table_label">Restore DB</td>
               <td className="popup_modal_table_input">
-                <button
+              <label for="img"  class="popup_modal_input">Choose File</label>
+              <input 
+                  type="file" 
                   className="popup_modal_button"
-                  onClick={(e) => {
+                  id="img" 
+                  style={{ display: "none" }}
+                  onChange={(e) => {
                     e.stopPropagation();
-                    fetch(baseURL + "/restore_db/", {
+                    fetch((`${baseURL}/restore_db/${e.target.value.replace("C:\\fakepath\\", "")}/`), {
                       method: "POST",
                       headers: {
                         Accept: "application/json",
@@ -67,9 +71,7 @@ function ConfigModal({ props, baseURL, onClose }) {
                       },
                     });
                   }}
-                >
-                  Restore Now
-                </button>
+                />
               </td>
             </tr>
             <tr>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import NewInvestmentModal from "./new_investment_modal.js";
 import NewReinvestmentModal from "./new_reinvestment_modal.js";
+import NewDividendModal from "./new_dividend_modal.js";
 import ConfigModal from "./config_modal.js";
 import axios from "axios";
 import "../../index.css";
@@ -86,9 +87,6 @@ function MenuBar(constants) {
             onClose={() => handleNewInvestmentClose()}
           ></NewInvestmentModal>
         )}
-
-
-
         {showNewReinvestment && (
           <NewReinvestmentModal
             props={constants}
@@ -96,24 +94,13 @@ function MenuBar(constants) {
             onClose={() => handleNewReinvestmentClose()}
           ></NewReinvestmentModal>
         )}
-
-
-
-
         {showNewDividend && (
-          <NewInvestmentModal
+          <NewDividendModal
             props={constants}
-            endpoint={baseURL + "/new_investment/"}
+            endpoint={baseURL + "/add_dividend/"}
             onClose={() => handleNewDividendClose()}
-          ></NewInvestmentModal>
+          ></NewDividendModal>
         )}
-
-
-
-
-
-
-
         Add New
       </span>
       <span

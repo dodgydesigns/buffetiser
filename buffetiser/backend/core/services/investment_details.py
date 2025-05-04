@@ -103,6 +103,7 @@ def get_all_details_for_investment(investment):
     all_details = {
         "name": investment.name,
         "symbol": investment.symbol,
+        "visible": investment.visible,
         "last_price": live_price,
         "variation": live_price - yesterday_price,
         "daily_change": variation.daily_change if variation else 0,

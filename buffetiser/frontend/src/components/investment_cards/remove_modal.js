@@ -8,34 +8,34 @@ import "react-datepicker/dist/react-datepicker.css";
 
 registerLocale('enAU', enAU)
 
-function RemoveModal({ investment, constants, endpoint, onClose }) {
+function RemoveModal({ investment, _, endpoint, onClose }) {
   const [symbol] = useState(investment.symbol);
   const [name] = useState(investment.name);
   const endpoint_string = endpoint;
 
-  const HandleClose = (button) => {
-    if (button === "ok") {
-    }
+  const HandleClose = () => {
     onClose(false);
   };
 
   return (
     <div className="popup_overlay">
-      <div className="popup_modal sale_modal">
+      <div className="popup_modal remove_modal">
         <h2 className="popup_heading">Remove Investment</h2>
         <div>
-          Are you absolutely sure you want to remove <p style={{color: "red"}}>{name} ({symbol})</p> from Buffetiser?
+          Are you sure you want to remove <p>{name} ({symbol})</p> from Buffetiser?
         </div>
         <p>
-          This action CAN NOT be undone. All history associate with {symbol} will be lost.
+          The data for {symbol} will be retained but the investment will not be shown.
+        </p>
+        <p>
+        You will have to modify the Investment in the DB to show it again.
         </p>
         <div>
           <div
-            className="save"
+            className="remove_remove"
             onClick={(e) => {
               e.stopPropagation();
-              // HandleClose("ok", false);
-
+              HandleClose();
               const result = {
                 symbol: symbol,
               };
@@ -53,11 +53,11 @@ function RemoveModal({ investment, constants, endpoint, onClose }) {
           REMOVE
         </div>
         <div
-            className="cancel"
+            className="remove_cancel"
             style={{ marginRight: "3rem" }}
             onClick={(e) => {
               e.stopPropagation();
-              HandleClose("cancel", false);
+              HandleClose();
             }}
           >
             Cancel

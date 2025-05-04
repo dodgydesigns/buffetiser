@@ -10,7 +10,7 @@ import "../index.css";
 function InvestmentCards({ allInvestments, constants }) {
   return (
     <div className="investment_cards_container">
-      {allInvestments.map((item) => InvestmentCard(item, constants))};
+      {allInvestments.map((item) => item.visible && InvestmentCard(item, constants))};
     </div>
   );
 }

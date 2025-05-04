@@ -63,7 +63,7 @@ Menu bar at the top of the page.
 */
 .header {
   height: 4vh;
-  min-height: 2vh;
+  min-height: 1.5vh;
   padding-top: 0.5rem;
   background-color: var(--COLOUR0);
   justify-content: center;
