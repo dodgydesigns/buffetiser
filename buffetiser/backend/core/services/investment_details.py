@@ -255,7 +255,7 @@ def get_total_reinvestment_units_on_date(investment, date):
     reinvestments = DividendReinvestment.objects.filter(investment=investment)
     total_reinvestment_units = 0
     for reinvestment in reinvestments:
-        if date_to_datetime(reinvestment.reinvestment_date) <= date:
+        if date_to_datetime(reinvestment.date) <= date:
             total_reinvestment_units += reinvestment.units
     return total_reinvestment_units
 

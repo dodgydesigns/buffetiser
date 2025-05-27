@@ -33,16 +33,14 @@ class Command(BaseCommand):
             for row in reader_obj:
                 investment = Investment.objects.filter(symbol=row[0]).first()
                 date_elements = row[1].split("/")
-                reinvestment_date = datetime(
-                    int(date_elements[2]), int(date_elements[1]), int(date_elements[0])
-                )
+                date = datetime(int(date_elements[2]), int(date_elements[1]), int(date_elements[0]))
                 # cutoff_date isn't correct but it's too much work to figure out the real cutoff date
                 # as it's not provided in 'statements'. Creating a DividendReinvestment object
                 # when it shows up will be easy as the details are available when it happens.
                 reinvest = DividendReinvestment(
                     investment=investment,
-                    cutoff_date=reinvestment_date,
-                    reinvestment_date=reinvestment_date,
+                    cutoff_date=date,
+                    date=date,
                     units=int(row[2]),
                 )
                 reinvest.save()

@@ -376,7 +376,7 @@ class ReportsView(APIView):
 
             # Combine all and sort by date
             all_transactions = purchases + sales + dividends + reinvestments
-            all_transactions.sort(key=lambda x: x.get("date") or x.get("payment_date") or x.get("reinvestment_date"))
+            all_transactions.sort(key=lambda x: x.get("date") or x.get("date") or x.get("date"))
 
             report_dict[investment.key] = {
                 "key": investment.key,
@@ -431,7 +431,7 @@ class DividendPaymentView(APIView):
         dividend= DividendPayment.objects.create(                    
             investment=dividend_investment,
             value=float(dividend_data["amount"]),
-            payment_date=fe_string_to_date(dividend_data["date"]))
+            date=fe_string_to_date(dividend_data["date"]))
         dividend.save()
 
         return HttpResponse(HTTPStatus.OK)
@@ -450,7 +450,7 @@ class DividendReinvestmentView(APIView):
         reinvestment = DividendReinvestment.objects.create(                    
             investment=reinvestment_investment,
             units=float(reinvestment_data["units"]),
-            reinvestment_date=fe_string_to_date(reinvestment_data["date"]),
+            date=fe_string_to_date(reinvestment_data["date"]),
         )
         reinvestment.save()
         

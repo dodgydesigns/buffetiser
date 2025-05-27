@@ -68,7 +68,7 @@ def add_dividend(investment, reinvest, cutoff_date, reinvestment_date, price_per
                 floor((units_held * price_per_unit) / nearest_value_to_cutoff)
             )
             reinvestment = DividendReinvestment(
-                reinvestment_date=reinvestment_date,
+                date=reinvestment_date,
                 units=reinvestment_units_received,
                 investment=investment,
             )
@@ -77,20 +77,20 @@ def add_dividend(investment, reinvest, cutoff_date, reinvestment_date, price_per
                 reinvestment_units_received * nearest_value_to_cutoff
             )
             dividend_payment = DividendPayment(
-                payment_date=reinvestment_date, value=left_over, investment=investment
+                date=reinvestment_date, value=left_over, investment=investment
             )
             reinvestment.save()
             dividend_payment.save()
         else:
             dividend_payment = DividendPayment(
-                payment_date=reinvestment_date,
+                date=reinvestment_date,
                 value=(units_held * price_per_unit),
                 investment=investment,
             )
             dividend_payment.save()
     else:
         dividend_payment = DividendPayment(
-            payment_date=reinvestment_date,
+            date=reinvestment_date,
             value=(units_held * price_per_unit),
             investment=investment,
         )
