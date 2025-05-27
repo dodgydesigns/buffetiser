@@ -197,21 +197,21 @@ class DividendReinvestment(Model):
     """
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
-    reinvestment_date = DateField()
+    date = DateField()
     units = IntegerField(default=0)
     price_per_unit = FloatField()
 
     def to_json(self):
         return {
             "units": self.units,
-            "reinvestment_date": date_to_string(self.reinvestment_date),
+            "date": date_to_string(self.date),
         }
 
     def __str__(self):
-        return f"{self.investment.symbol}, {self.units} units on {self.reinvestment_date}"
+        return f"{self.investment.symbol}, {self.units} units on {self.date}"
 
     class Meta:
-        unique_together = ("reinvestment_date", "investment")
+        unique_together = ("date", "investment")
 
 
 class DividendPayment(Model):
@@ -221,7 +221,7 @@ class DividendPayment(Model):
     Payment is made up of the cutoff date, payment date and the value of money paid.
     """
 
-    payment_date = DateField()
+    date = DateField()
     value = FloatField()
 
     investment = ForeignKey(to=Investment, on_delete=CASCADE)
@@ -229,14 +229,14 @@ class DividendPayment(Model):
     def to_json(self):
         return {
             "value": self.value,
-            "payment_date": date_to_string(self.payment_date),
+            "date": date_to_string(self.date),
         }
 
     def __str__(self):
         return f"{self.investment.key}"
 
     class Meta:
-        unique_together = ("payment_date", "investment")
+        unique_together = ("date", "investment")
 
 
 class History(Model):
