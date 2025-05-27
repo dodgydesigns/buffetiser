@@ -196,10 +196,10 @@ class DividendReinvestment(Model):
     and the number of shares (Investment.units) obtained.
     """
 
+    investment = ForeignKey(to=Investment, on_delete=CASCADE)
     reinvestment_date = DateField()
     units = IntegerField(default=0)
-
-    investment = ForeignKey(to=Investment, on_delete=CASCADE)
+    price_per_unit = FloatField()
 
     def to_json(self):
         return {
