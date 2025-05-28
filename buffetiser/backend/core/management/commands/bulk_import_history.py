@@ -9,8 +9,9 @@ e.g.             ABC    7/4/2025   1.00   1.10   0.90   1.05
 import csv
 from datetime import datetime
 
-from core.models import History, Investment, Purchase, Sale
 from django.core.management.base import BaseCommand
+
+from core.models import History, Investment, Purchase, Sale
 
 
 class Command(BaseCommand):

@@ -1,8 +1,10 @@
-from core import views
-from core.views import (AllConstantsView, AllInvestmentsDataView, BackupDBView, 
-                        RestoreDBView,ConfigView, CronTimeView, InvestmentViewSet)
 from django.urls import path
 from rest_framework import routers
+
+from core import views
+from core.views import (AllConstantsView, AllInvestmentsDataView, BackupDBView,
+                        ConfigView, CronTimeView, InvestmentViewSet,
+                        RestoreDBView)
 
 router = routers.DefaultRouter()
 router.register(r"investments", InvestmentViewSet)
@@ -24,5 +26,5 @@ urlpatterns += [
     path("remove/", views.RemoveView.as_view()),
     path("reports/", views.ReportsView.as_view()),
     path("add_reinvestment/", views.DividendReinvestmentView.as_view()),
-    path("add_dividend/", views.DividendPaymentView.as_view()),
+    path("add_dividend_payment/", views.DividendPaymentView.as_view()),
 ]

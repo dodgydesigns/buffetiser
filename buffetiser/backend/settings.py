@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+
 print("*"*60)
 print(f"POSTGRES_DB env var: {os.getenv('POSTGRES_DB')}")
 print(f"POSTGRES_USER env var: {os.getenv('POSTGRES_USER')}")

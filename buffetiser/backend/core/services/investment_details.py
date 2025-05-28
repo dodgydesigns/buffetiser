@@ -1,15 +1,11 @@
 import datetime
-import json
 import logging
 
-from asgiref.sync import sync_to_async
-from bs4 import BeautifulSoup
+from django.db.models import Sum
+
 from core.models import (DailyChange, DividendReinvestment, History,
-                         Investment, Purchase)
-from core.services.investment_helpers import (date_to_datetime, date_to_string,
-                                              get_purchase_history,
-                                              get_sale_history)
-from core.services.investment_updaters import update_history
+                         Investment, Purchase, Sale)
+from core.services.investment_helpers import (date_to_datetime, date_to_string,)
 
 logging.basicConfig(
     filename="debug.log",
@@ -19,61 +15,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
-
-@sync_to_async
-def scraper_function_get_daily_change(investment_and_url, response):
-    """
-    This function is passed to the scraper functions that will asynchronously iterate through
-    Investments, pull the data from the Investments URLs and provide the data required below.
-    The results are stored in global so they can be pulled whenever required (this seems wrong).
-
-    To execute: initiate_async_scape(scraper_function_get_daily_change)
-    Does not need to implement a loop of Investments. The async functions do this.
-    """
-    soup = BeautifulSoup(response, "html.parser")
-    symbol = soup.find("td", {"class": "symb-col"}).text
-    daily_change_string = soup.find("td", {"class": "change-col"}).text.replace(
-        "\xa0", ""
-    )
-    daily_change_percent_string = soup.find(
-        "td", {"class": "percent-col"}
-    ).text.replace("%", "")
-
-    daily_change = float(daily_change_string) if daily_change_string != "UNCH" else 0
-    daily_change_percent = (
-        float(daily_change_percent_string) if daily_change_string != "UNCH" else 0
-    )
-
-    daily_change = DailyChange.objects.create(
-        symbol=investment_and_url[symbol]["investment"].symbol,
-        daily_change=daily_change,
-        daily_change_percent=daily_change_percent,
-    )
-
-    daily_change.save()
-
-
-@sync_to_async
-def scraper_function_investment_and_history(investment_and_url, response):
-    """
-    This function is passed to the scraper functions that will asynchronously iterate through
-    Investments, pull the data from the Investments URLs and provide the data required below.
-
-    To execute: initiate_async_scape(scraper_function_investment_and_history)
-    Does not need to implement a loop of Investments. The async functions do this.
-    """
-    soup = BeautifulSoup(response, "html.parser")
-    symbol = soup.find("td", {"class": "symb-col"}).text
-    last_price = soup.find("td", {"class": "last-col"}).text
-    high = soup.find("td", {"class": "high-col"}).text
-    low = soup.find("td", {"class": "low-col"}).text
-    volume = soup.find("td", {"class": "volume-col"}).text
-    investment = investment_and_url[symbol]["investment"]
-    update_history(investment, high, low, last_price, volume)
-
-    investment.live_price = last_price
-    investment.save()
 
 
 def get_all_details_for_investment(investment):
@@ -87,13 +28,9 @@ def get_all_details_for_investment(investment):
     """
     date = datetime.datetime.now()
     live_price = investment.live_price
-    if (
-        History.objects.filter(investment=investment)
-        and len(History.objects.filter(investment=investment).all()) > 0
-    ):
-        yesterday_price = (
-            History.objects.filter(investment=investment).order_by("-id")[1].close
-        )
+    if (History.objects.filter(investment=investment)
+        and len(History.objects.filter(investment=investment).all()) > 0):
+        yesterday_price = (History.objects.filter(investment=investment).order_by("-id")[1].close)
     else:
         yesterday_price = live_price
 
@@ -138,6 +75,40 @@ def get_investment_price_history(investment):
     return price_history
 
 
+def get_purchase_history(investment):
+    """
+    All the purchases that have been made of this Investment.
+    """
+    investment_purchase_history = Purchase.objects.filter(investment=investment).all()
+    purchases = {}
+    for purchase in investment_purchase_history:
+        purchases.setdefault(purchase.date, []).append(
+            {
+                "units": purchase.units,
+                "price_per_unit": purchase.price_per_unit,
+                "total_cost": purchase.units * purchase.price_per_unit,
+            }
+        )
+    return purchases
+
+
+def get_sale_history(investment):
+    """
+    All the sales that have been made of this Investment.
+    """
+    investment_sale_history = Sale.objects.filter(investment=investment).all()
+    sales = {}
+    for sale in investment_sale_history:
+        sales.setdefault(sale.date, []).append(
+            {
+                "units": sale.units,
+                "price_per_unit": sale.price_per_unit,
+                "total_cost": sale.units * sale.price_per_unit,
+            }
+        )
+    return sales
+
+
 def get_credit_debit_history():
     """
     Generates the money put into (purchases) and removed (sales) by date for all Investments.
@@ -171,49 +142,17 @@ def get_total_units_held_on_date(investment, date):
     Get the number of units held of a particular investment on a
     certain date.
     """
-    units_held = 0
-    purchases_dict = get_purchase_history(investment).items()
-    for purchase_date, purchases in purchases_dict:
-        for purchase in purchases:
-            # There can be multiple purchases per day.
-            if date_to_datetime(purchase_date) <= date:
-                units_held += int(purchase["units"])
 
-    reinvestment_units = get_total_reinvestment_units_on_date(investment, date)
-    units_held += reinvestment_units
+    purchases_units = Purchase.objects.filter(investment=investment, 
+                                              date__lte=date).aggregate(total=Sum('units'))['total'] or 0
+    reinvestments_units = DividendReinvestment.objects.filter(investment=investment, 
+                                                              date__lte=date).aggregate(total=Sum('units'))['total'] or 0
+    sales_units = Sale.objects.filter(investment=investment, 
+                                      date__lte=date).aggregate(total=Sum('units'))['total'] or 0
 
-    sales_dict = get_sale_history(investment).items()
-    for sale_date, sales in sales_dict:
-        # There can be multiple sales per day.
-        for sale in sales:
-            if date_to_datetime(sale_date) <= date:
-                units_held -= int(sale["units"])
+    units_held = purchases_units + reinvestments_units - sales_units
 
     return units_held
-
-
-def get_total_cost_on_date(investment, date):
-    """
-    The sum of all purchases of an investment.
-    """
-    purchases = Purchase.objects.filter(investment=investment).all()
-    total_cost = 0
-    for purchase in purchases:
-        if date_to_datetime(purchase.date) <= date:
-            total_cost += purchase.price_per_unit * purchase.units
-    return total_cost
-
-
-def get_total_value_on_date(investment, date):
-    """
-    The current total value of an investment.
-    """
-    total_value_on_date = 0
-    if len(list(History.objects.filter(investment=investment))) >= 1:
-        total_value_on_date = get_total_units_held_on_date(investment, date) * float(
-            list(History.objects.filter(investment=investment))[-1].close
-        )
-    return total_value_on_date
 
 
 def get_average_cost_on_date(investment, date):
@@ -222,11 +161,48 @@ def get_average_cost_on_date(investment, date):
     """
     # We can have zero units held if the Investment is just being watched
     total_cost_on_date = 0
-    if get_total_units_held_on_date(investment, date) > 0:
-        total_cost_on_date = get_total_cost_on_date(
-            investment, date
-        ) / get_total_units_held_on_date(investment, date)
+    total_units_held_on_date = get_total_units_held_on_date(investment, date)
+    if total_units_held_on_date > 0:
+        total_cost_on_date = get_total_cost_on_date(investment, date) / total_units_held_on_date
     return total_cost_on_date
+
+
+def get_total_cost_on_date(investment, date):
+    """
+    The formula for the total cost of an Investment on a certain date as used by the ATO for shares held over 12 months is:
+    Sum of all purchase costs*units, adding re-investment units and subtracting sales*average cost.
+    For shares held less than 12 months, the FIFO (First In First Out) method is used.
+    """
+    purchases = Purchase.objects.filter(investment=investment, date__lte=date).all()
+    purchases_cost = 0
+    purchase_units = 0
+    for purchase in purchases:
+        purchase_units += purchase.units
+        purchases_cost += purchase.price_per_unit * purchase.units
+
+    reinvestment_units = DividendReinvestment.objects.filter(investment=investment, 
+                                                             date__lte=date).aggregate(total=Sum('units'))['total'] or 0
+    sales_units = Sale.objects.filter(investment=investment, 
+                                      date__lte=date).aggregate(total=Sum('units'))['total'] or 0
+    
+    average_purchase_cost = purchases_cost / (purchase_units + reinvestment_units)
+    sales_cost = sales_units * average_purchase_cost
+    cost_of_currently_held = purchases_cost - sales_cost
+
+    return cost_of_currently_held
+
+
+def get_total_value_on_date(investment, date):
+    """
+    The current total value of an investment:
+        The number of units held on a certain date multiplied by the price of the Investment on that date.
+    """
+    total_value_on_date = 0
+    if len(list(History.objects.filter(investment=investment))) >= 1:
+        total_value_on_date = get_total_units_held_on_date(investment, date) * float(
+            list(History.objects.filter(investment=investment))[-1].close
+        )
+    return total_value_on_date
 
 
 def get_profit_total_and_percentage_on_date(investment, date):
@@ -340,16 +316,12 @@ def get_portfolio_totals():
     }
     for investment in Investment.objects.all():
         investment_cost = get_total_cost_on_date(investment, date)
-        investment_profit = get_profit_total_and_percentage_on_date(investment, date)[
-            "total_profit"
-        ]
+        investment_profit = get_profit_total_and_percentage_on_date(investment, date)["total_profit"]
         investment_value = get_total_value_on_date(investment, date)
         portfolio["total_cost"] += investment_cost
         portfolio["total_profit"] += investment_profit
         portfolio["total_value"] += investment_value
 
-    portfolio["total_profit_percentage"] = (
-        (portfolio["total_value"] / portfolio["total_cost"]) - 1
-    ) * 100
+    portfolio["total_profit_percentage"] = ((portfolio["total_value"] / portfolio["total_cost"]) - 1) * 100
 
     return portfolio

@@ -32,7 +32,7 @@ services:
       sh -c "
         ./wait-for-it.sh db:5433 -- python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-05-27_data.json &&
+        # python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-05-27_data.json &&
         # python manage.py createsuperuser --username buffetiser --email dodgydesigns@gmail.com --noinput &&
         python manage.py runserver 0.0.0.0:8000"
     volumes:

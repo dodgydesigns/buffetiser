@@ -5,26 +5,28 @@ from datetime import datetime
 from http import HTTPStatus
 from itertools import count
 from threading import Thread
+
 import schedule
+from django.core.cache import cache
+from django.http import HttpResponse, JsonResponse
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.config import Constants
 from core.models import (Configuration, DailyChange, DividendPayment,
                          DividendReinvestment, Investment, Purchase, Sale)
 from core.serializers import InvestmentSerializer
-from core.services.investment_details import (
-    get_all_details_for_investment, get_portfolio_totals,
-    get_portfolio_value_history, scraper_function_get_daily_change,
-    scraper_function_investment_and_history)
+from core.services.investment_details import (get_all_details_for_investment,
+                                              get_portfolio_totals,
+                                              get_portfolio_value_history)
 from core.services.investment_helpers import (fe_string_to_date,
                                               initiate_async_scrape)
-from django.http import HttpResponse, JsonResponse
-from django.core.cache import cache
-from rest_framework import viewsets
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from core.services.investment_updaters import (
+    scraper_function_get_daily_change, scraper_function_investment_and_history)
 
 # There can be multiple purchases/sales of an Investment in a single day. The records
 # only keep date not time so we need to be able to differentiate.
