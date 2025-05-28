@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from core.views import LogoutAndBlacklistRefreshTokenView  # Import custom logout view
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
+
+from core.views import \
+    LogoutAndBlacklistRefreshTokenView  # Import custom logout view
 
 router = routers.DefaultRouter()
 

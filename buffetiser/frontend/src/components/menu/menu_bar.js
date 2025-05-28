@@ -97,7 +97,7 @@ function MenuBar(constants) {
         {showNewDividend && (
           <NewDividendModal
             props={constants}
-            endpoint={baseURL + "/add_dividend/"}
+            endpoint={baseURL + "/add_dividend_payment/"}
             onClose={() => handleNewDividendClose()}
           ></NewDividendModal>
         )}

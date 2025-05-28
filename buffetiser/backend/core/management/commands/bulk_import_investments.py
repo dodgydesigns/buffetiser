@@ -11,9 +11,10 @@ e.g. 1/11/2022, CB, 11 VAS @ 85.4600 AUD, Vanguard Australian Shares Index ETF, 
 import csv
 from datetime import datetime
 
+from django.core.management.base import BaseCommand
+
 from core.models import Investment, Purchase, Sale
 from core.services.investment_updaters import update_investment_and_history
-from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
