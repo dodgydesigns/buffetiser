@@ -197,11 +197,13 @@ def get_total_value_on_date(investment, date):
     The current total value of an investment:
         The number of units held on a certain date multiplied by the price of the Investment on that date.
     """
-    total_value_on_date = 0
-    if len(list(History.objects.filter(investment=investment))) >= 1:
-        total_value_on_date = get_total_units_held_on_date(investment, date) * float(
-            list(History.objects.filter(investment=investment))[-1].close
-        )
+    # Get the last history entry on or before the date
+    closest_history_object = list(History.objects.filter(investment=investment, date__lte=date))[-1]
+    closest_date = closest_history_object.date
+    closest_units_to_date = get_total_units_held_on_date(investment, closest_date)
+    closest_close_value_to_date = closest_history_object.close
+    total_value_on_date = closest_units_to_date * closest_close_value_to_date
+
     return total_value_on_date
 
 
