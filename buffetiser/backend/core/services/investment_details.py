@@ -1,4 +1,5 @@
 import datetime
+from functools import cache
 import logging
 
 from django.db.models import Sum
@@ -137,6 +138,7 @@ def get_credit_debit_history():
     return credit_debit_history_by_date
 
 
+@cache
 def get_total_units_held_on_date(investment, date):
     """
     Get the number of units held of a particular investment on a
@@ -167,6 +169,7 @@ def get_average_cost_on_date(investment, date):
     return total_cost_on_date
 
 
+@cache
 def get_total_cost_on_date(investment, date):
     """
     The formula for the total cost of an Investment on a certain date as used by the ATO for shares held over 12 months is:
@@ -225,83 +228,40 @@ def get_profit_total_and_percentage_on_date(investment, date):
     }
 
 
-def get_total_reinvestment_units_on_date(investment, date):
-    """
-    If an Investment has received reinvestment units, return the total number of units
-    received.
-    """
-    reinvestments = DividendReinvestment.objects.filter(investment=investment)
-    total_reinvestment_units = 0
-    for reinvestment in reinvestments:
-        if date_to_datetime(reinvestment.date) <= date:
-            total_reinvestment_units += reinvestment.units
-    return total_reinvestment_units
-
-
 def get_portfolio_value_history():
     """
     Get the value of all shares for each date for the whole portfolio.
     """
-    # TODO: List of dividends reinvested ***
+    # Get all unique history dates in order
+    all_histories = History.objects.all().order_by("date").select_related("investment")
+    history_dates = sorted(set(history.date for history in all_histories))
+    if not history_dates:
+        return []
 
-    date = datetime.datetime.now()
-
-    # Remove duplicate history dates
-    history_dates = set()
-    # Declaring this here make the search faster: Python is a
-    # dynamic language, and resolving history_dates.add each iteration is more costly than resolving a local variable.
-    history_dates_add = history_dates.add
-    history_dates = [
-        history.date
-        for history in History.objects.all().order_by("date")
-        if not (history.date in history_dates or history_dates_add(history.date))
-    ]
-    history_start_date = history_dates[0]
-
+    # Cache purchases and sales once
     purchases_dict = {}
     sales_dict = {}
     for investment in Investment.objects.all():
         purchases_dict.update(get_purchase_history(investment))
         sales_dict.update(get_sale_history(investment))
 
-    # Purchase happened before history started: units*price_per_unit #TODO: This could be a separate chart
-    # but doesn't fit in well with the history chart.
-    pre_history_value_on_date = {}
-    # cumulative_value = 0
-    # for purchase_date in sorted(purchases_dict.keys()):
-    #     pre_history_value_on_date[date_to_string(purchase_date)] = 0
-    #     if purchase_date < history_start_date:
-    #         for purchase in purchases_dict[purchase_date]:
-    #             cumulative_value += int(purchase["units"]) * float(purchase["price_per_unit"])
-    #             pre_history_value_on_date[date_to_string(purchase_date)] = cumulative_value
+    # Group histories by (investment, date) for fast lookup
+    history_lookup = {(history.investment.symbol, history.date): history.close for history in all_histories}
 
-    # Purchase happened after history started: unit*close
+    # Compute portfolio value for each date
     history_value_on_date = {}
+    investments = list(Investment.objects.all())  # cache for reuse
     for history_date in history_dates:
-        cumulative_value = 0
-        history_value_on_date[date_to_string(history_date)] = 0
-        close_value = 0
-        for investment in Investment.objects.all():
-            units = get_total_units_held_on_date(
-                investment, date_to_datetime(history_date)
-            )
-            # We can have zero History if we are just watching the Investment
-            if (len(History.objects.filter(investment=investment, date=history_date)) > 0):
-                close_value = (
-                    History.objects.filter(investment=investment, date=history_date)
-                    .first()
-                    .close
-                )
-            cumulative_value += units * close_value
-        history_value_on_date[date_to_string(history_date)] = cumulative_value
+        total_value = 0
+        dt = date_to_datetime(history_date)
+        for investment in investments:
+            units = get_total_units_held_on_date(investment, dt)
+            close = history_lookup.get((investment.symbol, history_date), 0)
+            total_value += units * close
+        history_value_on_date[date_to_string(history_date)] = total_value
 
-    value_history_dict = pre_history_value_on_date
-    value_history_dict.update(history_value_on_date)
-
-    value_history = []
-    for date, total in value_history_dict.items():
-        value_history.append({"date": date, "total": total})
-    return value_history
+    # Format as list of dicts
+    return [{"date": date, "total": total} for date, total in history_value_on_date.items()]
 
 
 def get_portfolio_totals():
