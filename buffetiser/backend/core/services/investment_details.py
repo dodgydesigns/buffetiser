@@ -10,8 +10,7 @@ from core.services.investment_helpers import (date_to_datetime, date_to_string,)
 
 logging.basicConfig(
     filename="debug.log",
-    # format='%(asctime)s %(message)s',
-    format="--------investment_details.py----------%(message)s",
+    format="%(asctime)s--------investment_details.py----------%(message)s",
     filemode="w",
 )
 logger = logging.getLogger()
@@ -52,7 +51,6 @@ def get_all_details_for_investment(investment):
         "profit": profit_total["total_profit"],
         "profit_percent": profit_total["total_profit_percentage"],
         "history": get_investment_price_history(investment),
-        "credit_debit_history": get_credit_debit_history(),
     }
     return all_details
 
@@ -108,34 +106,6 @@ def get_sale_history(investment):
             }
         )
     return sales
-
-
-def get_credit_debit_history():
-    """
-    Generates the money put into (purchases) and removed (sales) by date for all Investments.
-    """
-    investments = Investment.objects.all()
-    purchases = {}
-    sales = {}
-    for investment in investments:
-        purchases.update(get_purchase_history(investment))
-        sales.update(get_sale_history(investment))
-
-    all_transaction_dates = list(set(list(purchases.keys()) + list(sales.keys())))
-    all_transaction_dates.sort(key=lambda date: date)
-
-    credit_debit_history_by_date = []
-    total = 0
-    for date in all_transaction_dates:
-        if date in purchases.keys():
-            for purchase in purchases[date]:
-                total += purchase["total_cost"]
-        if date in sales.keys():
-            for sale in sales[date]:
-                total -= sale["total_cost"]
-        credit_debit_history_by_date.append({"date": date, "total": total})
-
-    return credit_debit_history_by_date
 
 
 @cache

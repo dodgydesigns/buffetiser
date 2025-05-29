@@ -14,11 +14,11 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          {/* Protected Routes */}
-          {/* <Route element={<PrivateRoute />}> */}
+          Protected Routes
+          <Route element={<PrivateRoute />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/reports/" element={<InvestmentTransactions />} />
-          {/* </Route> */}
+          </Route>
         </Routes>
       </Router>
     </AuthProvider>
