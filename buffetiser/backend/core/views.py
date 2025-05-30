@@ -104,7 +104,7 @@ class ConfigView(APIView):
 
 
 class BackupDBView(APIView):
-    """ """
+    """ Create a backup of the database by dumping it to a JSON file in the fixtures directory."""
 
     def post(self, _):
         # Generate backup file name with timestamp
@@ -127,11 +127,9 @@ class BackupDBView(APIView):
 
         return JsonResponse({}, status=200)
 
-# import subprocess
-# import tkinter as tk
-# from tkinter import filedialog, messagebox
+
 class RestoreDBView(APIView):
-    """ """
+    """ Allows the user to restore the database from a backup file contained in the fixtures directory."""
 
     def post(self, _, path):
         print("*" * 60)
