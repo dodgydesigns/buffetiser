@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: BUFFETISER_DB
     ports:
       - "5432:5432"
-    # volumes:
-    #   - ./postgres_backup:/var/lib/postgresql/backup
     networks:
       - network
 
@@ -32,7 +30,7 @@ services:
       sh -c "
         ./wait-for-it.sh db:5432 -- python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-05-01_data.json &&
+        python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-06-05_data.json &&
         # python manage.py createsuperuser --username buffetiser --email dodgydesigns@gmail.com --noinput &&
         python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -68,7 +66,6 @@ services:
     ports:
       - "8080:8080"
     command: ["sh", "-c", "npm install && npm run build"]  # Build the frontend
-    # command: ["sh", "-c", "npm install && npm run build && serve -s build -l 8080"]  # Build the frontend
 
   webserver:
     image: nginx:alpine
@@ -78,7 +75,7 @@ services:
     volumes:
       - ./frontend/build:/usr/share/nginx/html:ro
     ports:
-      - "80:80"
+      - "81:80"
     networks:
       - network
 
