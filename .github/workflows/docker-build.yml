@@ -28,7 +28,7 @@ jobs:
         with:
           context: ./buffetiser/backend
           push: true
-          tags: dodgydesigns/buffetiser-backend:latest
+          tags: mullsy123/buffetiser-backend:latest
           platforms: linux/amd64
 
       - name: Build and Push Frontend Image
@@ -36,5 +36,5 @@ jobs:
         with:
           context: ./buffetiser/frontend
           push: true
-          tags: dodgydesigns/buffetiser-frontend:latest
+          tags: mullsy123/buffetiser-frontend:latest
           platforms: linux/amd64
