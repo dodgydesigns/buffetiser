@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug Secrets (masked)
+        run: echo "Username is ${{ secrets.DOCKERHUB_USERNAME }}"
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
