@@ -57,6 +57,14 @@ def update_all_investments(request):
     initiate_async_scrape(scraper_function_investment_and_history)
     print("Updated all investments prices")
 
+    # Clear the cache to ensure fresh data is served
+    cache_key = 'expensive_query_result'
+    if cache.get(cache_key) is not None:
+        cache.delete(cache_key)
+
+    # Trigger a backup of the database after updating
+    BackupDBView().post(request)
+
     return JsonResponse({}, status=204)
 
 

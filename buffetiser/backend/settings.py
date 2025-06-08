@@ -58,9 +58,7 @@ ALLOWED_HOSTS = ["localhost"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5000",
-    "http://localhost:5001",
-    "http://localhost:3000",
+    "http://localhost:81",
     "http://192.168.1.2:81",
 ]
 CORS_ALLOW_CREDENTIALS = True

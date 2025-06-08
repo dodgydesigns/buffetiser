@@ -62,7 +62,7 @@ body {
 Menu bar at the top of the page.
 */
 .header {
-  height: 4vh;
+  height: 3.8vh;
   min-height: 1.5vh;
   padding-top: 0.5rem;
   background-color: var(--COLOUR0);
@@ -89,7 +89,7 @@ Buttons in the menubar.
 
 /* Each investment card with header, chart and summary. */
 .investment_cards_container {
-  height: 50rem;
+  height: 40rem;
   overflow-y: scroll;
   z-index: 0;
 }

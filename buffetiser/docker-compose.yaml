@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: BUFFETISER_DB
     ports:
       - "5433:5432"
-    volumes:
-      - ./postgres_backup:/var/lib/postgresql/backup
     networks:
       - network
 
@@ -27,12 +25,11 @@ services:
     build:
       context: ./backend
     container_name: buffetiser_backend
-    # command: ./entrypoint.sh
     command: >
       sh -c "
         ./wait-for-it.sh db:5433 -- python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-05-29_data.json &&
+        python manage.py loaddata --exclude=auth.permission --exclude=contenttypes fixtures/buffetiser_25-06-06_data.json &&
         # python manage.py createsuperuser --username buffetiser --email dodgydesigns@gmail.com --noinput &&
         python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -51,7 +48,6 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
       - REDIS_URL=redis://redis:6379
-
     networks:
       - network
 
@@ -70,6 +66,16 @@ services:
     command: ["sh", "-c", "npm install && npm run build"]  # Build the frontend
     # command: ["sh", "-c", "npm install && npm run build && serve -s build -l 8080"]  # Build the frontend
 
+  # backend:
+  #   image: mullsy123/buffetiser-backend:latest
+  #   container_name: buffetiser_backend
+  #   restart: always
+
+  # frontend:
+  #   image: mullsy123/buffetiser-frontend:latest
+  #   container_name: buffetiser_frontend
+  #   restart: always
+
   webserver:
     image: nginx:alpine
     container_name: buffetiser_webserver
@@ -78,9 +84,17 @@ services:
     volumes:
       - ./frontend/build:/usr/share/nginx/html:ro
     ports:
-      - "80:80"
+      - "81:80"
     networks:
       - network
+
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   restart: always
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --cleanup --interval 300
 
 networks:
   network:
