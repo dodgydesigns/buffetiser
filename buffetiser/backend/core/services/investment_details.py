@@ -241,10 +241,10 @@ def get_portfolio_totals():
     date = datetime.datetime.now()
 
     portfolio = {
-        "total_cost": 0,
-        "total_profit": 0,
-        "total_profit_percentage": 0,
-        "total_value": 0,
+        "total_cost": 0.0,
+        "total_profit": 0.0,
+        "total_profit_percentage": 0.0,
+        "total_value": 0.0,
     }
     for investment in Investment.objects.all():
         investment_cost = get_total_cost_on_date(investment, date)

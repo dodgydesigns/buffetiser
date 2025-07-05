@@ -100,14 +100,6 @@ class Investment(Model):
         return total_fees
 
     @property
-    def daily_gain(self) -> float:
-        """
-        The profit or loss for current day.
-        """
-        # Use history
-        pass
-
-    @property
     def total_profit(self) -> float:
         """
         The current value of all units held minus all costs.

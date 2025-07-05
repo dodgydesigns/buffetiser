@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import { PureComponent } from "react";
 import {
   LineChart,
   Line,
@@ -68,5 +68,3 @@ export default class InvestmentCharts extends PureComponent {
     );
   }
 }
-
-// portfolio_in_out

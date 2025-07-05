@@ -105,10 +105,10 @@ class ConfigView(APIView):
     """Nothing to be done here at this point."""
 
     def get(self, _):
-        return JsonResponse(status=200)
+        return JsonResponse({}, status=200)
 
     def post(self, _):
-        return JsonResponse(status=200)
+        return JsonResponse({}, status=200)
 
 
 class BackupDBView(APIView):
@@ -167,14 +167,11 @@ class CronTimeView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.countdown = CountdownTask()
+        self.config: Configuration = Configuration.objects.all().first() or Configuration()
 
     def get(self, _):
-        if len(Configuration.objects.all()) == 0:
-            config = Configuration()
-            config.save()
-
         return JsonResponse(
-            {"cron_time": Configuration.objects.all().first().update_time}, status=200
+            {"cron_time": self.config.update_time}, status=200
         )
 
     def post(self, response):
@@ -182,15 +179,15 @@ class CronTimeView(APIView):
         Sets a daily schedule to update the prices for all investments. In case the scheduled time is changed,
         the schedule is cleared and restarted with the new run time.
         """
-        config = Configuration.objects.all().first()
-        config.update_time = response.data
-        config.save()
+
+        self.config.update_time = response.data
+        self.config.save()
 
         if self.countdown.running():
             self.countdown.terminate()
         self.countdown.setup(
-            Configuration.objects.all().first().update_time,
-            Configuration.objects.all().first().update_time_zone,
+            self.config.update_time,
+            self.config.update_time_zone,
         )
         countdown_thread = Thread(target=self.countdown.run)
         countdown_thread.setDaemon(True)
@@ -284,18 +281,20 @@ class NewInvestmentView(APIView):
                     name=new_investment_data["name"],
                     symbol=new_investment_data["symbol"],
                 )
-                new_investment.live_price = get_all_details_for_investment(
-                    new_investment
-                )["last_price"]
-                new_investment.live_price
+                new_investment.live_price = get_all_details_for_investment(new_investment)["last_price"]
+                new_investment.save()
 
                 purchase, created = Purchase.objects.get_or_create(
                     investment=new_investment,
                     units=0,
-                    price_per_unit=new_investment.live_price[0],
+                    price_per_unit=new_investment.live_price,
                     fee=0,
-                    date=datetime.datetime.now(),
+                    date=datetime.now(),
                     trade_count=next(trade_counter),
+                    currency = new_investment_data["currency"],
+                    exchange = new_investment_data["exchange"],
+                    platform = new_investment_data["platform"],
+                    visible = True,
                 )
                 if created:
                     purchase.save()
@@ -384,7 +383,7 @@ class ReportsView(APIView):
 
             # Combine all and sort by date
             all_transactions = purchases + sales + dividends + reinvestments
-            all_transactions.sort(key=lambda x: x.get("date") or x.get("date") or x.get("date"))
+            all_transactions.sort(key=lambda x: x.get("date") or "")
 
             report_dict[investment.key] = {
                 "key": investment.key,
